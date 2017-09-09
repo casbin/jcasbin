@@ -51,6 +51,7 @@ public class DefaultRoleManager implements RoleManager {
      * aka role: name1 inherits role: name2.
      * domain is a prefix to the roles.
      */
+    @Override
     public void addLink(String name1, String name2, String... domain) {
     }
 
@@ -59,6 +60,7 @@ public class DefaultRoleManager implements RoleManager {
      * aka role: name1 does not inherit role: name2 any more.
      * domain is a prefix to the roles.
      */
+    @Override
     public void deleteLink(String name1, String name2, String... domain) {
     }
 
@@ -66,6 +68,7 @@ public class DefaultRoleManager implements RoleManager {
      * hasLink determines whether role: name1 inherits role: name2.
      * domain is a prefix to the roles.
      */
+    @Override
     public boolean hasLink(String name1, String name2, String... domain) {
         return true;
     }
@@ -74,6 +77,7 @@ public class DefaultRoleManager implements RoleManager {
      * getRoles gets the roles that a subject inherits.
      * domain is a prefix to the roles.
      */
+    @Override
     public List<String> getRoles(String name, String... domain) {
         return null;
     }
@@ -81,6 +85,7 @@ public class DefaultRoleManager implements RoleManager {
     /**
      * getUsers gets the users that inherits a subject.
      */
+    @Override
     public List<String> getUsers(String name) {
         return null;
     }
@@ -88,6 +93,7 @@ public class DefaultRoleManager implements RoleManager {
     /**
      * printRoles prints all the roles to log.
      */
+    @Override
     public void printRoles() {
     }
 }

@@ -37,12 +37,14 @@ public class FileAdapter implements Adapter {
     /**
      * loadPolicy loads all policy rules from the storage.
      */
+    @Override
     public void loadPolicy(Model model) {
     }
 
     /**
      * savePolicy saves all policy rules to the storage.
      */
+    @Override
     public void savePolicy(Model model) {
     }
 
@@ -56,18 +58,21 @@ public class FileAdapter implements Adapter {
     /**
      * addPolicy adds a policy rule to the storage.
      */
+    @Override
     public void addPolicy(String sec, String ptype, List<String> rule) {
     }
 
     /**
      * removePolicy removes a policy rule from the storage.
      */
+    @Override
     public void removePolicy(String sec, String ptype, List<String> rule) {
     }
 
     /**
      * removeFilteredPolicy removes policy rules that match the filter from the storage.
      */
+    @Override
     public void removeFilteredPolicy(String sec, String ptype, int fieldIndex, String... fieldValues) {
     }
 }

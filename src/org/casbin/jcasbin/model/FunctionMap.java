@@ -24,7 +24,7 @@ public class FunctionMap {
     /**
      * Method represents a function that is used in the matchers, used to get attributes in ABAC.
      */
-    private Map<String, Method> functionMap;
+    private Map<String, Method> fm;
 
     /**
      * addFunction adds an expression function.
@@ -35,7 +35,7 @@ public class FunctionMap {
     /**
      * loadFunctionMap loads an initial function map.
      */
-    public Map<String, Method> loadFunctionMap() {
+    public static Map<String, Method> loadFunctionMap() {
         return null;
     }
 }

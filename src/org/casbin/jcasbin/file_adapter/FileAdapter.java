@@ -15,20 +15,22 @@
 package org.casbin.jcasbin.file_adapter;
 
 import org.casbin.jcasbin.model.Model;
+import org.casbin.jcasbin.persist.Adapter;
 
 import java.lang.reflect.Method;
 import java.util.List;
 
 /**
- * Adapter is the interface for Casbin adapters.
+ * FileAdapter is the file adapter for Casbin.
+ * It can load policy from file or save policy to file.
  */
-public class Adapter {
+public class FileAdapter implements Adapter {
     private String filePath;
 
     /**
-     * Adapter is the constructor for Adapter.
+     * FileAdapter is the constructor for FileAdapter.
      */
-    public Adapter(String filePath) {
+    public FileAdapter(String filePath) {
         this.filePath = filePath;
     }
 

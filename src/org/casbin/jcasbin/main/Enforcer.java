@@ -21,6 +21,7 @@ import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.rbac.RoleManagerConstructor;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -177,5 +178,127 @@ public class Enforcer {
      */
     public boolean enforce(String... rvals) {
         return true;
+    }
+
+    /**
+     * getAllSubjects gets the list of subjects that show up in the current policy.
+     */
+    public List<String> getAllSubjects() {
+        return null;
+    }
+
+    /**
+     * getAllObjects gets the list of objects that show up in the current policy.
+     */
+    public List<String> getAllObjects() {
+        return null;
+    }
+
+    /**
+     * getAllActions gets the list of actions that show up in the current policy.
+     */
+    public List<String> getAllActions() {
+        return null;
+    }
+
+    /**
+     * getAllRoles gets the list of roles that show up in the current policy.
+     */
+    public List<String> getAllRoles() {
+        return null;
+    }
+
+    /**
+     * getPolicy gets all the authorization rules in the policy.
+     */
+    public List<List<String>> getPolicy() {
+        return null;
+    }
+
+    /**
+     * getFilteredPolicy gets all the authorization rules in the policy, field filters can be specified.
+     */
+    public List<List<String>> getFilteredPolicy() {
+        return null;
+    }
+
+    /**
+     * getGroupingPolicy gets all the role inheritance rules in the policy.
+     */
+    public List<List<String>> getGroupingPolicy() {
+        return null;
+    }
+
+    /**
+     * getFilteredGroupingPolicy gets all the role inheritance rules in the policy, field filters can be specified.
+     */
+    public List<List<String>> getFilteredGroupingPolicy() {
+        return null;
+    }
+
+    /**
+     * hasPolicy determines whether an authorization rule exists.
+     */
+    public boolean hasPolicy(List<String> policy) {
+        return true;
+    }
+
+    /**
+     * addPolicy adds an authorization rule to the current policy.
+     * If the rule already exists, the function returns false and the rule will not be added.
+     * Otherwise the function returns true by adding the new rule.
+     */
+    public boolean addPolicy(List<String> policy) {
+        return true;
+    }
+
+    /**
+     * removePolicy removes an authorization rule from the current policy.
+     */
+    public boolean removePolicy(List<String> policy) {
+        return true;
+    }
+
+    /**
+     * removeFilteredPolicy removes an authorization rule from the current policy, field filters can be specified.
+     */
+    public boolean removeFilteredPolicy(int fieldIndex, String fieldValues) {
+        return true;
+    }
+
+    /**
+     * hasGroupingPolicy determines whether a role inheritance rule exists.
+     */
+    public boolean hasGroupingPolicy(List<String> policy) {
+        return true;
+    }
+
+    /**
+     * addGroupingPolicy adds a role inheritance rule to the current policy.
+     * If the rule already exists, the function returns false and the rule will not be added.
+     * Otherwise the function returns true by adding the new rule.
+     */
+    public boolean addGroupingPolicy(List<String> policy) {
+        return true;
+    }
+
+    /**
+     * removeGroupingPolicy removes a role inheritance rule from the current policy.
+     */
+    public boolean removeGroupingPolicy(List<String> policy) {
+        return true;
+    }
+
+    /**
+     * removeFilteredGroupingPolicy removes a role inheritance rule from the current policy, field filters can be specified.
+     */
+    public boolean removeFilteredGroupingPolicy(int fieldIndex, String fieldValues) {
+        return true;
+    }
+
+    /**
+     * addFunction adds a customized function.
+     */
+    public void addFunction(String name, Method function) {
     }
 }

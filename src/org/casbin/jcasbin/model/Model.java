@@ -14,7 +14,7 @@
 
 package org.casbin.jcasbin.model;
 
-import org.casbin.jcasbin.api.ConfigInterface;
+import org.casbin.jcasbin.config.ConfigInterface;
 
 import java.util.List;
 import java.util.Map;

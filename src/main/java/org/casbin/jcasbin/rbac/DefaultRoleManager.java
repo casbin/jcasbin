@@ -34,7 +34,7 @@ public class DefaultRoleManager implements RoleManager {
      * default RoleManager implementation.
      */
     public DefaultRoleManager(int level) {
-        this.allRoles = new HashMap<>();
+        this.allRoles = new HashMap<String, Role>();
         this.level = level;
     }
 

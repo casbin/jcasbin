@@ -12,112 +12,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 package org.casbin.jcasbin.rbac;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-/**
- * RoleManager provides interface to define the operations for managing roles.
- */
-public class RoleManager {
-    private Map<String, Role> allRoles;
-    private int level;
-
+public interface RoleManager {
     /**
-     * RoleManager is the constructor for creating an instance of the
-     * default RoleManager implementation.
-     */
-    public RoleManager(int level) {
-        this.allRoles = new HashMap<>();
-        this.level = level;
-    }
-
-    private boolean hasRole(String name) {
-        return true;
-    }
-
-    private Role createRole(String name) {
-        return null;
-    }
-
-    /**
-     * addLink adds the inheritance link between role: name1 and role: name2.
-     * aka role: name1 inherits role: name2.
+     * addLink adds the inheritance link between two roles. role: name1 and role: name2.
      * domain is a prefix to the roles.
      */
-    public void addLink(String name1, String name2, String... domain) {
-    }
+    public void addLink(String name1, String name2, String... domain);
 
     /**
-     * deleteLink deletes the inheritance link between role: name1 and role: name2.
-     * aka role: name1 does not inherit role: name2 any more.
+     * deleteLink deletes the inheritance link between two roles. role: name1 and role: name2.
      * domain is a prefix to the roles.
      */
-    public void deleteLink(String name1, String name2, String... domain) {
-    }
+    public void deleteLink(String name1, String name2, String... domain);
 
     /**
-     * hasLink determines whether role: name1 inherits role: name2.
+     * hasLink determines whether a link exists between two roles. role: name1 inherits role: name2.
      * domain is a prefix to the roles.
      */
-    public boolean hasLink(String name1, String name2, String... domain) {
-        return true;
-    }
+    public boolean hasLink(String name1, String name2, String... domain);
 
     /**
-     * getRoles gets the roles that a subject inherits.
+     * getRoles gets the roles that a user inherits.
      * domain is a prefix to the roles.
      */
-    public List<String> getRoles(String name, String... domain) {
-        return null;
-    }
+    public List<String> getRoles(String name, String... domain);
 
     /**
-     * getUsers gets the users that inherits a subject.
+     * getUsers gets the users that inherits a role.
      */
-    public List<String> getUsers(String name) {
-        return null;
-    }
+    public List<String> getUsers(String name);
 
     /**
      * printRoles prints all the roles to log.
      */
-    public void printRoles() {
-    }
-}
-
-/**
- * Role represents the data structure for a role in RBAC.
- */
-class Role {
-    private String name;
-    private List<Role> roles;
-
-    protected Role(String name) {
-        this.name = name;
-    }
-
-    protected void addRole(Role role) {
-    }
-
-    protected void deleteRole(Role role) {
-    }
-
-    protected boolean hasRole(String name, int level) {
-        return true;
-    }
-
-    protected boolean hasDirectRole(String name) {
-        return true;
-    }
-
-    public String toString() {
-        return "";
-    }
-
-    protected List<String> getRoles() {
-        return null;
-    }
+    public void printRoles();
 }

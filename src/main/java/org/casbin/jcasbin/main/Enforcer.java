@@ -37,6 +37,7 @@ public class Enforcer {
 
     boolean enabled;
     boolean autoSave;
+    boolean autoBuildRoleLinks;
 
     /**
      * Enforcer initializes an enforcer with a model file and a policy file.
@@ -46,8 +47,7 @@ public class Enforcer {
 
         this.adapter = new FileAdapter(policyFile);
 
-        this.enabled = true;
-        this.autoSave = true;
+        this.initialize();
 
         if (!this.modelPath.equals("")) {
             loadModel();
@@ -63,8 +63,7 @@ public class Enforcer {
 
         this.adapter = adapter;
 
-        this.enabled = true;
-        this.autoSave = true;
+        this.initialize();
 
         if (!this.modelPath.equals("")) {
             loadModel();
@@ -83,12 +82,17 @@ public class Enforcer {
         this.model.printModel();
         this.fm = FunctionMap.loadFunctionMap();
 
-        this.enabled = true;
-        this.autoSave = true;
+        this.initialize();
 
         if (this.adapter != null) {
             loadPolicy();
         }
+    }
+
+    private void initialize() {
+        this.enabled = true;
+        this.autoSave = true;
+        this.autoBuildRoleLinks = true;
     }
 
     /**

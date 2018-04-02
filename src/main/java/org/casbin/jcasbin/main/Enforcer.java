@@ -98,8 +98,21 @@ public class Enforcer {
     /**
      * newModel creates a model.
      */
-    public Model newModel(String... text) {
-        return null;
+    private Model newModel() {
+        Model model = new Model();
+
+        return model;
+    }
+
+    /**
+     * newModel creates a model.
+     */
+    private Model newModel(String text) {
+        Model model = new Model();
+
+        model.loadModelFromText(text);
+
+        return model;
     }
 
     /**
@@ -107,36 +120,43 @@ public class Enforcer {
      * Because the policy is attached to a model, so the policy is invalidated and needs to be reloaded by calling LoadPolicy().
      */
     public void loadModel() {
+        this.model = newModel();
+        this.model.loadModel(this.modelPath);
+        this.model.printModel();
+        this.fm = FunctionMap.loadFunctionMap();
     }
 
     /**
      * getModel gets the current model.
      */
     public Model getModel() {
-        return null;
+        return this.model;
     }
 
     /**
      * setModel sets the current model.
      */
     public void setModel(Model model) {
+        this.model = model;
+        this.fm = FunctionMap.loadFunctionMap();
     }
 
     /**
      * getAdapter gets the current adapter.
      */
     public Adapter getAdapter() {
-        return null;
+        return this.adapter;
     }
 
     /**
      * setAdapter sets the current adapter.
      */
     public void setAdapter(Adapter adapter) {
+        this.adapter = adapter;
     }
 
     /**
-     * setRoleManager sets the constructor function for creating a RoleManager.
+     * SetRoleManager sets the current role manager.
      */
     public void setRoleManager(RoleManagerConstructor rmc) {
     }
@@ -145,24 +165,34 @@ public class Enforcer {
      * clearPolicy clears all policy.
      */
     public void clearPolicy() {
+        this.model.clearPolicy();
     }
 
     /**
      * loadPolicy reloads the policy from file/database.
      */
     public void loadPolicy() {
+        this.model.clearPolicy();
+        this.adapter.loadPolicy(this.model);
+
+        this.model.printPolicy();
+        if (this.autoBuildRoleLinks) {
+            this.buildRoleLinks();
+        }
     }
 
     /**
      * savePolicy saves the current policy (usually after changed with Casbin API) back to file/database.
      */
     public void savePolicy() {
+        this.adapter.savePolicy(this.model);
     }
 
     /**
      * enableEnforce changes the enforcing state of Casbin, when Casbin is disabled, all access will be allowed by the Enforce() function.
      */
     public void enableEnforce(boolean enable) {
+        this.enabled = enable;
     }
 
     /**
@@ -175,6 +205,13 @@ public class Enforcer {
      * enableAutoSave controls whether to save a policy rule automatically to the adapter when it is added or removed.
      */
     public void enableAutoSave(boolean autoSave) {
+        this.autoSave = autoSave;
+    }
+
+    /**
+     * buildRoleLinks manually rebuild the role inheritance relations.
+     */
+    public void buildRoleLinks() {
     }
 
     /**

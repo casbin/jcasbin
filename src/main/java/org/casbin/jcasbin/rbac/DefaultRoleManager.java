@@ -25,10 +25,6 @@ public class DefaultRoleManager implements RoleManager {
     private Map<String, Role> allRoles;
     private int level;
 
-    public RoleManager Constructor() {
-        return new DefaultRoleManager(10);
-    }
-
     /**
      * DefaultRoleManager is the constructor for creating an instance of the
      * default RoleManager implementation.
@@ -44,6 +40,9 @@ public class DefaultRoleManager implements RoleManager {
 
     private Role createRole(String name) {
         return null;
+    }
+
+    public void clear() {
     }
 
     /**

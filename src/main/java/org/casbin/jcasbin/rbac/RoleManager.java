@@ -19,6 +19,11 @@ import java.util.List;
 
 public interface RoleManager {
     /**
+     * Clear clears all stored data and resets the role manager to the initial state.
+     */
+    public void clear();
+
+    /**
      * addLink adds the inheritance link between two roles. role: name1 and role: name2.
      * domain is a prefix to the roles.
      */

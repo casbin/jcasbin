@@ -18,7 +18,8 @@ import org.casbin.jcasbin.file_adapter.FileAdapter;
 import org.casbin.jcasbin.model.FunctionMap;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
-import org.casbin.jcasbin.rbac.RoleManagerConstructor;
+import org.casbin.jcasbin.rbac.DefaultRoleManager;
+import org.casbin.jcasbin.rbac.RoleManager;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -31,9 +32,9 @@ public class Enforcer {
     String modelPath;
     Model model;
     Map<String, Method> fm;
-    RoleManagerConstructor rmc;
 
     Adapter adapter;
+    RoleManager rm;
 
     boolean enabled;
     boolean autoSave;
@@ -90,6 +91,8 @@ public class Enforcer {
     }
 
     private void initialize() {
+        this.rm = new DefaultRoleManager(10);
+
         this.enabled = true;
         this.autoSave = true;
         this.autoBuildRoleLinks = true;
@@ -158,7 +161,8 @@ public class Enforcer {
     /**
      * SetRoleManager sets the current role manager.
      */
-    public void setRoleManager(RoleManagerConstructor rmc) {
+    public void setRoleManager(RoleManager rm) {
+        this.rm = rm;
     }
 
     /**

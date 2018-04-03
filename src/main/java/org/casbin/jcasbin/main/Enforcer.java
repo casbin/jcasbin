@@ -213,9 +213,19 @@ public class Enforcer {
     }
 
     /**
-     * buildRoleLinks manually rebuild the role inheritance relations.
+     * enableAutoBuildRoleLinks controls whether to save a policy rule automatically to the adapter when it is added or removed.
+     */
+    public void enableAutoBuildRoleLinks(boolean autoBuildRoleLinks) {
+        this.autoBuildRoleLinks = autoBuildRoleLinks;
+    }
+
+    /**
+     * buildRoleLinks manually rebuild the
+     * role inheritance relations.
      */
     public void buildRoleLinks() {
+        this.rm.clear();
+        this.model.buildRoleLinks(this.rm);
     }
 
     /**
@@ -229,63 +239,171 @@ public class Enforcer {
      * getAllSubjects gets the list of subjects that show up in the current policy.
      */
     public List<String> getAllSubjects() {
-        return null;
+        return this.getAllNamedSubjects("p");
+    }
+
+    /**
+     * GetAllNamedSubjects gets the list of subjects that show up in the current named policy.
+     */
+    public List<String> getAllNamedSubjects(String ptype) {
+        return this.model.getValuesForFieldInPolicy("p", ptype, 0);
     }
 
     /**
      * getAllObjects gets the list of objects that show up in the current policy.
      */
     public List<String> getAllObjects() {
-        return null;
+        return this.getAllNamedObjects("p");
+    }
+
+    /**
+     * getAllNamedObjects gets the list of objects that show up in the current named policy.
+     */
+    public List<String> getAllNamedObjects(String ptype) {
+        return this.model.getValuesForFieldInPolicy("p", ptype, 1);
     }
 
     /**
      * getAllActions gets the list of actions that show up in the current policy.
      */
     public List<String> getAllActions() {
-        return null;
+        return this.getAllNamedActions("p");
+    }
+
+    /**
+     * GetAllNamedActions gets the list of actions that show up in the current named policy.
+     */
+    public List<String> getAllNamedActions(String ptype) {
+        return this.model.getValuesForFieldInPolicy("p", ptype, 2);
     }
 
     /**
      * getAllRoles gets the list of roles that show up in the current policy.
      */
     public List<String> getAllRoles() {
-        return null;
+        return this.getAllNamedRoles("g");
+    }
+
+    /**
+     * getAllNamedRoles gets the list of roles that show up in the current named policy.
+     */
+    public List<String> getAllNamedRoles(String ptype) {
+        return this.model.getValuesForFieldInPolicy("g", ptype, 1);
     }
 
     /**
      * getPolicy gets all the authorization rules in the policy.
      */
     public List<List<String>> getPolicy() {
-        return null;
+        return this.getNamedPolicy("p");
     }
 
     /**
      * getFilteredPolicy gets all the authorization rules in the policy, field filters can be specified.
      */
-    public List<List<String>> getFilteredPolicy() {
-        return null;
+    public List<List<String>> getFilteredPolicy(int fieldIndex, String... fieldValues) {
+        return this.getFilteredNamedPolicy("p", fieldIndex, fieldValues);
+    }
+
+    /**
+     * getNamedPolicy gets all the authorization rules in the named policy.
+     */
+    public List<List<String>> getNamedPolicy(String ptype) {
+        return this.model.getPolicy("p", ptype);
+    }
+
+    /**
+     * getFilteredNamedPolicy gets all the authorization rules in the named policy, field filters can be specified.
+     */
+    public List<List<String>> getFilteredNamedPolicy(String ptype, int fieldIndex, String... fieldValues) {
+        return this.model.getFilteredPolicy("p", ptype, fieldIndex, fieldValues);
     }
 
     /**
      * getGroupingPolicy gets all the role inheritance rules in the policy.
      */
     public List<List<String>> getGroupingPolicy() {
-        return null;
+        return this.getNamedGroupingPolicy("g");
     }
 
     /**
      * getFilteredGroupingPolicy gets all the role inheritance rules in the policy, field filters can be specified.
      */
-    public List<List<String>> getFilteredGroupingPolicy() {
-        return null;
+    public List<List<String>> getFilteredGroupingPolicy(int fieldIndex, String... fieldValues) {
+        return this.getFilteredNamedGroupingPolicy("g", fieldIndex, fieldValues);
+    }
+
+    /**
+     * getNamedGroupingPolicy gets all the role inheritance rules in the policy.
+     */
+    public List<List<String>> getNamedGroupingPolicy(String ptype) {
+        return this.model.getPolicy("g", ptype);
+    }
+
+    /**
+     * getFilteredNamedGroupingPolicy gets all the role inheritance rules in the policy, field filters can be specified.
+     */
+    public List<List<String>> getFilteredNamedGroupingPolicy(String ptype, int fieldIndex, String... fieldValues) {
+        return this.model.getFilteredPolicy("g", ptype, fieldIndex, fieldValues);
     }
 
     /**
      * hasPolicy determines whether an authorization rule exists.
      */
-    public boolean hasPolicy(List<String> policy) {
-        return true;
+    public boolean hasPolicy(List<String> params) {
+        return this.hasNamedPolicy("p", params);
+    }
+
+    /**
+     * hasNamedPolicy determines whether a named authorization rule exists.
+     */
+    public boolean hasNamedPolicy(String ptype, List<String> params) {
+        return this.model.hasPolicy("p", ptype, params);
+    }
+
+    /**
+     * addPolicy adds a rule to the current policy.
+     */
+    private boolean addPolicy(String sec, String ptype, List<String> rule) {
+        boolean ruleAdded = this.model.addPolicy(sec, ptype, rule);
+
+        if (ruleAdded) {
+            if (this.adapter != null && this.autoSave) {
+                this.adapter.addPolicy(sec, ptype, rule);
+            }
+        }
+
+        return ruleAdded;
+    }
+
+    /**
+     * removePolicy removes a rule from the current policy.
+     */
+    private boolean removePolicy(String sec, String ptype, List<String> rule) {
+        boolean ruleRemoved = this.model.removePolicy(sec, ptype, rule);
+
+        if (ruleRemoved) {
+            if (this.adapter != null && this.autoSave) {
+                this.adapter.removePolicy(sec, ptype, rule);
+            }
+        }
+
+        return ruleRemoved;
+    }
+
+    /**
+     * removeFilteredPolicy removes rules based on field filters from the current policy.
+     */
+    private boolean removeFilteredPolicy(String sec, String ptype, int fieldIndex, String... fieldValues) {
+        boolean ruleRemoved = this.model.removeFilteredPolicy(sec, ptype, fieldIndex, fieldValues);
+
+        if (ruleRemoved) {
+            if (this.adapter != null && this.autoSave) {
+                this.adapter.removeFilteredPolicy(sec, ptype, fieldIndex, fieldValues);
+            }
+        }
+
+        return ruleRemoved;
     }
 
     /**
@@ -293,29 +411,59 @@ public class Enforcer {
      * If the rule already exists, the function returns false and the rule will not be added.
      * Otherwise the function returns true by adding the new rule.
      */
-    public boolean addPolicy(List<String> policy) {
-        return true;
+    public boolean addPolicy(List<String> params) {
+        return this.addNamedPolicy("p", params);
+    }
+
+    /**
+     * AddNamedPolicy adds an authorization rule to the current named policy.
+     * If the rule already exists, the function returns false and the rule will not be added.
+     * Otherwise the function returns true by adding the new rule.
+     */
+    public boolean addNamedPolicy(String ptype, List<String> params) {
+        return this.addPolicy("p", ptype, params);
     }
 
     /**
      * removePolicy removes an authorization rule from the current policy.
      */
-    public boolean removePolicy(List<String> policy) {
-        return true;
+    public boolean removePolicy(List<String> params) {
+        return this.removeNamedPolicy("p", params);
     }
 
     /**
      * removeFilteredPolicy removes an authorization rule from the current policy, field filters can be specified.
      */
-    public boolean removeFilteredPolicy(int fieldIndex, String fieldValues) {
-        return true;
+    public boolean removeFilteredPolicy(int fieldIndex, String... fieldValues) {
+        return this.removeFilteredNamedPolicy("p", fieldIndex, fieldValues);
+    }
+
+    /**
+     * removeNamedPolicy removes an authorization rule from the current named policy.
+     */
+    public boolean removeNamedPolicy(String ptype, List<String> params) {
+        return this.removePolicy("p", ptype, params);
+    }
+
+    /**
+     * removeFilteredNamedPolicy removes an authorization rule from the current named policy, field filters can be specified.
+     */
+    public boolean removeFilteredNamedPolicy(String ptype, int fieldIndex, String... fieldValues) {
+        return this.removeFilteredPolicy("p", ptype, fieldIndex, fieldValues);
     }
 
     /**
      * hasGroupingPolicy determines whether a role inheritance rule exists.
      */
-    public boolean hasGroupingPolicy(List<String> policy) {
-        return true;
+    public boolean hasGroupingPolicy(List<String> params) {
+        return this.hasNamedGroupingPolicy("g", params);
+    }
+
+    /**
+     * hasNamedGroupingPolicy determines whether a named role inheritance rule exists.
+     */
+    public boolean hasNamedGroupingPolicy(String ptype, List<String> params) {
+        return this.model.hasPolicy("g", ptype, params);
     }
 
     /**
@@ -323,27 +471,65 @@ public class Enforcer {
      * If the rule already exists, the function returns false and the rule will not be added.
      * Otherwise the function returns true by adding the new rule.
      */
-    public boolean addGroupingPolicy(List<String> policy) {
-        return true;
+    public boolean addGroupingPolicy(List<String> params) {
+        return this.addNamedGroupingPolicy("g", params);
+    }
+
+    /**
+     * addNamedGroupingPolicy adds a named role inheritance rule to the current policy.
+     * If the rule already exists, the function returns false and the rule will not be added.
+     * Otherwise the function returns true by adding the new rule.
+     */
+    public boolean addNamedGroupingPolicy(String ptype, List<String> params) {
+        boolean ruleAdded = this.addPolicy("g", ptype, params);
+
+        if (this.autoBuildRoleLinks) {
+            this.buildRoleLinks();
+        }
+        return ruleAdded;
     }
 
     /**
      * removeGroupingPolicy removes a role inheritance rule from the current policy.
      */
-    public boolean removeGroupingPolicy(List<String> policy) {
-        return true;
+    public boolean removeGroupingPolicy(List<String> params) {
+        return this.removeNamedGroupingPolicy("g", params);
     }
 
     /**
      * removeFilteredGroupingPolicy removes a role inheritance rule from the current policy, field filters can be specified.
      */
-    public boolean removeFilteredGroupingPolicy(int fieldIndex, String fieldValues) {
-        return true;
+    public boolean removeFilteredGroupingPolicy(int fieldIndex, String... fieldValues) {
+        return this.removeFilteredNamedGroupingPolicy("g", fieldIndex, fieldValues);
+    }
+
+    /**
+     * removeNamedGroupingPolicy removes a role inheritance rule from the current named policy.
+     */
+    public boolean removeNamedGroupingPolicy(String ptype, List<String> params) {
+        boolean ruleRemoved = this.removePolicy("g", ptype, params);
+
+        if (this.autoBuildRoleLinks) {
+            this.buildRoleLinks();
+        }
+        return ruleRemoved;
+    }
+
+    /**
+     * removeFilteredNamedGroupingPolicy removes a role inheritance rule from the current named policy, field filters can be specified.
+     */
+    public boolean removeFilteredNamedGroupingPolicy(String ptype, int fieldIndex, String... fieldValues) {
+        boolean ruleRemoved = this.removeFilteredPolicy("g", ptype, fieldIndex, fieldValues);
+
+        if (this.autoBuildRoleLinks) {
+            this.buildRoleLinks();
+        }
+        return ruleRemoved;
     }
 
     /**
      * addFunction adds a customized function.
      */
-    public void addFunction(String name, Method function) {
+    public void addFunction(String ptype, Method function) {
     }
 }

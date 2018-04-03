@@ -15,6 +15,7 @@
 package org.casbin.jcasbin.model;
 
 import org.casbin.jcasbin.config.ConfigInterface;
+import org.casbin.jcasbin.rbac.RoleManager;
 
 import java.util.List;
 import java.util.Map;
@@ -65,7 +66,7 @@ public class Model {
     /**
      * buildRoleLinks initializes the roles in RBAC.
      */
-    public void buildRoleLinks() {
+    public void buildRoleLinks(RoleManager rm) {
     }
 
     /**

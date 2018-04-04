@@ -27,10 +27,10 @@ public class Assertion {
     public String key;
     public String value;
     public String[] tokens;
-    private List<List<String>> policy;
+    public List<List<String>> policy;
     private RoleManager rm;
 
-    protected void buildRoleLinks(RoleManager rm) throws Exception {
+    protected void buildRoleLinks(RoleManager rm) {
         this.rm = rm;
         int count = 0;
         for (int i = 0; i < this.value.length(); i ++) {
@@ -40,10 +40,10 @@ public class Assertion {
         }
         for (List<String> rule : this.policy) {
             if (count < 2) {
-                throw new Exception("the number of \"_\" in role definition should be at least 2");
+                throw new Error("the number of \"_\" in role definition should be at least 2");
             }
             if (rule.size() < count) {
-                throw new Exception("grouping policy elements do not meet role definition");
+                throw new Error("grouping policy elements do not meet role definition");
             }
 
             if (count == 2) {

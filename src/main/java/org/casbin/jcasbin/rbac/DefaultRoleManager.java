@@ -14,35 +14,40 @@
 
 package org.casbin.jcasbin.rbac;
 
+import org.casbin.jcasbin.util.Util;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * DefaultRoleManager provides interface to define the operations for managing roles.
- */
 public class DefaultRoleManager implements RoleManager {
     private Map<String, Role> allRoles;
-    private int level;
+    private int maxHierarchyLevel;
 
     /**
      * DefaultRoleManager is the constructor for creating an instance of the
      * default RoleManager implementation.
      */
-    public DefaultRoleManager(int level) {
-        this.allRoles = new HashMap<String, Role>();
-        this.level = level;
+    public DefaultRoleManager(int maxHierarchyLevel) {
+        this.allRoles = new HashMap<>();
+        this.maxHierarchyLevel = maxHierarchyLevel;
     }
 
     private boolean hasRole(String name) {
-        return true;
+        return allRoles.containsKey(name);
     }
 
     private Role createRole(String name) {
-        return null;
+        return allRoles.getOrDefault(name, new Role(name));
     }
 
+    /**
+     * clear clears all stored data and resets the role manager to the initial state.
+     */
+    @Override
     public void clear() {
+        allRoles.clear();
     }
 
     /**
@@ -52,6 +57,16 @@ public class DefaultRoleManager implements RoleManager {
      */
     @Override
     public void addLink(String name1, String name2, String... domain) {
+        if (domain.length == 1) {
+            name1 = domain[0] + "::" + name1;
+            name2 = domain[0] + "::" + name2;
+        } else if (domain.length > 1) {
+            throw new Error("error: domain should be 1 parameter");
+        }
+
+        Role role1 = createRole(name1);
+        Role role2 = createRole(name2);
+        role1.addRole(role2);
     }
 
     /**
@@ -61,6 +76,20 @@ public class DefaultRoleManager implements RoleManager {
      */
     @Override
     public void deleteLink(String name1, String name2, String... domain) {
+        if (domain.length == 1) {
+            name1 = domain[0] + "::" + name1;
+            name2 = domain[0] + "::" + name2;
+        } else if (domain.length > 1) {
+            throw new Error("error: domain should be 1 parameter");
+        }
+
+        if (!hasRole(name1) || !hasRole(name2)) {
+            throw new Error("error: name1 or name2 does not exist");
+        }
+
+        Role role1 = createRole(name1);
+        Role role2 = createRole(name2);
+        role1.deleteRole(role2);
     }
 
     /**
@@ -69,7 +98,23 @@ public class DefaultRoleManager implements RoleManager {
      */
     @Override
     public boolean hasLink(String name1, String name2, String... domain) {
-        return true;
+        if (domain.length == 1) {
+            name1 = domain[0] + "::" + name1;
+            name2 = domain[0] + "::" + name2;
+        } else if (domain.length > 1) {
+            throw new Error("error: domain should be 1 parameter");
+        }
+
+        if (name1.equals(name2)) {
+            return true;
+        }
+
+        if (!hasRole(name1) || !hasRole(name2)) {
+            return false;
+        }
+
+        Role role1 = createRole(name1);
+        return role1.hasRole(name2, maxHierarchyLevel);
     }
 
     /**
@@ -78,15 +123,42 @@ public class DefaultRoleManager implements RoleManager {
      */
     @Override
     public List<String> getRoles(String name, String... domain) {
-        return null;
+        if (domain.length == 1) {
+            name = domain[0] + "::" + name;
+        } else if (domain.length > 1) {
+            throw new Error("error: domain should be 1 parameter");
+        }
+
+        if (!hasRole(name)) {
+            throw new Error("error: name does not exist");
+        }
+
+        List<String> roles = createRole(name).getRoles();
+        if (domain.length == 1) {
+            for (int i = 0; i < roles.size(); i ++) {
+                roles.set(i, roles.get(i).substring(domain[0].length() + 2, roles.get(i).length()));
+            }
+        }
+        return roles;
     }
 
     /**
      * getUsers gets the users that inherits a subject.
+     * domain is an unreferenced parameter here, may be used in other implementations.
      */
     @Override
     public List<String> getUsers(String name) {
-        return null;
+        if (!hasRole(name)) {
+            throw new Error("error: name does not exist");
+        }
+
+        List<String> names = new ArrayList<>();
+        for (Role role : allRoles.values()) {
+            if (role.hasDirectRole(name)) {
+                names.add(role.name);
+            }
+        }
+        return names;
     }
 
     /**
@@ -94,6 +166,9 @@ public class DefaultRoleManager implements RoleManager {
      */
     @Override
     public void printRoles() {
+        for (Role role : allRoles.values()) {
+            Util.logPrint(role.toString());
+        }
     }
 }
 
@@ -101,7 +176,7 @@ public class DefaultRoleManager implements RoleManager {
  * Role represents the data structure for a role in RBAC.
  */
 class Role {
-    private String name;
+    public String name;
     private List<Role> roles;
 
     protected Role(String name) {
@@ -109,24 +184,68 @@ class Role {
     }
 
     protected void addRole(Role role) {
+        for (Role r : roles) {
+            if (r.name.equals(role.name)) {
+                return;
+            }
+        }
+
+        roles.add(role);
     }
 
     protected void deleteRole(Role role) {
+        for (Role r : roles) {
+            if (r.name.equals(role.name)) {
+                roles.remove(r);
+            }
+        }
     }
 
-    protected boolean hasRole(String name, int level) {
-        return true;
+    protected boolean hasRole(String name, int hierarchyLevel) {
+        if (this.name.equals(name)) {
+            return true;
+        }
+
+        if (hierarchyLevel <= 0) {
+            return false;
+        }
+
+        for (Role role : roles) {
+            if (role.hasRole(name, hierarchyLevel - 1)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected boolean hasDirectRole(String name) {
-        return true;
+        for (Role r : roles) {
+            if (r.name.equals(name)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public String toString() {
-        return "";
+        StringBuilder names = new StringBuilder();
+        for (int i = 0; i < roles.size(); i ++) {
+            Role role = roles.get(i);
+            if (i == 0) {
+                names.append(role.name);
+            } else {
+                names.append(", " + role.name);
+            }
+        }
+        return name + " < " + names;
     }
 
     protected List<String> getRoles() {
-        return null;
+        List<String> names = new ArrayList<>();
+        for (Role r : roles) {
+            names.add(r.name);
+        }
+        return names;
     }
 }

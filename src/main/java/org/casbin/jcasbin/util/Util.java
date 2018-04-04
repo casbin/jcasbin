@@ -82,4 +82,11 @@ public class Util {
     public static boolean arrayRemoveDuplicates(List<String> s) {
         return true;
     }
+
+    /**
+     * arrayToString gets a printable string for a string array.
+     */
+    public static String arrayToString(List<String> s) {
+        return String.join(", ", s);
+    }
 }

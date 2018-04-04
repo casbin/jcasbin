@@ -14,11 +14,15 @@
 
 package org.casbin.jcasbin.persist.file_adapter;
 
+import org.casbin.jcasbin.model.Assertion;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
+import org.casbin.jcasbin.persist.Helper;
+import org.casbin.jcasbin.util.Util;
 
-import java.lang.reflect.Method;
+import java.io.*;
 import java.util.List;
+import java.util.Map;
 
 /**
  * FileAdapter is the file adapter for Casbin.
@@ -39,6 +43,11 @@ public class FileAdapter implements Adapter {
      */
     @Override
     public void loadPolicy(Model model) {
+        if (filePath.equals("")) {
+            throw new Error("invalid file path, file path cannot be empty");
+        }
+
+        loadPolicyFile(model, Helper::loadPolicyLine);
     }
 
     /**
@@ -46,13 +55,72 @@ public class FileAdapter implements Adapter {
      */
     @Override
     public void savePolicy(Model model) {
+        if (filePath.equals("")) {
+            throw new Error("invalid file path, file path cannot be empty");
+        }
+
+        StringBuilder tmp = new StringBuilder();
+
+        for (Map.Entry<String, Assertion> entry : model.model.get("p").entrySet()) {
+            String ptype = entry.getKey();
+            Assertion ast = entry.getValue();
+
+            for (List<String> rule : ast.policy) {
+                tmp.append(ptype + ", ");
+                tmp.append(Util.arrayToString(rule));
+                tmp.append("\n");
+            }
+        }
+
+        for (Map.Entry<String, Assertion> entry : model.model.get("g").entrySet()) {
+            String ptype = entry.getKey();
+            Assertion ast = entry.getValue();
+
+            for (List<String> rule : ast.policy) {
+                tmp.append(ptype + ", ");
+                tmp.append(Util.arrayToString(rule));
+                tmp.append("\n");
+            }
+        }
+
+        savePolicyFile(tmp.toString().trim());
     }
 
 
-    private void loadPolicyFile(Model model, Method handler) {
+    private void loadPolicyFile(Model model, Helper.loadPolicyLineHandler<String, Model> handler) {
+        FileInputStream fis;
+        try {
+            fis = new FileInputStream(filePath);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            throw new Error("policy file not found");
+        }
+        BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+
+        String line;
+        try {
+            while((line = br.readLine()) != null)
+            {
+                handler.accept(line, model);
+            }
+
+            fis.close();
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new Error("IO error occurred");
+        }
     }
 
     private void savePolicyFile(String text) {
+        try {
+            FileOutputStream fos = new FileOutputStream(filePath);
+            fos.write(text.getBytes());
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new Error("IO error occurred");
+        }
     }
 
     /**
@@ -60,6 +128,7 @@ public class FileAdapter implements Adapter {
      */
     @Override
     public void addPolicy(String sec, String ptype, List<String> rule) {
+        throw new Error("not implemented");
     }
 
     /**
@@ -67,6 +136,7 @@ public class FileAdapter implements Adapter {
      */
     @Override
     public void removePolicy(String sec, String ptype, List<String> rule) {
+        throw new Error("not implemented");
     }
 
     /**
@@ -74,5 +144,6 @@ public class FileAdapter implements Adapter {
      */
     @Override
     public void removeFilteredPolicy(String sec, String ptype, int fieldIndex, String... fieldValues) {
+        throw new Error("not implemented");
     }
 }

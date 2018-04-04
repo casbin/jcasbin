@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Policy {
-    Map<String, Map<String, Assertion>> model;
+    public Map<String, Map<String, Assertion>> model;
 
     /**
      * buildRoleLinks initializes the roles in RBAC.

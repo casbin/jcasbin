@@ -14,9 +14,11 @@
 
 package org.casbin.jcasbin.model;
 
-import org.casbin.jcasbin.config.ConfigInterface;
+import org.casbin.jcasbin.config.Config;
 import org.casbin.jcasbin.rbac.RoleManager;
+import org.casbin.jcasbin.util.Util;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,43 +26,110 @@ import java.util.Map;
  * Model represents the whole access control model.
  */
 public class Model {
-    Map<String, Map<String, Assertion>> Model;
-    Map<String, String> sectionNameMap;
+    Map<String, Map<String, Assertion>> model;
 
-    private boolean loadAssertion(ConfigInterface cfg, String sec, String key) {
-        return true;
+    static Map<String, String> sectionNameMap;
+
+    static {
+        sectionNameMap = new HashMap<>();
+        sectionNameMap.put("r", "request_definition");
+        sectionNameMap.put("p", "policy_definition");
+        sectionNameMap.put("g", "role_definition");
+        sectionNameMap.put("e", "policy_effect");
+        sectionNameMap.put("m", "matchers");
+    }
+
+    private boolean loadAssertion(Model model, Config cfg, String sec, String key) {
+        String value = cfg.getString(sectionNameMap.get(sec) + "::" + key);
+        return model.addDef(sec, key, value);
     }
 
     /**
      * addDef adds an assertion to the model.
      */
     public boolean addDef(String sec, String key, String value) {
+        Assertion ast = new Assertion();
+        ast.key = key;
+        ast.value = value;
+
+        if (ast.value.equals("")) {
+            return false;
+        }
+
+        if (sec.equals("r") || sec.equals("p")) {
+            ast.tokens = ast.value.split(", ");
+            for (int i = 0; i < ast.tokens.length; i ++) {
+                ast.tokens[i] = key + "_" + ast.tokens[i];
+            }
+        } else {
+            ast.value = Util.removeComments(Util.escapeAssertion(ast.value));
+        }
+
+        if (!model.containsKey(sec)) {
+            model.put(sec, new HashMap<String, Assertion>());
+        }
+
+        model.get(sec).put(key, ast);
         return true;
     }
 
     private String getKeySuffix(int i) {
-        return "";
+        if (i == 1) {
+            return "";
+        }
+
+        return Integer.toString(i);
     }
 
-    private void loadSection(ConfigInterface cfg, String sec) {
+    private void loadSection(Model model, Config cfg, String sec) {
+        int i = 1;
+        while (true) {
+            if (!loadAssertion(model, cfg, sec, sec + getKeySuffix(i))) {
+                break;
+            } else {
+                i ++;
+            }
+        }
     }
 
     /**
      * loadModel loads the model from model CONF file.
      */
     public void loadModel(String path) {
+        Config cfg = Config.newConfig(path);
+
+        loadSection(this, cfg, "r");
+        loadSection(this, cfg, "p");
+        loadSection(this, cfg, "e");
+        loadSection(this, cfg, "m");
+
+        loadSection(this, cfg, "g");
     }
 
     /**
      * loadModelFromText loads the model from the text.
      */
     public void loadModelFromText(String text) {
+        Config cfg = Config.newConfigFromText(text);
+
+        loadSection(this, cfg, "r");
+        loadSection(this, cfg, "p");
+        loadSection(this, cfg, "e");
+        loadSection(this, cfg, "m");
+
+        loadSection(this, cfg, "g");
     }
 
     /**
      * printModel prints the model to the log.
      */
     public void printModel() {
+        Util.logPrint("Model:");
+        for (Map.Entry<String, Map<String, Assertion>> entry : this.model.entrySet()) {
+            for (Map.Entry<String, Assertion> entry2 : entry.getValue().entrySet()) {
+                Util.logPrintf("%s.%s: %s", entry.getKey(), entry2.getKey(), entry2.getValue().value);
+            }
+        }
     }
 
     /**

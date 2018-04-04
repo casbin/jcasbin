@@ -24,9 +24,9 @@ import java.util.List;
  * For example: r = sub, obj, act
  */
 public class Assertion {
-    private String key;
-    private String value;
-    private List<String> tokens;
+    public String key;
+    public String value;
+    public String[] tokens;
     private List<List<String>> policy;
     private RoleManager rm;
 

@@ -14,8 +14,11 @@
 
 package org.casbin.jcasbin.model;
 
+import org.casbin.jcasbin.util.BuiltInFunctions;
+
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 /**
  * FunctionMap represents the collection of Function.
@@ -24,18 +27,23 @@ public class FunctionMap {
     /**
      * Method represents a function that is used in the matchers, used to get attributes in ABAC.
      */
-    private Map<String, Method> fm;
+    private Map<String, BiFunction<String, String, Boolean>> fm;
 
     /**
      * addFunction adds an expression function.
      */
-    public void addFunction(String name, Method function) {
+    public void addFunction(String name, BiFunction<String, String, Boolean> function) {
+        fm.put(name, function);
     }
 
     /**
      * loadFunctionMap loads an initial function map.
      */
-    public static Map<String, Method> loadFunctionMap() {
-        return null;
+    public static FunctionMap loadFunctionMap() {
+        // Map<String, Method> fm = new HashMap<>();
+
+        FunctionMap fm = new FunctionMap();
+
+        return fm;
     }
 }

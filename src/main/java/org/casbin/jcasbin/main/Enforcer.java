@@ -14,7 +14,7 @@
 
 package org.casbin.jcasbin.main;
 
-import org.casbin.jcasbin.file_adapter.FileAdapter;
+import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
 import org.casbin.jcasbin.model.FunctionMap;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;

@@ -15,6 +15,7 @@
 package org.casbin.jcasbin.model;
 
 import org.casbin.jcasbin.rbac.RoleManager;
+import org.casbin.jcasbin.util.Util;
 
 import java.util.List;
 
@@ -27,8 +28,34 @@ public class Assertion {
     private String value;
     private List<String> tokens;
     private List<List<String>> policy;
-    private RoleManager roleManager;
+    private RoleManager rm;
 
-    protected void buildRoleLinks() {
+    protected void buildRoleLinks(RoleManager rm) throws Exception {
+        this.rm = rm;
+        int count = 0;
+        for (int i = 0; i < this.value.length(); i ++) {
+            if (this.value.charAt(i) == '_') {
+                count ++;
+            }
+        }
+        for (List<String> rule : this.policy) {
+            if (count < 2) {
+                throw new Exception("the number of \"_\" in role definition should be at least 2");
+            }
+            if (rule.size() < count) {
+                throw new Exception("grouping policy elements do not meet role definition");
+            }
+
+            if (count == 2) {
+                this.rm.addLink(rule.get(0), rule.get(1));
+            } else if (count == 3) {
+                this.rm.addLink(rule.get(0), rule.get(1), rule.get(2));
+            } else if (count == 4) {
+                this.rm.addLink(rule.get(0), rule.get(1), rule.get(2), rule.get(3));
+            }
+        }
+
+        Util.logPrint("Role links for: " + this.key);
+        this.rm.printRoles();
     }
 }

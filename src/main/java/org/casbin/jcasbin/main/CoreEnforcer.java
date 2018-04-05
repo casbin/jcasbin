@@ -36,12 +36,12 @@ public class CoreEnforcer {
     private Map<String, Method> fm;
     private Effector eft;
 
-    protected Adapter adapter;
+    Adapter adapter;
     private RoleManager rm;
 
     private boolean enabled;
-    protected boolean autoSave;
-    protected boolean autoBuildRoleLinks;
+    boolean autoSave;
+    boolean autoBuildRoleLinks;
 
     /**
      * CoreEnforcer is the default constructor.

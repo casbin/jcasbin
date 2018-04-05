@@ -17,7 +17,7 @@ package org.casbin.jcasbin.main;
 import java.lang.reflect.Method;
 import java.util.List;
 
-public class ManagementEnforcer extends CoreEnforcer {
+public class ManagementEnforcer extends InternalEnforcer {
     /**
      * getAllSubjects gets the list of subjects that show up in the current policy.
      */
@@ -142,51 +142,6 @@ public class ManagementEnforcer extends CoreEnforcer {
      */
     public boolean hasNamedPolicy(String ptype, List<String> params) {
         return this.model.hasPolicy("p", ptype, params);
-    }
-
-    /**
-     * addPolicy adds a rule to the current policy.
-     */
-    private boolean addPolicy(String sec, String ptype, List<String> rule) {
-        boolean ruleAdded = this.model.addPolicy(sec, ptype, rule);
-
-        if (ruleAdded) {
-            if (this.adapter != null && this.autoSave) {
-                this.adapter.addPolicy(sec, ptype, rule);
-            }
-        }
-
-        return ruleAdded;
-    }
-
-    /**
-     * removePolicy removes a rule from the current policy.
-     */
-    private boolean removePolicy(String sec, String ptype, List<String> rule) {
-        boolean ruleRemoved = this.model.removePolicy(sec, ptype, rule);
-
-        if (ruleRemoved) {
-            if (this.adapter != null && this.autoSave) {
-                this.adapter.removePolicy(sec, ptype, rule);
-            }
-        }
-
-        return ruleRemoved;
-    }
-
-    /**
-     * removeFilteredPolicy removes rules based on field filters from the current policy.
-     */
-    private boolean removeFilteredPolicy(String sec, String ptype, int fieldIndex, String... fieldValues) {
-        boolean ruleRemoved = this.model.removeFilteredPolicy(sec, ptype, fieldIndex, fieldValues);
-
-        if (ruleRemoved) {
-            if (this.adapter != null && this.autoSave) {
-                this.adapter.removeFilteredPolicy(sec, ptype, fieldIndex, fieldValues);
-            }
-        }
-
-        return ruleRemoved;
     }
 
     /**

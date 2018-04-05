@@ -21,11 +21,11 @@ class InternalEnforcer extends CoreEnforcer {
      * addPolicy adds a rule to the current policy.
      */
     boolean addPolicy(String sec, String ptype, List<String> rule) {
-        boolean ruleAdded = this.model.addPolicy(sec, ptype, rule);
+        boolean ruleAdded = model.addPolicy(sec, ptype, rule);
 
         if (ruleAdded) {
-            if (this.adapter != null && this.autoSave) {
-                this.adapter.addPolicy(sec, ptype, rule);
+            if (adapter != null && autoSave) {
+                adapter.addPolicy(sec, ptype, rule);
             }
             if (watcher != null) {
                 watcher.update();
@@ -39,11 +39,11 @@ class InternalEnforcer extends CoreEnforcer {
      * removePolicy removes a rule from the current policy.
      */
     boolean removePolicy(String sec, String ptype, List<String> rule) {
-        boolean ruleRemoved = this.model.removePolicy(sec, ptype, rule);
+        boolean ruleRemoved = model.removePolicy(sec, ptype, rule);
 
         if (ruleRemoved) {
-            if (this.adapter != null && this.autoSave) {
-                this.adapter.removePolicy(sec, ptype, rule);
+            if (adapter != null && autoSave) {
+                adapter.removePolicy(sec, ptype, rule);
             }
             if (watcher != null) {
                 watcher.update();
@@ -57,11 +57,11 @@ class InternalEnforcer extends CoreEnforcer {
      * removeFilteredPolicy removes rules based on field filters from the current policy.
      */
     boolean removeFilteredPolicy(String sec, String ptype, int fieldIndex, String... fieldValues) {
-        boolean ruleRemoved = this.model.removeFilteredPolicy(sec, ptype, fieldIndex, fieldValues);
+        boolean ruleRemoved = model.removeFilteredPolicy(sec, ptype, fieldIndex, fieldValues);
 
         if (ruleRemoved) {
-            if (this.adapter != null && this.autoSave) {
-                this.adapter.removeFilteredPolicy(sec, ptype, fieldIndex, fieldValues);
+            if (adapter != null && autoSave) {
+                adapter.removeFilteredPolicy(sec, ptype, fieldIndex, fieldValues);
             }
             if (watcher != null) {
                 watcher.update();

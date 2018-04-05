@@ -57,9 +57,9 @@ public class CoreEnforcer {
     public CoreEnforcer(String modelPath, String policyFile) {
         this.modelPath = modelPath;
 
-        this.adapter = new FileAdapter(policyFile);
+        adapter = new FileAdapter(policyFile);
 
-        this.initialize();
+        initialize();
 
         if (!this.modelPath.equals("")) {
             loadModel();
@@ -75,7 +75,7 @@ public class CoreEnforcer {
 
         this.adapter = adapter;
 
-        this.initialize();
+        initialize();
 
         if (!this.modelPath.equals("")) {
             loadModel();
@@ -87,14 +87,14 @@ public class CoreEnforcer {
      * CoreEnforcer initializes an enforcer with a model and a database adapter.
      */
     public CoreEnforcer(Model m, Adapter adapter) {
-        this.modelPath = "";
+        modelPath = "";
         this.adapter = adapter;
 
-        this.model = m;
-        this.model.printModel();
-        this.fm = FunctionMap.loadFunctionMap();
+        model = m;
+        model.printModel();
+        fm = FunctionMap.loadFunctionMap();
 
-        this.initialize();
+        initialize();
 
         if (this.adapter != null) {
             loadPolicy();
@@ -102,13 +102,13 @@ public class CoreEnforcer {
     }
 
     private void initialize() {
-        this.rm = new DefaultRoleManager(10);
-        this.eft = new DefaultEffector();
-        this.watcher = null;
+        rm = new DefaultRoleManager(10);
+        eft = new DefaultEffector();
+        watcher = null;
 
-        this.enabled = true;
-        this.autoSave = true;
-        this.autoBuildRoleLinks = true;
+        enabled = true;
+        autoSave = true;
+        autoBuildRoleLinks = true;
     }
 
     /**
@@ -136,17 +136,17 @@ public class CoreEnforcer {
      * Because the policy is attached to a model, so the policy is invalidated and needs to be reloaded by calling LoadPolicy().
      */
     public void loadModel() {
-        this.model = newModel();
-        this.model.loadModel(this.modelPath);
-        this.model.printModel();
-        this.fm = FunctionMap.loadFunctionMap();
+        model = newModel();
+        model.loadModel(this.modelPath);
+        model.printModel();
+        fm = FunctionMap.loadFunctionMap();
     }
 
     /**
      * getModel gets the current model.
      */
     public Model getModel() {
-        return this.model;
+        return model;
     }
 
     /**
@@ -154,14 +154,14 @@ public class CoreEnforcer {
      */
     public void setModel(Model model) {
         this.model = model;
-        this.fm = FunctionMap.loadFunctionMap();
+        fm = FunctionMap.loadFunctionMap();
     }
 
     /**
      * getAdapter gets the current adapter.
      */
     public Adapter getAdapter() {
-        return this.adapter;
+        return adapter;
     }
 
     /**
@@ -197,19 +197,19 @@ public class CoreEnforcer {
      * clearPolicy clears all policy.
      */
     public void clearPolicy() {
-        this.model.clearPolicy();
+        model.clearPolicy();
     }
 
     /**
      * loadPolicy reloads the policy from file/database.
      */
     public void loadPolicy() {
-        this.model.clearPolicy();
-        this.adapter.loadPolicy(this.model);
+        model.clearPolicy();
+        adapter.loadPolicy(model);
 
-        this.model.printPolicy();
-        if (this.autoBuildRoleLinks) {
-            this.buildRoleLinks();
+        model.printPolicy();
+        if (autoBuildRoleLinks) {
+            buildRoleLinks();
         }
     }
 
@@ -234,9 +234,9 @@ public class CoreEnforcer {
             throw new Error("cannot save a filtered policy");
         }
 
-        this.adapter.savePolicy(this.model);
-        if (this.watcher != null) {
-            this.watcher.update();
+        adapter.savePolicy(model);
+        if (watcher != null) {
+            watcher.update();
         }
     }
 
@@ -273,8 +273,8 @@ public class CoreEnforcer {
      * role inheritance relations.
      */
     public void buildRoleLinks() {
-        this.rm.clear();
-        this.model.buildRoleLinks(this.rm);
+        rm.clear();
+        model.buildRoleLinks(rm);
     }
 
     /**

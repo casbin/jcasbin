@@ -30,8 +30,8 @@ public class DefaultRoleManager implements RoleManager {
      * default RoleManager implementation.
      */
     public DefaultRoleManager(int maxHierarchyLevel) {
-        this.allRoles = new HashMap<>();
-        this.maxHierarchyLevel = maxHierarchyLevel;
+        allRoles = new HashMap<>();
+        maxHierarchyLevel = maxHierarchyLevel;
     }
 
     private boolean hasRole(String name) {
@@ -202,7 +202,7 @@ class Role {
     }
 
     protected boolean hasRole(String name, int hierarchyLevel) {
-        if (this.name.equals(name)) {
+        if (name.equals(name)) {
             return true;
         }
 

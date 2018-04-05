@@ -28,7 +28,7 @@ public class Policy {
      * buildRoleLinks initializes the roles in RBAC.
      */
     public void buildRoleLinks(RoleManager rm) {
-        for (Assertion ast : this.model.get("g").values()) {
+        for (Assertion ast : model.get("g").values()) {
             ast.buildRoleLinks(rm);
         }
     }
@@ -68,7 +68,7 @@ public class Policy {
      * getPolicy gets all rules in a policy.
      */
     public List<List<String>> getPolicy(String sec, String ptype) {
-        return this.model.get(sec).get(ptype).policy;
+        return model.get(sec).get(ptype).policy;
     }
 
     /**
@@ -77,7 +77,7 @@ public class Policy {
     public List<List<String>> getFilteredPolicy(String sec, String ptype, int fieldIndex, String... fieldValues) {
         List<List<String>> res = new ArrayList<>();
 
-        for (List<String> rule : this.model.get(sec).get(ptype).policy) {
+        for (List<String> rule : model.get(sec).get(ptype).policy) {
             boolean matched = true;
             for (int i = 0; i < fieldValues.length; i ++) {
                 String fieldValue = fieldValues[i];
@@ -112,8 +112,8 @@ public class Policy {
      * addPolicy adds a policy rule to the model.
      */
     public boolean addPolicy(String sec, String ptype, List<String> rule) {
-        if (!this.hasPolicy(sec, ptype, rule)) {
-            this.model.get(sec).get(ptype).policy.add(rule);
+        if (!hasPolicy(sec, ptype, rule)) {
+            model.get(sec).get(ptype).policy.add(rule);
             return true;
         }
         return false;
@@ -123,10 +123,10 @@ public class Policy {
      * removePolicy removes a policy rule from the model.
      */
     public boolean removePolicy(String sec, String ptype, List<String> rule) {
-        for (int i = 0; i < this.model.get(sec).get(ptype).policy.size(); i ++) {
-            List<String> r = this.model.get(sec).get(ptype).policy.get(i);
+        for (int i = 0; i < model.get(sec).get(ptype).policy.size(); i ++) {
+            List<String> r = model.get(sec).get(ptype).policy.get(i);
             if (Util.arrayEquals(rule, r)) {
-                this.model.get(sec).get(ptype).policy.remove(i);
+                model.get(sec).get(ptype).policy.remove(i);
                 return true;
             }
         }
@@ -141,7 +141,7 @@ public class Policy {
         List<List<String>> tmp = new ArrayList<>();
         boolean res = false;
 
-        for (List<String> rule : this.model.get(sec).get(ptype).policy) {
+        for (List<String> rule : model.get(sec).get(ptype).policy) {
             boolean matched = true;
             for (int i = 0; i < fieldValues.length; i ++) {
                 String fieldValue = fieldValues[i];
@@ -158,7 +158,7 @@ public class Policy {
             }
         }
 
-        this.model.get(sec).get(ptype).policy = tmp;
+        model.get(sec).get(ptype).policy = tmp;
         return res;
     }
 
@@ -168,7 +168,7 @@ public class Policy {
     public List<String> getValuesForFieldInPolicy(String sec, String ptype, int fieldIndex) {
         List<String> values = new ArrayList<>();
 
-        for (List<String> rule : this.model.get(sec).get(ptype).policy) {
+        for (List<String> rule : model.get(sec).get(ptype).policy) {
             values.add(rule.get(fieldIndex));
         }
 

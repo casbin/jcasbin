@@ -123,7 +123,7 @@ public class Model extends Policy {
      */
     public void printModel() {
         Util.logPrint("Model:");
-        for (Map.Entry<String, Map<String, Assertion>> entry : this.model.entrySet()) {
+        for (Map.Entry<String, Map<String, Assertion>> entry : model.entrySet()) {
             for (Map.Entry<String, Assertion> entry2 : entry.getValue().entrySet()) {
                 Util.logPrintf("%s.%s: %s", entry.getKey(), entry2.getKey(), entry2.getValue().value);
             }

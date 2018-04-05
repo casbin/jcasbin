@@ -31,14 +31,14 @@ public class Assertion {
     public RoleManager rm;
 
     protected void buildRoleLinks(RoleManager rm) {
-        this.rm = rm;
+        rm = rm;
         int count = 0;
-        for (int i = 0; i < this.value.length(); i ++) {
-            if (this.value.charAt(i) == '_') {
+        for (int i = 0; i < value.length(); i ++) {
+            if (value.charAt(i) == '_') {
                 count ++;
             }
         }
-        for (List<String> rule : this.policy) {
+        for (List<String> rule : policy) {
             if (count < 2) {
                 throw new Error("the number of \"_\" in role definition should be at least 2");
             }
@@ -47,15 +47,15 @@ public class Assertion {
             }
 
             if (count == 2) {
-                this.rm.addLink(rule.get(0), rule.get(1));
+                rm.addLink(rule.get(0), rule.get(1));
             } else if (count == 3) {
-                this.rm.addLink(rule.get(0), rule.get(1), rule.get(2));
+                rm.addLink(rule.get(0), rule.get(1), rule.get(2));
             } else if (count == 4) {
-                this.rm.addLink(rule.get(0), rule.get(1), rule.get(2), rule.get(3));
+                rm.addLink(rule.get(0), rule.get(1), rule.get(2), rule.get(3));
             }
         }
 
-        Util.logPrint("Role links for: " + this.key);
-        this.rm.printRoles();
+        Util.logPrint("Role links for: " + key);
+        rm.printRoles();
     }
 }

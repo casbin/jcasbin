@@ -14,6 +14,8 @@
 
 package org.casbin.jcasbin.main;
 
+import org.casbin.jcasbin.effect.DefaultEffector;
+import org.casbin.jcasbin.effect.Effector;
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
 import org.casbin.jcasbin.model.FunctionMap;
 import org.casbin.jcasbin.model.Model;
@@ -32,6 +34,7 @@ public class Enforcer {
     String modelPath;
     Model model;
     Map<String, Method> fm;
+    Effector eft;
 
     Adapter adapter;
     RoleManager rm;
@@ -92,6 +95,7 @@ public class Enforcer {
 
     private void initialize() {
         this.rm = new DefaultRoleManager(10);
+        this.eft = new DefaultEffector();
 
         this.enabled = true;
         this.autoSave = true;
@@ -163,6 +167,13 @@ public class Enforcer {
      */
     public void setRoleManager(RoleManager rm) {
         this.rm = rm;
+    }
+
+    /**
+     * setEffector sets the current effector.
+     */
+    public void setEffector(Effector eft) {
+        this.eft = eft;
     }
 
     /**

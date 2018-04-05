@@ -19,7 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Util {
-    static boolean enableLog = true;
+    public static boolean enableLog = true;
 
     static Logger logger = Logger.getLogger("casbin");
 

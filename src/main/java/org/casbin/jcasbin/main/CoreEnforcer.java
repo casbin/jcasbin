@@ -22,31 +22,32 @@ import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.rbac.DefaultRoleManager;
 import org.casbin.jcasbin.rbac.RoleManager;
+import org.casbin.jcasbin.util.Util;
 
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Enforcer is the main interface for authorization enforcement and policy management.
+ * CoreEnforcer is the main interface for authorization enforcement and policy management.
  */
-public class Enforcer {
-    String modelPath;
-    Model model;
-    Map<String, Method> fm;
-    Effector eft;
+public class CoreEnforcer {
+    private String modelPath;
+    private Model model;
+    private Map<String, Method> fm;
+    private Effector eft;
 
-    Adapter adapter;
-    RoleManager rm;
+    private Adapter adapter;
+    private RoleManager rm;
 
-    boolean enabled;
-    boolean autoSave;
-    boolean autoBuildRoleLinks;
+    private boolean enabled;
+    private boolean autoSave;
+    private boolean autoBuildRoleLinks;
 
     /**
-     * Enforcer initializes an enforcer with a model file and a policy file.
+     * CoreEnforcer initializes an enforcer with a model file and a policy file.
      */
-    public Enforcer(String modelPath, String policyFile) {
+    public CoreEnforcer(String modelPath, String policyFile) {
         this.modelPath = modelPath;
 
         this.adapter = new FileAdapter(policyFile);
@@ -60,9 +61,9 @@ public class Enforcer {
     }
 
     /**
-     * Enforcer initializes an enforcer with a database adapter.
+     * CoreEnforcer initializes an enforcer with a database adapter.
      */
-    public Enforcer(String modelPath, Adapter adapter) {
+    public CoreEnforcer(String modelPath, Adapter adapter) {
         this.modelPath = modelPath;
 
         this.adapter = adapter;
@@ -76,9 +77,9 @@ public class Enforcer {
     }
 
     /**
-     * Enforcer initializes an enforcer with a model and a database adapter.
+     * CoreEnforcer initializes an enforcer with a model and a database adapter.
      */
-    public Enforcer(Model m, Adapter adapter) {
+    public CoreEnforcer(Model m, Adapter adapter) {
         this.modelPath = "";
         this.adapter = adapter;
 
@@ -214,6 +215,7 @@ public class Enforcer {
      * enableLog changes whether to print Casbin log to the standard output.
      */
     public void enableLog(boolean enable) {
+        Util.enableLog = enable;
     }
 
     /**

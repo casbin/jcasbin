@@ -27,6 +27,9 @@ class InternalEnforcer extends CoreEnforcer {
             if (this.adapter != null && this.autoSave) {
                 this.adapter.addPolicy(sec, ptype, rule);
             }
+            if (watcher != null) {
+                watcher.update();
+            }
         }
 
         return ruleAdded;
@@ -42,6 +45,9 @@ class InternalEnforcer extends CoreEnforcer {
             if (this.adapter != null && this.autoSave) {
                 this.adapter.removePolicy(sec, ptype, rule);
             }
+            if (watcher != null) {
+                watcher.update();
+            }
         }
 
         return ruleRemoved;
@@ -56,6 +62,9 @@ class InternalEnforcer extends CoreEnforcer {
         if (ruleRemoved) {
             if (this.adapter != null && this.autoSave) {
                 this.adapter.removeFilteredPolicy(sec, ptype, fieldIndex, fieldValues);
+            }
+            if (watcher != null) {
+                watcher.update();
             }
         }
 

@@ -16,6 +16,7 @@ package org.casbin.jcasbin.main;
 
 import org.casbin.jcasbin.effect.DefaultEffector;
 import org.casbin.jcasbin.effect.Effector;
+import org.casbin.jcasbin.persist.Watcher;
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
 import org.casbin.jcasbin.model.FunctionMap;
 import org.casbin.jcasbin.model.Model;
@@ -37,6 +38,7 @@ public class CoreEnforcer {
     private Effector eft;
 
     Adapter adapter;
+    Watcher watcher;
     private RoleManager rm;
 
     private boolean enabled;
@@ -102,6 +104,7 @@ public class CoreEnforcer {
     private void initialize() {
         this.rm = new DefaultRoleManager(10);
         this.eft = new DefaultEffector();
+        this.watcher = null;
 
         this.enabled = true;
         this.autoSave = true;
@@ -169,6 +172,14 @@ public class CoreEnforcer {
     }
 
     /**
+     * setWatcher sets the current watcher.
+     */
+    public void setWatcher(Watcher watcher) {
+        this.watcher = watcher;
+        watcher.setUpdateCallback(loadPolicy());
+    }
+
+    /**
      * SetRoleManager sets the current role manager.
      */
     public void setRoleManager(RoleManager rm) {
@@ -203,10 +214,30 @@ public class CoreEnforcer {
     }
 
     /**
+     * loadFilteredPolicy reloads a filtered policy from file/database.
+     */
+    public void loadFilteredPolicy(Object filter) {
+    }
+
+    /**
+     * isFiltered returns true if the loaded policy has been filtered.
+     */
+    public boolean isFiltered() {
+        return false;
+    }
+
+    /**
      * savePolicy saves the current policy (usually after changed with Casbin API) back to file/database.
      */
     public void savePolicy() {
+        if (isFiltered()) {
+            throw new Error("cannot save a filtered policy");
+        }
+
         this.adapter.savePolicy(this.model);
+        if (this.watcher != null) {
+            this.watcher.update();
+        }
     }
 
     /**

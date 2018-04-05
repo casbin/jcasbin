@@ -17,7 +17,7 @@ package org.casbin.jcasbin.main;
 import javax.management.relation.Role;
 import java.util.List;
 
-public class Enforcer extends CoreEnforcer {
+public class Enforcer extends ManagementEnforcer {
     /**
      * getRolesForUser gets the roles that a user has.
      */

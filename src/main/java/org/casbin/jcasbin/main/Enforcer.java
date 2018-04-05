@@ -14,7 +14,8 @@
 
 package org.casbin.jcasbin.main;
 
-import javax.management.relation.Role;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Enforcer extends ManagementEnforcer {
@@ -54,7 +55,7 @@ public class Enforcer extends ManagementEnforcer {
      * Returns false if the user already has the role (aka not affected).
      */
     public boolean addRoleForUser(String user, String role) {
-        return true;
+        return addGroupingPolicy(user, role);
     }
 
     /**
@@ -62,7 +63,7 @@ public class Enforcer extends ManagementEnforcer {
      * Returns false if the user does not have the role (aka not affected).
      */
     public boolean deleteRoleForUser(String user, String role) {
-        return true;
+        return removeGroupingPolicy(user, role);
     }
 
     /**
@@ -70,7 +71,7 @@ public class Enforcer extends ManagementEnforcer {
      * Returns false if the user does not have any roles (aka not affected).
      */
     public boolean deleteRolesForUser(String user) {
-        return true;
+        return removeFilteredGroupingPolicy(0, user);
     }
 
     /**
@@ -78,13 +79,15 @@ public class Enforcer extends ManagementEnforcer {
      * Returns false if the user does not exist (aka not affected).
      */
     public boolean deleteUser(String user) {
-        return true;
+        return removeFilteredGroupingPolicy(0, user);
     }
 
     /**
      * deleteRole deletes a role.
      */
     public void deleteRole(String role) {
+        removeFilteredGroupingPolicy(1, role);
+        removeFilteredPolicy(0, role);
     }
 
     /**
@@ -92,7 +95,7 @@ public class Enforcer extends ManagementEnforcer {
      * Returns false if the permission does not exist (aka not affected).
      */
     public boolean deletePermission(String... permission) {
-        return true;
+        return removeFilteredPolicy(1, permission);
     }
 
     /**
@@ -100,7 +103,12 @@ public class Enforcer extends ManagementEnforcer {
      * Returns false if the user or role already has the permission (aka not affected).
      */
     public boolean addPermissionForUser(String user, String... permission) {
-        return true;
+        List<String> params = new ArrayList<>();
+
+        params.add(user);
+        Collections.addAll(params, permission);
+
+        return addPolicy(params);
     }
 
     /**
@@ -108,7 +116,12 @@ public class Enforcer extends ManagementEnforcer {
      * Returns false if the user or role does not have the permission (aka not affected).
      */
     public boolean deletePermissionForUser(String user, String... permission) {
-        return true;
+        List<String> params = new ArrayList<>();
+
+        params.add(user);
+        Collections.addAll(params, permission);
+
+        return removePolicy(params);
     }
 
     /**
@@ -116,20 +129,25 @@ public class Enforcer extends ManagementEnforcer {
      * Returns false if the user or role does not have any permissions (aka not affected).
      */
     public boolean deletePermissionsForUser(String user) {
-        return true;
+        return removeFilteredPolicy(0, user);
     }
 
     /**
      * getPermissionsForUser gets permissions for a user or role.
      */
-    public String[][] getPermissionsForUser(String user) {
-        return null;
+    public List<List<String>> getPermissionsForUser(String user) {
+        return getFilteredPolicy(0, user);
     }
 
     /**
      * hasPermissionForUser determines whether a user has a permission.
      */
     public boolean hasPermissionForUser(String user, String... permission) {
-        return true;
+        List<String> params = new ArrayList<>();
+
+        params.add(user);
+        Collections.addAll(params, permission);
+
+        return hasPolicy(params);
     }
 }

@@ -28,7 +28,7 @@ public class Assertion {
     public String value;
     public String[] tokens;
     public List<List<String>> policy;
-    private RoleManager rm;
+    public RoleManager rm;
 
     protected void buildRoleLinks(RoleManager rm) {
         this.rm = rm;

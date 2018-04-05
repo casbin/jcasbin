@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public class CoreEnforcer {
     private String modelPath;
-    private Model model;
+    public Model model;
     private Map<String, Method> fm;
     private Effector eft;
 
@@ -43,6 +43,12 @@ public class CoreEnforcer {
     private boolean enabled;
     private boolean autoSave;
     private boolean autoBuildRoleLinks;
+
+    /**
+     * CoreEnforcer is the default constructor.
+     */
+    public CoreEnforcer() {
+    }
 
     /**
      * CoreEnforcer initializes an enforcer with a model file and a policy file.

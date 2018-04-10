@@ -14,12 +14,6 @@
 
 package org.casbin.jcasbin.effect;
 
-/**
- * Effector is the interface for Casbin effectors.
- */
-public interface Effector {
-    /**
-     * mergeEffects merges all matching results collected by the enforcer into a single decision.
-     */
-    boolean mergeEffects(String expr, Effect[] effects, float[] results);
+public enum Effect {
+    Allow, Indeterminate, Deny
 }

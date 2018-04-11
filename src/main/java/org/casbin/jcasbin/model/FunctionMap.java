@@ -14,25 +14,27 @@
 
 package org.casbin.jcasbin.model;
 
-import org.casbin.jcasbin.util.BuiltInFunctions;
+import com.googlecode.aviator.runtime.type.AviatorFunction;
+import org.casbin.jcasbin.util.function.KeyMatchFunc;
+import org.casbin.jcasbin.util.function.KeyMatch2Func;
+import org.casbin.jcasbin.util.function.RegexMatchFunc;
+import org.casbin.jcasbin.util.function.IPMatchFunc;
 
-import java.lang.reflect.Method;
 import java.util.Map;
-import java.util.function.BiFunction;
 
 /**
  * FunctionMap represents the collection of Function.
  */
 public class FunctionMap {
     /**
-     * Method represents a function that is used in the matchers, used to get attributes in ABAC.
+     * AviatorFunction represents a function that is used in the matchers, used to get attributes in ABAC.
      */
-    private Map<String, BiFunction<String, String, Boolean>> fm;
+    public Map<String, AviatorFunction> fm;
 
     /**
      * addFunction adds an expression function.
      */
-    public void addFunction(String name, BiFunction<String, String, Boolean> function) {
+    public void addFunction(String name, AviatorFunction function) {
         fm.put(name, function);
     }
 
@@ -40,9 +42,12 @@ public class FunctionMap {
      * loadFunctionMap loads an initial function map.
      */
     public static FunctionMap loadFunctionMap() {
-        // Map<String, Method> fm = new HashMap<>();
-
         FunctionMap fm = new FunctionMap();
+
+        fm.addFunction("keyMatch", new KeyMatchFunc());
+        fm.addFunction("keyMatch2", new KeyMatch2Func());
+        fm.addFunction("regexMatch", new RegexMatchFunc());
+        fm.addFunction("ipMatch", new IPMatchFunc());
 
         return fm;
     }

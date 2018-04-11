@@ -14,8 +14,12 @@
 
 package org.casbin.jcasbin.main;
 
+import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.runtime.type.AviatorFunction;
 import org.casbin.jcasbin.effect.DefaultEffector;
+import org.casbin.jcasbin.effect.Effect;
 import org.casbin.jcasbin.effect.Effector;
+import org.casbin.jcasbin.model.Assertion;
 import org.casbin.jcasbin.persist.Watcher;
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
 import org.casbin.jcasbin.model.FunctionMap;
@@ -25,7 +29,8 @@ import org.casbin.jcasbin.rbac.DefaultRoleManager;
 import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.Util;
 
-import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,7 +39,7 @@ import java.util.Map;
 public class CoreEnforcer {
     private String modelPath;
     public Model model;
-    private Map<String, Method> fm;
+    private FunctionMap fm;
     private Effector eft;
 
     Adapter adapter;
@@ -277,10 +282,123 @@ public class CoreEnforcer {
         model.buildRoleLinks(rm);
     }
 
+    private AviatorFunction generateGFunction(RoleManager rm) {
+        return null;
+    }
+
     /**
      * enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
      */
     public boolean enforce(String... rvals) {
-        return true;
+        if (!enabled) {
+            return true;
+        }
+
+        Map<String, AviatorFunction> functions = new HashMap<>();
+        for (Map.Entry<String, AviatorFunction> entry : fm.fm.entrySet()) {
+            String key = entry.getKey();
+            AviatorFunction function = entry.getValue();
+
+            functions.put(key, function);
+        }
+        if (model.model.containsKey("g")) {
+            for (Map.Entry<String, Assertion> entry : model.model.get("g").entrySet()) {
+                String key = entry.getKey();
+                Assertion ast = entry.getValue();
+
+                RoleManager rm = ast.rm;
+                functions.put(key, generateGFunction(rm));
+            }
+        }
+
+        String expString = model.model.get("m").get("m").value;
+        for (AviatorFunction f : functions.values()) {
+            AviatorEvaluator.addFunction(f);
+        }
+
+        Effect policyEffects[];
+        float matcherResults[];
+        int policyLen;
+        if ((policyLen = model.model.get("p").get("p").policy.size()) != 0) {
+            policyEffects = new Effect[policyLen];
+            matcherResults = new float[policyLen];
+
+            for (int i = 0; i < model.model.get("p").get("p").policy.size(); i ++) {
+                List<String> pvals = model.model.get("p").get("p").policy.get(i);
+
+                // Util.logPrint("Policy Rule: " + pvals);
+
+                Map<String, Object> parameters = new HashMap<>();
+                for (int j = 0; j < model.model.get("r").get("r").tokens.length; j ++) {
+                    String token = model.model.get("r").get("r").tokens[j];
+                    parameters.put(token, rvals[j]);
+                }
+                for (int j = 0; j < model.model.get("p").get("p").tokens.length; j ++) {
+                    String token = model.model.get("p").get("p").tokens[j];
+                    parameters.put(token, pvals.get(j));
+                }
+
+                float result = (float) AviatorEvaluator.execute(expString, parameters);
+                // Util.logPrint("Result: " + result);
+
+                matcherResults[i] = result;
+
+                if (parameters.containsKey("p_eft")) {
+                    String eft = (String) parameters.get("p_eft");
+                    if (eft.equals("allow")) {
+                        policyEffects[i] = Effect.Allow;
+                    } else if (eft.equals("deny")) {
+                        policyEffects[i] = Effect.Deny;
+                    } else {
+                        policyEffects[i] = Effect.Indeterminate;
+                    }
+                } else {
+                    policyEffects[i] = Effect.Allow;
+                }
+
+                if (model.model.get("e").get("e").value.equals("priority(p_eft) || deny")) {
+                    break;
+                }
+            }
+        } else {
+            policyEffects = new Effect[policyLen];
+            matcherResults = new float[policyLen];
+
+            Map<String, Object> parameters = new HashMap<>();
+            for (int j = 0; j < model.model.get("r").get("r").tokens.length; j ++) {
+                String token = model.model.get("r").get("r").tokens[j];
+                parameters.put(token, rvals[j]);
+            }
+            for (int j = 0; j < model.model.get("p").get("p").tokens.length; j ++) {
+                String token = model.model.get("p").get("p").tokens[j];
+                parameters.put(token, "");
+            }
+
+            float result = (float) AviatorEvaluator.execute(expString, parameters);
+            // Util.logPrint("Result: " + result);
+
+            if (result != 0) {
+                policyEffects[0] = Effect.Allow;
+            } else {
+                policyEffects[0] = Effect.Indeterminate;
+            }
+        }
+
+        boolean result = eft.mergeEffects(model.model.get("e").get("e").value, policyEffects, matcherResults);
+
+        StringBuilder reqStr = new StringBuilder("Request: ");
+        for (int i = 0; i < rvals.length; i ++) {
+            String rval = rvals[i];
+
+            if (i != rvals.length - 1) {
+                reqStr.append(String.format("%s, ", rval));
+            } else {
+                reqStr.append(String.format("%s", rval));
+            }
+        }
+        reqStr.append(String.format(" ---> %s", result));
+        Util.logPrint(reqStr.toString());
+
+        return result;
     }
 }

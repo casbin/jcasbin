@@ -31,7 +31,7 @@ public class DefaultRoleManager implements RoleManager {
      */
     public DefaultRoleManager(int maxHierarchyLevel) {
         allRoles = new HashMap<>();
-        maxHierarchyLevel = maxHierarchyLevel;
+        this.maxHierarchyLevel = maxHierarchyLevel;
     }
 
     private boolean hasRole(String name) {

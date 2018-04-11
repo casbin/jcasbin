@@ -26,6 +26,11 @@
             <artifactId>aviator</artifactId>
             <version>3.3.0</version>
         </dependency>
+        <dependency>
+                <groupId>com.github.seancfoley</groupId>
+                <artifactId>ipaddress</artifactId>
+                <version>4.2.0</version>
+        </dependency>
     </dependencies>
 
 </project>

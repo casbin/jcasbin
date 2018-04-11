@@ -14,6 +14,10 @@
 
 package org.casbin.jcasbin.util;
 
+import inet.ipaddr.AddressStringException;
+import inet.ipaddr.IPAddress;
+import inet.ipaddr.IPAddressString;
+
 import java.util.regex.Pattern;
 
 public class BuiltInFunctions {
@@ -83,6 +87,38 @@ public class BuiltInFunctions {
      * For example, "192.168.2.123" matches "192.168.2.0/24"
      */
     public static boolean ipMatch(String ip1, String ip2) {
-        return true;
+        IPAddressString ipas1 = new IPAddressString(ip1);
+        try {
+            ipas1.validateIPv4();
+        } catch (AddressStringException e) {
+            e.printStackTrace();
+            throw new Error("invalid argument: ip1 in IPMatch() function is not an IP address.");
+        }
+
+        IPAddressString ipas2 = new IPAddressString(ip2);
+        try {
+            ipas2.validate();
+        } catch (AddressStringException e) {
+            e.printStackTrace();
+            throw new Error("invalid argument: ip2 in IPMatch() function is neither an IP address nor a CIDR.");
+        }
+
+        if (ipas1.equals(ipas2)) {
+            return true;
+        }
+
+        IPAddress ipa1;
+        IPAddress ipa2;
+        try {
+            ipa1 = ipas1.toAddress();
+            ipa2 = ipas2.toAddress();
+        } catch (AddressStringException e) {
+            e.printStackTrace();
+            throw new Error("invalid argument: ip1 or ip2 in IPMatch() function is not an IP address.");
+        }
+
+        Integer prefix = ipa2.getNetworkPrefixLength();
+        IPAddress mask = ipa2.getNetwork().getNetworkMask(prefix, false);
+        return ipa1.mask(mask).equals(ipa2);
     }
 }

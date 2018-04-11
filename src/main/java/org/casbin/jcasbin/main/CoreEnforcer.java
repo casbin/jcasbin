@@ -181,7 +181,7 @@ public class CoreEnforcer {
      */
     public void setWatcher(Watcher watcher) {
         this.watcher = watcher;
-        watcher.setUpdateCallback(loadPolicy());
+        watcher.setUpdateCallback(this::loadPolicy);
     }
 
     /**

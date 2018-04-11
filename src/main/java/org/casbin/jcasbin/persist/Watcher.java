@@ -14,8 +14,6 @@
 
 package org.casbin.jcasbin.persist;
 
-import java.lang.reflect.Method;
-
 /**
  * Watcher is the interface for Casbin watchers.
  */
@@ -25,12 +23,12 @@ public interface Watcher {
      * when the policy in DB has been changed by other instances.
      * A classic callback is Enforcer.LoadPolicy().
      */
-    public void setUpdateCallback(Method callback);
+    void setUpdateCallback(Runnable runnable);
 
     /**
      * Update calls the update callback of other instances to synchronize their policy.
      * It is usually called after changing the policy in DB, like Enforcer.SavePolicy(),
      * Enforcer.AddPolicy(), Enforcer.RemovePolicy(), etc.
      */
-    public void update();
+    void update();
 }

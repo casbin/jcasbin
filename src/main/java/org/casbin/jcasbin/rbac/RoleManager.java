@@ -21,39 +21,39 @@ public interface RoleManager {
     /**
      * Clear clears all stored data and resets the role manager to the initial state.
      */
-    public void clear();
+    void clear();
 
     /**
      * addLink adds the inheritance link between two roles. role: name1 and role: name2.
      * domain is a prefix to the roles.
      */
-    public void addLink(String name1, String name2, String... domain);
+    void addLink(String name1, String name2, String... domain);
 
     /**
      * deleteLink deletes the inheritance link between two roles. role: name1 and role: name2.
      * domain is a prefix to the roles.
      */
-    public void deleteLink(String name1, String name2, String... domain);
+    void deleteLink(String name1, String name2, String... domain);
 
     /**
      * hasLink determines whether a link exists between two roles. role: name1 inherits role: name2.
      * domain is a prefix to the roles.
      */
-    public boolean hasLink(String name1, String name2, String... domain);
+    boolean hasLink(String name1, String name2, String... domain);
 
     /**
      * getRoles gets the roles that a user inherits.
      * domain is a prefix to the roles.
      */
-    public List<String> getRoles(String name, String... domain);
+    List<String> getRoles(String name, String... domain);
 
     /**
      * getUsers gets the users that inherits a role.
      */
-    public List<String> getUsers(String name);
+    List<String> getUsers(String name);
 
     /**
      * printRoles prints all the roles to log.
      */
-    public void printRoles();
+    void printRoles();
 }

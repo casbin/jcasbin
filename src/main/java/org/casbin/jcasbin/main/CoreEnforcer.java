@@ -294,11 +294,24 @@ public class CoreEnforcer {
                     parameters.put(token, pvals.get(j));
                 }
 
-                float result = (float) AviatorEvaluator.execute(expString, parameters);
+                Object result =  AviatorEvaluator.execute(expString, parameters);
                 // Util.logPrint("Result: " + result);
 
-                matcherResults[i] = result;
-
+                if (result instanceof Boolean) {
+                    if (!((boolean) result)) {
+                        policyEffects[i] = Effect.Indeterminate;
+                        continue;
+                    }
+                } else if (result instanceof Float) {
+                    if ((float) result == 0) {
+                        policyEffects[i] = Effect.Indeterminate;
+                        continue;
+                    } else {
+                        matcherResults[i] = (float) result;
+                    }
+                } else {
+                    throw new Error("matcher result should be bool, int or float");
+                }
                 if (parameters.containsKey("p_eft")) {
                     String eft = (String) parameters.get("p_eft");
                     if (eft.equals("allow")) {
@@ -317,8 +330,8 @@ public class CoreEnforcer {
                 }
             }
         } else {
-            policyEffects = new Effect[policyLen];
-            matcherResults = new float[policyLen];
+            policyEffects = new Effect[1];
+            matcherResults = new float[1];
 
             Map<String, Object> parameters = new HashMap<>();
             for (int j = 0; j < model.model.get("r").get("r").tokens.length; j ++) {
@@ -330,10 +343,10 @@ public class CoreEnforcer {
                 parameters.put(token, "");
             }
 
-            float result = (float) AviatorEvaluator.execute(expString, parameters);
+            Object result = AviatorEvaluator.execute(expString, parameters);
             // Util.logPrint("Result: " + result);
 
-            if (result != 0) {
+            if ((boolean) result) {
                 policyEffects[0] = Effect.Allow;
             } else {
                 policyEffects[0] = Effect.Indeterminate;

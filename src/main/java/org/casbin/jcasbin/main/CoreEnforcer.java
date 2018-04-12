@@ -54,46 +54,31 @@ public class CoreEnforcer {
      * CoreEnforcer is the default constructor.
      */
     public CoreEnforcer() {
+        this("", "");
     }
 
     /**
      * CoreEnforcer initializes an enforcer with a model file and a policy file.
      */
     public CoreEnforcer(String modelPath, String policyFile) {
-        this.modelPath = modelPath;
-
-        adapter = new FileAdapter(policyFile);
-
-        initialize();
-
-        if (!this.modelPath.equals("")) {
-            loadModel();
-            loadPolicy();
-        }
+        this(modelPath, new FileAdapter(policyFile));
     }
 
     /**
      * CoreEnforcer initializes an enforcer with a database adapter.
      */
     public CoreEnforcer(String modelPath, Adapter adapter) {
+        this(newModel(modelPath, ""), adapter);
+
         this.modelPath = modelPath;
-
-        this.adapter = adapter;
-
-        initialize();
-
-        if (!this.modelPath.equals("")) {
-            loadModel();
-            loadPolicy();
-        }
     }
 
     /**
      * CoreEnforcer initializes an enforcer with a model and a database adapter.
      */
     public CoreEnforcer(Model m, Adapter adapter) {
-        modelPath = "";
         this.adapter = adapter;
+        this.watcher = null;
 
         model = m;
         model.printModel();
@@ -119,22 +104,34 @@ public class CoreEnforcer {
     /**
      * newModel creates a model.
      */
-    private Model newModel() {
-        Model model = new Model();
+    public static Model newModel() {
+        Model m = new Model();
 
-        return model;
+        return m;
     }
 
     /**
      * newModel creates a model.
      */
-    private Model newModel(String text) {
-        Model model = new Model();
+    public static Model newModel(String text) {
+        Model m = new Model();
 
-        model.loadModelFromText(text);
+        m.loadModelFromText(text);
 
-        return model;
+        return m;
     }
+
+    /**
+     * newModel creates a model.
+     */
+    public static Model newModel(String modelPath, String unused) {
+        Model m = new Model();
+
+        m.loadModel(modelPath);
+
+        return m;
+    }
+
 
     /**
      * loadModel reloads the model from the model CONF file.

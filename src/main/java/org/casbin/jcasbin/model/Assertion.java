@@ -17,6 +17,7 @@ package org.casbin.jcasbin.model;
 import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.Util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,6 +30,10 @@ public class Assertion {
     public String[] tokens;
     public List<List<String>> policy;
     public RoleManager rm;
+
+    public Assertion() {
+        policy = new ArrayList<>();
+    }
 
     protected void buildRoleLinks(RoleManager rm) {
         rm = rm;

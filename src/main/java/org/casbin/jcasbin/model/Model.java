@@ -26,7 +26,7 @@ import java.util.Map;
  * Model represents the whole access control model.
  */
 public class Model extends Policy {
-    static Map<String, String> sectionNameMap;
+    private static Map<String, String> sectionNameMap;
 
     static {
         sectionNameMap = new HashMap<>();
@@ -68,7 +68,7 @@ public class Model extends Policy {
         }
 
         if (!model.containsKey(sec)) {
-            model.put(sec, new HashMap<String, Assertion>());
+            model.put(sec, new HashMap<>());
         }
 
         model.get(sec).put(key, ast);

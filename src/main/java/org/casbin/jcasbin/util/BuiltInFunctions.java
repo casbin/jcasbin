@@ -14,12 +14,17 @@
 
 package org.casbin.jcasbin.util;
 
+import com.googlecode.aviator.runtime.function.AbstractFunction;
+import com.googlecode.aviator.runtime.function.FunctionUtils;
+import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
+import com.googlecode.aviator.runtime.type.AviatorObject;
 import inet.ipaddr.AddressStringException;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
 import org.casbin.jcasbin.rbac.RoleManager;
 
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class BuiltInFunctions {
@@ -128,6 +133,35 @@ public class BuiltInFunctions {
      * generateGFunction is the factory method of the g(_, _) function.
      */
     public static AviatorFunction generateGFunction(RoleManager rm) {
-        return null;
+        return new AbstractFunction() {
+            public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+                String name1 = FunctionUtils.getStringValue(arg1, env);
+                String name2 = FunctionUtils.getStringValue(arg2, env);
+
+                if (rm == null) {
+                    return AviatorBoolean.valueOf(name1.equals(name2));
+                } else {
+                    boolean res = rm.hasLink(name1, name2);
+                    return AviatorBoolean.valueOf(res);
+                }
+            }
+
+            public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2, AviatorObject arg3) {
+                String name1 = FunctionUtils.getStringValue(arg1, env);
+                String name2 = FunctionUtils.getStringValue(arg2, env);
+
+                if (rm == null) {
+                    return AviatorBoolean.valueOf(name1.equals(name2));
+                } else {
+                    String domain = FunctionUtils.getStringValue(arg3, env);
+                    boolean res = rm.hasLink(name1, name2, domain);
+                    return AviatorBoolean.valueOf(res);
+                }
+            }
+
+            public String getName() {
+                return "g";
+            }
+        };
     }
 }

@@ -66,6 +66,13 @@ public class Enforcer extends ManagementEnforcer {
     }
 
     /**
+     * CoreEnforcer initializes an enforcer with a model.
+     */
+    public Enforcer(Model m) {
+        this(m, null);
+    }
+
+    /**
      * getRolesForUser gets the roles that a user has.
      */
     public List<String> getRolesForUser(String name) {

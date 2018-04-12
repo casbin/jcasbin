@@ -55,12 +55,16 @@ public class Policy {
      * clearPolicy clears all current policy.
      */
     public void clearPolicy() {
-        for (Assertion ast : model.get("p").values()) {
-            ast.policy = null;
+        if (model.containsKey("p")) {
+            for (Assertion ast : model.get("p").values()) {
+                ast.policy = new ArrayList<>();
+            }
         }
 
-        for (Assertion ast : model.get("g").values()) {
-            ast.policy = null;
+        if (model.containsKey("g")) {
+            for (Assertion ast : model.get("g").values()) {
+                ast.policy = new ArrayList<>();
+            }
         }
     }
 

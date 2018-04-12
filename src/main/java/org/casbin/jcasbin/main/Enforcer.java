@@ -14,11 +14,57 @@
 
 package org.casbin.jcasbin.main;
 
+import org.casbin.jcasbin.model.FunctionMap;
+import org.casbin.jcasbin.model.Model;
+import org.casbin.jcasbin.persist.Adapter;
+import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class Enforcer extends ManagementEnforcer {
+    /**
+     * CoreEnforcer is the default constructor.
+     */
+    public Enforcer() {
+        this("", "");
+    }
+
+    /**
+     * CoreEnforcer initializes an enforcer with a model file and a policy file.
+     */
+    public Enforcer(String modelPath, String policyFile) {
+        this(modelPath, new FileAdapter(policyFile));
+    }
+
+    /**
+     * CoreEnforcer initializes an enforcer with a database adapter.
+     */
+    public Enforcer(String modelPath, Adapter adapter) {
+        this(newModel(modelPath, ""), adapter);
+
+        this.modelPath = modelPath;
+    }
+
+    /**
+     * CoreEnforcer initializes an enforcer with a model and a database adapter.
+     */
+    public Enforcer(Model m, Adapter adapter) {
+        this.adapter = adapter;
+        this.watcher = null;
+
+        model = m;
+        model.printModel();
+        fm = FunctionMap.loadFunctionMap();
+
+        initialize();
+
+        if (this.adapter != null) {
+            loadPolicy();
+        }
+    }
+
     /**
      * getRolesForUser gets the roles that a user has.
      */

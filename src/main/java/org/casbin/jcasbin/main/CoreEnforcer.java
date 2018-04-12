@@ -37,9 +37,9 @@ import java.util.Map;
  * CoreEnforcer is the main interface for authorization enforcement and policy management.
  */
 public class CoreEnforcer {
-    private String modelPath;
+    String modelPath;
     public Model model;
-    private FunctionMap fm;
+    FunctionMap fm;
     private Effector eft;
 
     Adapter adapter;
@@ -50,48 +50,7 @@ public class CoreEnforcer {
     boolean autoSave;
     boolean autoBuildRoleLinks;
 
-    /**
-     * CoreEnforcer is the default constructor.
-     */
-    public CoreEnforcer() {
-        this("", "");
-    }
-
-    /**
-     * CoreEnforcer initializes an enforcer with a model file and a policy file.
-     */
-    public CoreEnforcer(String modelPath, String policyFile) {
-        this(modelPath, new FileAdapter(policyFile));
-    }
-
-    /**
-     * CoreEnforcer initializes an enforcer with a database adapter.
-     */
-    public CoreEnforcer(String modelPath, Adapter adapter) {
-        this(newModel(modelPath, ""), adapter);
-
-        this.modelPath = modelPath;
-    }
-
-    /**
-     * CoreEnforcer initializes an enforcer with a model and a database adapter.
-     */
-    public CoreEnforcer(Model m, Adapter adapter) {
-        this.adapter = adapter;
-        this.watcher = null;
-
-        model = m;
-        model.printModel();
-        fm = FunctionMap.loadFunctionMap();
-
-        initialize();
-
-        if (this.adapter != null) {
-            loadPolicy();
-        }
-    }
-
-    private void initialize() {
+    void initialize() {
         rm = new DefaultRoleManager(10);
         eft = new DefaultEffector();
         watcher = null;

@@ -27,11 +27,14 @@ import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.rbac.DefaultRoleManager;
 import org.casbin.jcasbin.rbac.RoleManager;
+import org.casbin.jcasbin.util.BuiltInFunctions;
 import org.casbin.jcasbin.util.Util;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.casbin.jcasbin.util.BuiltInFunctions.generateGFunction;
 
 /**
  * CoreEnforcer is the main interface for authorization enforcement and policy management.
@@ -238,10 +241,6 @@ public class CoreEnforcer {
         model.buildRoleLinks(rm);
     }
 
-    private AviatorFunction generateGFunction(RoleManager rm) {
-        return null;
-    }
-
     /**
      * enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
      */
@@ -263,7 +262,7 @@ public class CoreEnforcer {
                 Assertion ast = entry.getValue();
 
                 RoleManager rm = ast.rm;
-                functions.put(key, generateGFunction(rm));
+                functions.put(key, BuiltInFunctions.generateGFunction(rm));
             }
         }
 

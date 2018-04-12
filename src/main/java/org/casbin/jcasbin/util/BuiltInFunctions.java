@@ -14,9 +14,11 @@
 
 package org.casbin.jcasbin.util;
 
+import com.googlecode.aviator.runtime.type.AviatorFunction;
 import inet.ipaddr.AddressStringException;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
+import org.casbin.jcasbin.rbac.RoleManager;
 
 import java.util.regex.Pattern;
 
@@ -120,5 +122,12 @@ public class BuiltInFunctions {
         Integer prefix = ipa2.getNetworkPrefixLength();
         IPAddress mask = ipa2.getNetwork().getNetworkMask(prefix, false);
         return ipa1.mask(mask).equals(ipa2);
+    }
+
+    /**
+     * generateGFunction is the factory method of the g(_, _) function.
+     */
+    public static AviatorFunction generateGFunction(RoleManager rm) {
+        return null;
     }
 }

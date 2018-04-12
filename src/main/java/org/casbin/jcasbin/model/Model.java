@@ -37,6 +37,10 @@ public class Model extends Policy {
         sectionNameMap.put("m", "matchers");
     }
 
+    public Model() {
+        model = new HashMap<>();
+    }
+
     private boolean loadAssertion(Model model, Config cfg, String sec, String key) {
         String value = cfg.getString(sectionNameMap.get(sec) + "::" + key);
         return model.addDef(sec, key, value);

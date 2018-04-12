@@ -20,6 +20,7 @@ import org.casbin.jcasbin.util.function.KeyMatch2Func;
 import org.casbin.jcasbin.util.function.RegexMatchFunc;
 import org.casbin.jcasbin.util.function.IPMatchFunc;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -43,6 +44,7 @@ public class FunctionMap {
      */
     public static FunctionMap loadFunctionMap() {
         FunctionMap fm = new FunctionMap();
+        fm.fm = new HashMap<>();
 
         fm.addFunction("keyMatch", new KeyMatchFunc());
         fm.addFunction("keyMatch2", new KeyMatch2Func());

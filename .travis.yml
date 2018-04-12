@@ -4,4 +4,4 @@ sudo: false
 
 jdk:
   - oraclejdk8
-  - openjdk7
+  - openjdk8

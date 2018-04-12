@@ -46,8 +46,8 @@ public class Util {
      * escapeAssertion escapes the dots in the assertion, because the expression evaluation doesn't support such variable names.
      */
     public static String escapeAssertion(String s) {
-        s = s.replaceAll("r.", "r_");
-        s = s.replaceAll("p.", "p_");
+        s = s.replace("r.", "r_");
+        s = s.replace("p.", "p_");
         return s;
     }
 

@@ -28,8 +28,10 @@ public class Policy {
      * buildRoleLinks initializes the roles in RBAC.
      */
     public void buildRoleLinks(RoleManager rm) {
-        for (Assertion ast : model.get("g").values()) {
-            ast.buildRoleLinks(rm);
+        if (model.containsKey("g")) {
+            for (Assertion ast : model.get("g").values()) {
+                ast.buildRoleLinks(rm);
+            }
         }
     }
 
@@ -38,16 +40,20 @@ public class Policy {
      */
     public void printPolicy() {
         Util.logPrint("Policy:");
-        for (Map.Entry<String, Assertion> entry : model.get("p").entrySet()) {
-            String key = entry.getKey();
-            Assertion ast = entry.getValue();
-            Util.logPrint(key + ": " + ast.value + ": " + ast.policy);
+        if (model.containsKey("p")) {
+            for (Map.Entry<String, Assertion> entry : model.get("p").entrySet()) {
+                String key = entry.getKey();
+                Assertion ast = entry.getValue();
+                Util.logPrint(key + ": " + ast.value + ": " + ast.policy);
+            }
         }
 
-        for (Map.Entry<String, Assertion> entry : model.get("g").entrySet()) {
-            String key = entry.getKey();
-            Assertion ast = entry.getValue();
-            Util.logPrint(key + ": " + ast.value + ": " + ast.policy);
+        if (model.containsKey("g")) {
+            for (Map.Entry<String, Assertion> entry : model.get("g").entrySet()) {
+                String key = entry.getKey();
+                Assertion ast = entry.getValue();
+                Util.logPrint(key + ": " + ast.value + ": " + ast.policy);
+            }
         }
     }
 

@@ -181,6 +181,7 @@ class Role {
 
     protected Role(String name) {
         this.name = name;
+        roles = new ArrayList<>();
     }
 
     protected void addRole(Role role) {

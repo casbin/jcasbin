@@ -39,7 +39,13 @@ public class DefaultRoleManager implements RoleManager {
     }
 
     private Role createRole(String name) {
-        return allRoles.getOrDefault(name, new Role(name));
+        if (hasRole(name)) {
+            return allRoles.get(name);
+        } else {
+            Role role = new Role(name);
+            allRoles.put(name, role);
+            return role;
+        }
     }
 
     /**

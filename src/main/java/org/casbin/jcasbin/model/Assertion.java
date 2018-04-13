@@ -36,7 +36,7 @@ public class Assertion {
     }
 
     protected void buildRoleLinks(RoleManager rm) {
-        rm = rm;
+        this.rm = rm;
         int count = 0;
         for (int i = 0; i < value.length(); i ++) {
             if (value.charAt(i) == '_') {

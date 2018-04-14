@@ -44,7 +44,8 @@ public class FileAdapter implements Adapter {
     @Override
     public void loadPolicy(Model model) {
         if (filePath.equals("")) {
-            throw new Error("invalid file path, file path cannot be empty");
+            // throw new Error("invalid file path, file path cannot be empty");
+            return;
         }
 
         loadPolicyFile(model, Helper::loadPolicyLine);

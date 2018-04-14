@@ -73,6 +73,14 @@ public class Enforcer extends ManagementEnforcer {
     }
 
     /**
+     * CoreEnforcer initializes an enforcer with a model file, a policy file and an enable log flag.
+     */
+    public Enforcer(String modelPath, String policyFile, boolean enableLog) {
+        this(modelPath, new FileAdapter(policyFile));
+        this.enableLog(enableLog);
+    }
+
+    /**
      * getRolesForUser gets the roles that a user has.
      */
     public List<String> getRolesForUser(String name) {

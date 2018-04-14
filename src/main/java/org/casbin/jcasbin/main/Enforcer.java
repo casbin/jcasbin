@@ -73,6 +73,13 @@ public class Enforcer extends ManagementEnforcer {
     }
 
     /**
+     * CoreEnforcer initializes an enforcer with a model file.
+     */
+    public Enforcer(String modelPath) {
+        this(modelPath, "");
+    }
+
+    /**
      * CoreEnforcer initializes an enforcer with a model file, a policy file and an enable log flag.
      */
     public Enforcer(String modelPath, String policyFile, boolean enableLog) {

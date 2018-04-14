@@ -22,7 +22,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 public class ModelUnitTest {
-    public void testEnforce(Enforcer e, String sub, String obj, String act, boolean res) {
+    public void testEnforce(Enforcer e, String sub, Object obj, String act, boolean res) {
         assertEquals(res, e.enforce(sub, obj, act));
     }
 
@@ -296,6 +296,41 @@ public class ModelUnitTest {
         testEnforce(e, "bob", "data1", "write", false);
         testEnforce(e, "bob", "data2", "read", false);
         testEnforce(e, "bob", "data2", "write", true);
+    }
+
+    public class TestResource {
+        String name;
+        String owner;
+
+        TestResource(String name, String owner) {
+            this.name = name;
+            this.owner = owner;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getOwner() {
+            return owner;
+        }
+    }
+
+    @Test
+    public void testABACModel() {
+        Enforcer e = new Enforcer("examples/abac_model.conf");
+
+        TestResource data1 = new TestResource("data1", "alice");
+        TestResource data2 = new TestResource("data2", "bob");
+
+        testEnforce(e, "alice", data1, "read", true);
+        testEnforce(e, "alice", data1, "write", true);
+        testEnforce(e, "alice", data2, "read", false);
+        testEnforce(e, "alice", data2, "write", false);
+        testEnforce(e, "bob", data1, "read", false);
+        testEnforce(e, "bob", data1, "write", false);
+        testEnforce(e, "bob", data2, "read", true);
+        testEnforce(e, "bob", data2, "write", true);
     }
 
     @Test

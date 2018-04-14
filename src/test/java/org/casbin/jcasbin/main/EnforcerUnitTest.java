@@ -20,7 +20,6 @@ import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
 import org.casbin.jcasbin.util.Util;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;

@@ -5,3 +5,6 @@ sudo: false
 jdk:
   - oraclejdk8
   - openjdk8
+
+after_success:
+  - mvn clean test jacoco:report coveralls:report

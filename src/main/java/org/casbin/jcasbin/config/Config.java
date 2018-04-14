@@ -188,7 +188,7 @@ public class Config {
             option = keys[0];
         }
 
-        boolean ok = data.get(section).containsKey(option);
+        boolean ok = data.containsKey(section) && data.get(section).containsKey(option);
         if (ok) {
             return data.get(section).get(option);
         } else {

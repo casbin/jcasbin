@@ -243,7 +243,7 @@ public class CoreEnforcer {
     /**
      * enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
      */
-    public boolean enforce(String... rvals) {
+    public boolean enforce(Object... rvals) {
         if (!enabled) {
             return true;
         }
@@ -355,7 +355,7 @@ public class CoreEnforcer {
 
         StringBuilder reqStr = new StringBuilder("Request: ");
         for (int i = 0; i < rvals.length; i ++) {
-            String rval = rvals[i];
+            String rval = rvals[i].toString();
 
             if (i != rvals.length - 1) {
                 reqStr.append(String.format("%s, ", rval));

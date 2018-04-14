@@ -132,7 +132,7 @@ public class BuiltInFunctions {
     /**
      * generateGFunction is the factory method of the g(_, _) function.
      */
-    public static AviatorFunction generateGFunction(RoleManager rm) {
+    public static AviatorFunction generateGFunction(String name, RoleManager rm) {
         return new AbstractFunction() {
             public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
                 String name1 = FunctionUtils.getStringValue(arg1, env);
@@ -160,7 +160,7 @@ public class BuiltInFunctions {
             }
 
             public String getName() {
-                return "g";
+                return name;
             }
         };
     }

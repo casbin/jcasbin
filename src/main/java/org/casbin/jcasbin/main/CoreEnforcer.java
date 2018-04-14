@@ -261,7 +261,7 @@ public class CoreEnforcer {
                 Assertion ast = entry.getValue();
 
                 RoleManager rm = ast.rm;
-                functions.put(key, BuiltInFunctions.generateGFunction(rm));
+                functions.put(key, BuiltInFunctions.generateGFunction(key, rm));
             }
         }
 

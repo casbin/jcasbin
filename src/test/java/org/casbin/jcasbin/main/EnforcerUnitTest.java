@@ -17,14 +17,28 @@ package org.casbin.jcasbin.main;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
+import org.casbin.jcasbin.util.Util;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
 import static org.casbin.jcasbin.main.CoreEnforcer.newModel;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class EnforcerUnitTest {
     public void testEnforce(Enforcer e, String sub, String obj, String act, boolean res) {
         assertEquals(e.enforce(sub, obj, act), res);
+    }
+
+    public void testGetPolicy(Enforcer e, List res) {
+        List myRes = e.getPolicy();
+        Util.logPrint("Policy: " + myRes);
+
+        if (!Util.array2DEquals(res, myRes)) {
+            fail("Policy: " + myRes + ", supposed to be " + res);
+        }
     }
 
     @Test
@@ -146,7 +160,7 @@ public class EnforcerUnitTest {
     }
 
     @Test
-    public void TestRBACModelInMemory2() {
+    public void testRBACModelInMemory2() {
         String text =
 		    "[request_definition]\n"
             + "r = sub, obj, act\n"
@@ -187,7 +201,7 @@ public class EnforcerUnitTest {
     }
 
     @Test
-    public void TestNotUsedRBACModelInMemory() {
+    public void testNotUsedRBACModelInMemory() {
         Model m = newModel();
         m.addDef("r", "r", "sub, obj, act");
         m.addDef("p", "p", "sub, obj, act");
@@ -208,5 +222,200 @@ public class EnforcerUnitTest {
         testEnforce(e, "bob", "data1", "write", false);
         testEnforce(e, "bob", "data2", "read", false);
         testEnforce(e, "bob", "data2", "write", true);
+    }
+
+    @Test
+    public void testReloadPolicy() {
+        Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
+
+        e.loadPolicy();
+        testGetPolicy(e, asList(asList("alice", "data1", "read"), asList("bob", "data2", "write"), asList("data2_admin", "data2", "read"), asList("data2_admin", "data2", "write")));
+    }
+
+    @Test
+    public void testSavePolicy() {
+        Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
+
+        e.savePolicy();
+    }
+
+    @Test
+    public void testClearPolicy() {
+        Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
+
+        e.clearPolicy();
+    }
+
+    @Test
+    public void testEnableEnforce() {
+        Enforcer e = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv");
+
+        e.enableEnforce(false);
+        testEnforce(e, "alice", "data1", "read", true);
+        testEnforce(e, "alice", "data1", "write", true);
+        testEnforce(e, "alice", "data2", "read", true);
+        testEnforce(e, "alice", "data2", "write", true);
+        testEnforce(e, "bob", "data1", "read", true);
+        testEnforce(e, "bob", "data1", "write", true);
+        testEnforce(e, "bob", "data2", "read", true);
+        testEnforce(e, "bob", "data2", "write", true);
+
+        e.enableEnforce(true);
+        testEnforce(e, "alice", "data1", "read", true);
+        testEnforce(e, "alice", "data1", "write", false);
+        testEnforce(e, "alice", "data2", "read", false);
+        testEnforce(e, "alice", "data2", "write", false);
+        testEnforce(e, "bob", "data1", "read", false);
+        testEnforce(e, "bob", "data1", "write", false);
+        testEnforce(e, "bob", "data2", "read", false);
+        testEnforce(e, "bob", "data2", "write", true);
+    }
+
+    @Test
+    public void testEnableLog() {
+        Enforcer e = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv", true);
+        // The log is enabled by default, so the above is the same with:
+        // Enforcer e = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv");
+
+        testEnforce(e, "alice", "data1", "read", true);
+        testEnforce(e, "alice", "data1", "write", false);
+        testEnforce(e, "alice", "data2", "read", false);
+        testEnforce(e, "alice", "data2", "write", false);
+        testEnforce(e, "bob", "data1", "read", false);
+        testEnforce(e, "bob", "data1", "write", false);
+        testEnforce(e, "bob", "data2", "read", false);
+        testEnforce(e, "bob", "data2", "write", true);
+
+        // The log can also be enabled or disabled at run-time.
+        e.enableLog(false);
+        testEnforce(e, "alice", "data1", "read", true);
+        testEnforce(e, "alice", "data1", "write", false);
+        testEnforce(e, "alice", "data2", "read", false);
+        testEnforce(e, "alice", "data2", "write", false);
+        testEnforce(e, "bob", "data1", "read", false);
+        testEnforce(e, "bob", "data1", "write", false);
+        testEnforce(e, "bob", "data2", "read", false);
+        testEnforce(e, "bob", "data2", "write", true);
+    }
+
+    @Test
+    public void testEnableAutoSave() {
+        Enforcer e = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv");
+
+        e.enableAutoSave(false);
+        // Because AutoSave is disabled, the policy change only affects the policy in Casbin enforcer,
+        // it doesn't affect the policy in the storage.
+        e.removePolicy("alice", "data1", "read");
+        // Reload the policy from the storage to see the effect.
+        e.loadPolicy();
+        testEnforce(e, "alice", "data1", "read", true);
+        testEnforce(e, "alice", "data1", "write", false);
+        testEnforce(e, "alice", "data2", "read", false);
+        testEnforce(e, "alice", "data2", "write", false);
+        testEnforce(e, "bob", "data1", "read", false);
+        testEnforce(e, "bob", "data1", "write", false);
+        testEnforce(e, "bob", "data2", "read", false);
+        testEnforce(e, "bob", "data2", "write", true);
+
+        e.enableAutoSave(true);
+        // Because AutoSave is enabled, the policy change not only affects the policy in Casbin enforcer,
+        // but also affects the policy in the storage.
+        e.removePolicy("alice", "data1", "read");
+
+        // However, the file adapter doesn't implement the AutoSave feature, so enabling it has no effect at all here.
+
+        // Reload the policy from the storage to see the effect.
+        e.loadPolicy();
+        testEnforce(e, "alice", "data1", "read", true); // Will not be false here.
+        testEnforce(e, "alice", "data1", "write", false);
+        testEnforce(e, "alice", "data2", "read", false);
+        testEnforce(e, "alice", "data2", "write", false);
+        testEnforce(e, "bob", "data1", "read", false);
+        testEnforce(e, "bob", "data1", "write", false);
+        testEnforce(e, "bob", "data2", "read", false);
+        testEnforce(e, "bob", "data2", "write", true);
+    }
+
+    @Test
+    public void testInitWithAdapter() {
+        Adapter adapter = new FileAdapter("examples/basic_policy.csv");
+        Enforcer e = new Enforcer("examples/basic_model.conf", adapter);
+
+        testEnforce(e, "alice", "data1", "read", true);
+        testEnforce(e, "alice", "data1", "write", false);
+        testEnforce(e, "alice", "data2", "read", false);
+        testEnforce(e, "alice", "data2", "write", false);
+        testEnforce(e, "bob", "data1", "read", false);
+        testEnforce(e, "bob", "data1", "write", false);
+        testEnforce(e, "bob", "data2", "read", false);
+        testEnforce(e, "bob", "data2", "write", true);
+    }
+
+    @Test
+    public void testRoleLinks() {
+        Enforcer e = new Enforcer("examples/rbac_model.conf");
+        e.enableAutoBuildRoleLinks(false);
+        e.buildRoleLinks();
+        e.enforce("user501", "data9", "read");
+    }
+
+    @Test
+    public void testGetAndSetModel() {
+        Enforcer e = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv");
+        Enforcer e2 = new Enforcer("examples/basic_with_root_model.conf", "examples/basic_policy.csv");
+
+        testEnforce(e, "root", "data1", "read", false);
+
+        e.setModel(e2.getModel());
+
+        testEnforce(e, "root", "data1", "read", true);
+    }
+
+    @Test
+    public void testGetAndSetAdapterInMem() {
+        Enforcer e = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv");
+        Enforcer e2 = new Enforcer("examples/basic_model.conf", "examples/basic_inverse_policy.csv");
+
+        testEnforce(e, "alice", "data1", "read", true);
+        testEnforce(e, "alice", "data1", "write", false);
+
+        Adapter a2 = e2.getAdapter();
+        e.setAdapter(a2);
+        e.loadPolicy();
+
+        testEnforce(e, "alice", "data1", "read", false);
+        testEnforce(e, "alice", "data1", "write", true);
+    }
+
+    @Test
+    public void testSetAdapterFromFile() {
+        Enforcer e = new Enforcer("examples/basic_model.conf");
+
+        testEnforce(e, "alice", "data1", "read", false);
+
+        Adapter a = new FileAdapter("examples/basic_policy.csv");
+        e.setAdapter(a);
+        e.loadPolicy();
+
+        testEnforce(e, "alice", "data1", "read", true);
+    }
+
+    @Test
+    public void testInitEmpty() {
+        Enforcer e = new Enforcer();
+
+        Model m = newModel();
+        m.addDef("r", "r", "sub, obj, act");
+        m.addDef("p", "p", "sub, obj, act");
+        m.addDef("e", "e", "some(where (p.eft == allow))");
+        m.addDef("m", "m", "r.sub == p.sub && keyMatch(r.obj, p.obj) && regexMatch(r.act, p.act)");
+
+        Adapter a = new FileAdapter("examples/keymatch_policy.csv");
+
+        e.setModel(m);
+        e.setAdapter(a);
+        e.loadPolicy();
+
+        testEnforce(e, "alice", "/alice_data/resource1", "GET", true);
     }
 }

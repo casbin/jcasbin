@@ -126,7 +126,7 @@ public class BuiltInFunctions {
 
         Integer prefix = ipa2.getNetworkPrefixLength();
         IPAddress mask = ipa2.getNetwork().getNetworkMask(prefix, false);
-        return ipa1.mask(mask).equals(ipa2);
+        return ipa1.mask(mask).equals(ipas2.getHostAddress());
     }
 
     /**

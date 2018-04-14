@@ -30,6 +30,13 @@ public class Config {
     private Map<String, Map<String, String>> data;
 
     /**
+     * Config represents the configuration parser.
+     */
+    private Config() {
+        data = new HashMap<>();
+    }
+
+    /**
      * newConfig create an empty configuration representation from file.
      */
     public static Config newConfig(String confName) {

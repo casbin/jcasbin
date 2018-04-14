@@ -20,11 +20,11 @@ import static org.junit.Assert.assertEquals;
 
 public class ModelUnitTest {
     public void testEnforce(Enforcer e, String sub, String obj, String act, boolean res) {
-        assertEquals(e.enforce(sub, obj, act), res);
+        assertEquals(res, e.enforce(sub, obj, act));
     }
 
     public void testEnforceWithoutUsers(Enforcer e, String obj, String act, boolean res) {
-        assertEquals(e.enforce(obj, act), res);
+        assertEquals(res, e.enforce(obj, act));
     }
 
     @Test

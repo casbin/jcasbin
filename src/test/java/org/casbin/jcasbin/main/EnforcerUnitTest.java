@@ -29,7 +29,7 @@ import static org.junit.Assert.*;
 
 public class EnforcerUnitTest {
     public void testEnforce(Enforcer e, String sub, String obj, String act, boolean res) {
-        assertEquals(e.enforce(sub, obj, act), res);
+        assertEquals(res, e.enforce(sub, obj, act));
     }
 
     public void testGetPolicy(Enforcer e, List res) {

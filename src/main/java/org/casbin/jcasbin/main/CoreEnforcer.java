@@ -86,7 +86,9 @@ public class CoreEnforcer {
     public static Model newModel(String modelPath, String unused) {
         Model m = new Model();
 
-        m.loadModel(modelPath);
+        if (!modelPath.equals("")) {
+            m.loadModel(modelPath);
+        }
 
         return m;
     }

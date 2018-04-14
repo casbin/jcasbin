@@ -182,7 +182,7 @@ public class DefaultRoleManager implements RoleManager {
  * Role represents the data structure for a role in RBAC.
  */
 class Role {
-    public String name;
+    String name;
     private List<Role> roles;
 
     protected Role(String name) {
@@ -190,7 +190,7 @@ class Role {
         roles = new ArrayList<>();
     }
 
-    protected void addRole(Role role) {
+    void addRole(Role role) {
         for (Role r : roles) {
             if (r.name.equals(role.name)) {
                 return;
@@ -200,7 +200,7 @@ class Role {
         roles.add(role);
     }
 
-    protected void deleteRole(Role role) {
+    void deleteRole(Role role) {
         for (Role r : roles) {
             if (r.name.equals(role.name)) {
                 roles.remove(r);
@@ -208,8 +208,8 @@ class Role {
         }
     }
 
-    protected boolean hasRole(String name, int hierarchyLevel) {
-        if (name.equals(name)) {
+    boolean hasRole(String name, int hierarchyLevel) {
+        if (this.name.equals(name)) {
             return true;
         }
 
@@ -225,7 +225,7 @@ class Role {
         return false;
     }
 
-    protected boolean hasDirectRole(String name) {
+    boolean hasDirectRole(String name) {
         for (Role r : roles) {
             if (r.name.equals(name)) {
                 return true;
@@ -248,7 +248,7 @@ class Role {
         return name + " < " + names;
     }
 
-    protected List<String> getRoles() {
+    List<String> getRoles() {
         List<String> names = new ArrayList<>();
         for (Role r : roles) {
             names.add(r.name);

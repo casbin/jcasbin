@@ -15,6 +15,7 @@
 package org.casbin.jcasbin.main;
 
 import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import org.casbin.jcasbin.effect.DefaultEffector;
 import org.casbin.jcasbin.effect.Effect;
@@ -264,11 +265,12 @@ public class CoreEnforcer {
                 functions.put(key, BuiltInFunctions.generateGFunction(key, rm));
             }
         }
-
-        String expString = model.model.get("m").get("m").value;
         for (AviatorFunction f : functions.values()) {
             AviatorEvaluator.addFunction(f);
         }
+
+        String expString = model.model.get("m").get("m").value;
+        Expression expression = AviatorEvaluator.compile(expString);
 
         Effect policyEffects[];
         float matcherResults[];
@@ -292,7 +294,7 @@ public class CoreEnforcer {
                     parameters.put(token, pvals.get(j));
                 }
 
-                Object result =  AviatorEvaluator.execute(expString, parameters);
+                Object result =  expression.execute(parameters);
                 // Util.logPrint("Result: " + result);
 
                 if (result instanceof Boolean) {
@@ -341,7 +343,7 @@ public class CoreEnforcer {
                 parameters.put(token, "");
             }
 
-            Object result = AviatorEvaluator.execute(expString, parameters);
+            Object result = expression.execute(parameters);
             // Util.logPrint("Result: " + result);
 
             if ((boolean) result) {

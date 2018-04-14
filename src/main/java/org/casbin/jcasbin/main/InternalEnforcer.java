@@ -25,10 +25,17 @@ class InternalEnforcer extends CoreEnforcer {
 
         if (ruleAdded) {
             if (adapter != null && autoSave) {
-                adapter.addPolicy(sec, ptype, rule);
-            }
-            if (watcher != null) {
-                watcher.update();
+                try {
+                    adapter.addPolicy(sec, ptype, rule);
+                } catch (Error e) {
+                    if (!e.getMessage().equals("not implemented")) {
+                        throw e;
+                    }
+                }
+
+                if (watcher != null) {
+                    watcher.update();
+                }
             }
         }
 
@@ -43,10 +50,17 @@ class InternalEnforcer extends CoreEnforcer {
 
         if (ruleRemoved) {
             if (adapter != null && autoSave) {
-                adapter.removePolicy(sec, ptype, rule);
-            }
-            if (watcher != null) {
-                watcher.update();
+                try {
+                    adapter.removePolicy(sec, ptype, rule);
+                } catch (Error e) {
+                    if (!e.getMessage().equals("not implemented")) {
+                        throw e;
+                    }
+                }
+
+                if (watcher != null) {
+                    watcher.update();
+                }
             }
         }
 
@@ -61,10 +75,17 @@ class InternalEnforcer extends CoreEnforcer {
 
         if (ruleRemoved) {
             if (adapter != null && autoSave) {
-                adapter.removeFilteredPolicy(sec, ptype, fieldIndex, fieldValues);
-            }
-            if (watcher != null) {
-                watcher.update();
+                try {
+                    adapter.removeFilteredPolicy(sec, ptype, fieldIndex, fieldValues);
+                } catch (Error e) {
+                    if (!e.getMessage().equals("not implemented")) {
+                        throw e;
+                    }
+                }
+
+                if (watcher != null) {
+                    watcher.update();
+                }
             }
         }
 

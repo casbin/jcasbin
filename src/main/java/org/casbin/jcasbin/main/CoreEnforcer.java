@@ -21,7 +21,6 @@ import org.casbin.jcasbin.effect.Effect;
 import org.casbin.jcasbin.effect.Effector;
 import org.casbin.jcasbin.model.Assertion;
 import org.casbin.jcasbin.persist.Watcher;
-import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
 import org.casbin.jcasbin.model.FunctionMap;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
@@ -33,8 +32,6 @@ import org.casbin.jcasbin.util.Util;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.casbin.jcasbin.util.BuiltInFunctions.generateGFunction;
 
 /**
  * CoreEnforcer is the main interface for authorization enforcement and policy management.

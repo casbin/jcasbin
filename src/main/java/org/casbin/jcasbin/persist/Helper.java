@@ -17,7 +17,6 @@ package org.casbin.jcasbin.persist;
 import org.casbin.jcasbin.model.Model;
 
 import java.util.Arrays;
-import java.util.function.BiFunction;
 
 public class Helper {
     public interface loadPolicyLineHandler<T, U> {

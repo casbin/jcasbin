@@ -14,8 +14,6 @@
 
 package org.casbin.jcasbin.effect;
 
-import java.util.HashMap;
-
 /**
  * DefaultEffector is default effector for Casbin.
  */
@@ -30,7 +28,7 @@ public class DefaultEffector implements Effector {
      * mergeEffects merges all matching results collected by the enforcer into a single decision.
      */
     public boolean mergeEffects(String expr, Effect[] effects, float[] results) {
-        boolean result = false;
+        boolean result;
         if (expr.equals("some(where (p_eft == allow))")) {
             result = false;
             for (Effect eft : effects) {

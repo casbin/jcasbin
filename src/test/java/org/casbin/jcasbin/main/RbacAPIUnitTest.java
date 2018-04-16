@@ -17,9 +17,7 @@ package org.casbin.jcasbin.main;
 import org.junit.Test;
 
 import static java.util.Arrays.asList;
-import static org.casbin.jcasbin.main.TestUtil.testEnforce;
-import static org.casbin.jcasbin.main.TestUtil.testGetRoles;
-import static org.casbin.jcasbin.main.TestUtil.testHasRole;
+import static org.casbin.jcasbin.main.TestUtil.*;
 
 public class RbacAPIUnitTest {
     @Test
@@ -80,5 +78,51 @@ public class RbacAPIUnitTest {
         testEnforce(e, "bob", "data1", "write", false);
         testEnforce(e, "bob", "data2", "read", false);
         testEnforce(e, "bob", "data2", "write", true);
+    }
+
+    @Test
+    public void testPermissionAPI() {
+        Enforcer e = new Enforcer("examples/basic_without_resources_model.conf", "examples/basic_without_resources_policy.csv");
+
+        testEnforceWithoutUsers(e, "alice", "read", true);
+        testEnforceWithoutUsers(e, "alice", "write", false);
+        testEnforceWithoutUsers(e, "bob", "read", false);
+        testEnforceWithoutUsers(e, "bob", "write", true);
+
+        testGetPermissions(e, "alice", asList(asList("alice", "read")));
+        testGetPermissions(e, "bob", asList(asList("bob", "write")));
+
+        testHasPermission(e, "alice", asList("read"), true);
+        testHasPermission(e, "alice", asList("write"), false);
+        testHasPermission(e, "bob", asList("read"), false);
+        testHasPermission(e, "bob", asList("write"), true);
+
+        e.deletePermission("read");
+
+        testEnforceWithoutUsers(e, "alice", "read", false);
+        testEnforceWithoutUsers(e, "alice", "write", false);
+        testEnforceWithoutUsers(e, "bob", "read", false);
+        testEnforceWithoutUsers(e, "bob", "write", true);
+
+        e.addPermissionForUser("bob", "read");
+
+        testEnforceWithoutUsers(e, "alice", "read", false);
+        testEnforceWithoutUsers(e, "alice", "write", false);
+        testEnforceWithoutUsers(e, "bob", "read", true);
+        testEnforceWithoutUsers(e, "bob", "write", true);
+
+        e.deletePermissionForUser("bob", "read");
+
+        testEnforceWithoutUsers(e, "alice", "read", false);
+        testEnforceWithoutUsers(e, "alice", "write", false);
+        testEnforceWithoutUsers(e, "bob", "read", false);
+        testEnforceWithoutUsers(e, "bob", "write", true);
+
+        e.deletePermissionsForUser("bob");
+
+        testEnforceWithoutUsers(e, "alice", "read", false);
+        testEnforceWithoutUsers(e, "alice", "write", false);
+        testEnforceWithoutUsers(e, "bob", "read", false);
+        testEnforceWithoutUsers(e, "bob", "write", false);
     }
 }

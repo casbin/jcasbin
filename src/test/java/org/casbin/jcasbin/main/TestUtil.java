@@ -36,9 +36,9 @@ public class TestUtil {
 
     static void testGetPolicy(Enforcer e, List<List<String>> res) {
         List<List<String>> myRes = e.getPolicy();
-        org.casbin.jcasbin.util.Util.logPrint("Policy: " + myRes);
+        Util.logPrint("Policy: " + myRes);
 
-        if (!org.casbin.jcasbin.util.Util.array2DEquals(res, myRes)) {
+        if (!Util.array2DEquals(res, myRes)) {
             fail("Policy: " + myRes + ", supposed to be " + res);
         }
     }
@@ -67,6 +67,24 @@ public class TestUtil {
 
         if (res != myRes) {
             fail(name + " has role " + role + ": " + myRes + ", supposed to be " + res);
+        }
+    }
+
+    static void testGetPermissions(Enforcer e, String name, List<List<String>> res) {
+        List<List<String>> myRes = e.getPermissionsForUser(name);
+        Util.logPrint("Permissions for " + name + ": " + myRes);
+
+        if (!Util.array2DEquals(res, myRes)) {
+            fail("Permissions for " + name + ": " + myRes + ", supposed to be " + res);
+        }
+    }
+
+    static void testHasPermission(Enforcer e, String name, List<String> permission, boolean res) {
+        boolean myRes = e.hasPermissionForUser(name, permission);
+        Util.logPrint(name + " has permission " + Util.arrayToString(permission) + ": " + myRes);
+
+        if (res != myRes) {
+            fail(name + " has permission " + Util.arrayToString(permission) + ": " + myRes + ", supposed to be " + res);
         }
     }
 }

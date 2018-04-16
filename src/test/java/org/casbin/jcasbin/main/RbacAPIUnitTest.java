@@ -1,0 +1,84 @@
+// Copyright 2018 The casbin Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package org.casbin.jcasbin.main;
+
+import org.junit.Test;
+
+import static java.util.Arrays.asList;
+import static org.casbin.jcasbin.main.TestUtil.testEnforce;
+import static org.casbin.jcasbin.main.TestUtil.testGetRoles;
+import static org.casbin.jcasbin.main.TestUtil.testHasRole;
+
+public class RbacAPIUnitTest {
+    @Test
+    public void testRoleAPI() {
+        Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
+
+        testGetRoles(e, "alice", asList("data2_admin"));
+        testGetRoles(e, "bob", asList());
+        testGetRoles(e, "data2_admin", asList());
+        testGetRoles(e, "non_exist", asList());
+
+        testHasRole(e, "alice", "data1_admin", false);
+        testHasRole(e, "alice", "data2_admin", true);
+
+        e.addRoleForUser("alice", "data1_admin");
+
+        testGetRoles(e, "alice", asList("data1_admin", "data2_admin"));
+        testGetRoles(e, "bob", asList());
+        testGetRoles(e, "data2_admin", asList());
+
+        e.deleteRoleForUser("alice", "data1_admin");
+
+        testGetRoles(e, "alice", asList("data2_admin"));
+        testGetRoles(e, "bob", asList());
+        testGetRoles(e, "data2_admin", asList());
+
+        e.deleteRolesForUser("alice");
+
+        testGetRoles(e, "alice", asList());
+        testGetRoles(e, "bob", asList());
+        testGetRoles(e, "data2_admin", asList());
+
+        e.addRoleForUser("alice", "data1_admin");
+        e.deleteUser("alice");
+
+        testGetRoles(e, "alice", asList());
+        testGetRoles(e, "bob", asList());
+        testGetRoles(e, "data2_admin", asList());
+
+        e.addRoleForUser("alice", "data2_admin");
+
+        testEnforce(e, "alice", "data1", "read", true);
+        testEnforce(e, "alice", "data1", "write", false);
+        testEnforce(e, "alice", "data2", "read", true);
+        testEnforce(e, "alice", "data2", "write", true);
+        testEnforce(e, "bob", "data1", "read", false);
+        testEnforce(e, "bob", "data1", "write", false);
+        testEnforce(e, "bob", "data2", "read", false);
+        testEnforce(e, "bob", "data2", "write", true);
+
+        e.deleteRole("data2_admin");
+
+        testEnforce(e, "alice", "data1", "read", true);
+        testEnforce(e, "alice", "data1", "write", false);
+        testEnforce(e, "alice", "data2", "read", false);
+        testEnforce(e, "alice", "data2", "write", false);
+        testEnforce(e, "bob", "data1", "read", false);
+        testEnforce(e, "bob", "data1", "write", false);
+        testEnforce(e, "bob", "data2", "read", false);
+        testEnforce(e, "bob", "data2", "write", true);
+    }
+}

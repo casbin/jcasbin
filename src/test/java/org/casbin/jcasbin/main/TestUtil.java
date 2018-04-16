@@ -14,6 +14,8 @@
 
 package org.casbin.jcasbin.main;
 
+import org.casbin.jcasbin.util.Util;
+
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -38,6 +40,33 @@ public class TestUtil {
 
         if (!org.casbin.jcasbin.util.Util.array2DEquals(res, myRes)) {
             fail("Policy: " + myRes + ", supposed to be " + res);
+        }
+    }
+
+    static void testGetRoles(Enforcer e, String name, List<String> res) {
+        List<String> myRes = e.getRolesForUser(name);
+        Util.logPrint("Roles for " + name + ": " + myRes);
+
+        if (!Util.setEquals(res, myRes)) {
+            fail("Roles for " + name + ": " + myRes + ", supposed to be " + res);
+        }
+    }
+
+    static void testGetUsers(Enforcer e, String name, List<String> res) {
+        List<String> myRes = e.getUsersForRole(name);
+        Util.logPrint("Users for " + name + ": " + myRes);
+
+        if (!Util.setEquals(res, myRes)) {
+            fail("Users for " + name + ": " + myRes + ", supposed to be " + res);
+        }
+    }
+
+    static void testHasRole(Enforcer e, String name, String role, boolean res) {
+        boolean myRes = e.hasRoleForUser(name, role);
+        Util.logPrint(name + " has role " + role + ": " + myRes);
+
+        if (res != myRes) {
+            fail(name + " has role " + role + ": " + myRes + ", supposed to be " + res);
         }
     }
 }

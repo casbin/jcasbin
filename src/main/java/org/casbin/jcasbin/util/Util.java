@@ -14,6 +14,7 @@
 
 package org.casbin.jcasbin.util;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -127,5 +128,28 @@ public class Util {
      */
     public static String arrayToString(List<String> s) {
         return String.join(", ", s);
+    }
+
+    /**
+     * setEquals determines whether two string sets are identical.
+     *
+     * @param a the first set.
+     * @param b the second set.
+     * @return whether a equals to b.
+     */
+    public static boolean setEquals(List<String> a, List<String> b) {
+        if (a.size() != b.size()) {
+            return false;
+        }
+
+        Collections.sort(a);
+        Collections.sort(b);
+
+        for (int i = 0; i < a.size(); i ++) {
+            if (!a.get(i).equals(b.get(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 }

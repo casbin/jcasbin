@@ -17,29 +17,14 @@ package org.casbin.jcasbin.main;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
-import org.casbin.jcasbin.util.Util;
 import org.junit.Test;
-
-import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.casbin.jcasbin.main.CoreEnforcer.newModel;
-import static org.junit.Assert.*;
+import static org.casbin.jcasbin.main.Util.testEnforce;
+import static org.casbin.jcasbin.main.Util.testGetPolicy;
 
 public class EnforcerUnitTest {
-    public void testEnforce(Enforcer e, String sub, String obj, String act, boolean res) {
-        assertEquals(res, e.enforce(sub, obj, act));
-    }
-
-    public void testGetPolicy(Enforcer e, List res) {
-        List myRes = e.getPolicy();
-        Util.logPrint("Policy: " + myRes);
-
-        if (!Util.array2DEquals(res, myRes)) {
-            fail("Policy: " + myRes + ", supposed to be " + res);
-        }
-    }
-
     @Test
     public void testKeyMatchModelInMemory() {
         Model m = newModel();

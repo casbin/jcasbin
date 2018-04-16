@@ -19,21 +19,11 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.casbin.jcasbin.main.Util.testDomainEnforce;
+import static org.casbin.jcasbin.main.Util.testEnforce;
+import static org.casbin.jcasbin.main.Util.testEnforceWithoutUsers;
 
 public class ModelUnitTest {
-    public void testEnforce(Enforcer e, String sub, Object obj, String act, boolean res) {
-        assertEquals(res, e.enforce(sub, obj, act));
-    }
-
-    public void testEnforceWithoutUsers(Enforcer e, String obj, String act, boolean res) {
-        assertEquals(res, e.enforce(obj, act));
-    }
-
-    public void testDomainEnforce(Enforcer e, String sub, String dom, String obj, String act, boolean res) {
-        assertEquals(res, e.enforce(sub, dom, obj, act));
-    }
-
     @Test
     public void testBasicModel() {
         Enforcer e = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv");

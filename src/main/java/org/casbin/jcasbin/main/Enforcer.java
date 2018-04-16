@@ -220,6 +220,17 @@ public class Enforcer extends ManagementEnforcer {
     }
 
     /**
+     * deletePermission deletes a permission.
+     * Returns false if the permission does not exist (aka not affected).
+     *
+     * @param permission the permission, usually be (obj, act). It is actually the rule without the subject.
+     * @return succeeds or not.
+     */
+    public boolean deletePermission(List<String> permission) {
+        return deletePermission(permission.toArray(new String[0]));
+    }
+
+    /**
      * addPermissionForUser adds a permission for a user or role.
      * Returns false if the user or role already has the permission (aka not affected).
      *
@@ -237,6 +248,18 @@ public class Enforcer extends ManagementEnforcer {
     }
 
     /**
+     * addPermissionForUser adds a permission for a user or role.
+     * Returns false if the user or role already has the permission (aka not affected).
+     *
+     * @param user the user.
+     * @param permission the permission, usually be (obj, act). It is actually the rule without the subject.
+     * @return succeeds or not.
+     */
+    public boolean addPermissionForUser(String user, List<String> permission) {
+        return addPermissionForUser(user, permission.toArray(new String[0]));
+    }
+
+    /**
      * deletePermissionForUser deletes a permission for a user or role.
      * Returns false if the user or role does not have the permission (aka not affected).
      *
@@ -251,6 +274,18 @@ public class Enforcer extends ManagementEnforcer {
         Collections.addAll(params, permission);
 
         return removePolicy(params);
+    }
+
+    /**
+     * deletePermissionForUser deletes a permission for a user or role.
+     * Returns false if the user or role does not have the permission (aka not affected).
+     *
+     * @param user the user.
+     * @param permission the permission, usually be (obj, act). It is actually the rule without the subject.
+     * @return succeeds or not.
+     */
+    public boolean deletePermissionForUser(String user, List<String> permission) {
+        return deletePermissionForUser(user, permission.toArray(new String[0]));
     }
 
     /**
@@ -288,5 +323,16 @@ public class Enforcer extends ManagementEnforcer {
         Collections.addAll(params, permission);
 
         return hasPolicy(params);
+    }
+
+    /**
+     * hasPermissionForUser determines whether a user has a permission.
+     *
+     * @param user the user.
+     * @param permission the permission, usually be (obj, act). It is actually the rule without the subject.
+     * @return whether the user has the permission.
+     */
+    public boolean hasPermissionForUser(String user, List<String> permission) {
+        return hasPermissionForUser(user, permission.toArray(new String[0]));
     }
 }

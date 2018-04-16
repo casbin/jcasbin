@@ -19,7 +19,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class Util {
+public class TestUtil {
     static void testEnforce(Enforcer e, String sub, Object obj, String act, boolean res) {
         assertEquals(res, e.enforce(sub, obj, act));
     }

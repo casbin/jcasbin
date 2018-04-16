@@ -19,9 +19,9 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.casbin.jcasbin.main.Util.testDomainEnforce;
-import static org.casbin.jcasbin.main.Util.testEnforce;
-import static org.casbin.jcasbin.main.Util.testEnforceWithoutUsers;
+import static org.casbin.jcasbin.main.TestUtil.testDomainEnforce;
+import static org.casbin.jcasbin.main.TestUtil.testEnforce;
+import static org.casbin.jcasbin.main.TestUtil.testEnforceWithoutUsers;
 
 public class ModelUnitTest {
     @Test

@@ -21,8 +21,8 @@ import org.junit.Test;
 
 import static java.util.Arrays.asList;
 import static org.casbin.jcasbin.main.CoreEnforcer.newModel;
-import static org.casbin.jcasbin.main.Util.testEnforce;
-import static org.casbin.jcasbin.main.Util.testGetPolicy;
+import static org.casbin.jcasbin.main.TestUtil.testEnforce;
+import static org.casbin.jcasbin.main.TestUtil.testGetPolicy;
 
 public class EnforcerUnitTest {
     @Test

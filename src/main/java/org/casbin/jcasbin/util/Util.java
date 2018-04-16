@@ -14,6 +14,7 @@
 
 package org.casbin.jcasbin.util;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -78,6 +79,12 @@ public class Util {
      * @return whether a equals to b.
      */
     public static boolean arrayEquals(List<String> a, List<String> b) {
+        if (a == null) {
+            a = new ArrayList<>();
+        }
+        if (b == null) {
+            b = new ArrayList<>();
+        }
         if (a.size() != b.size()) {
             return false;
         }
@@ -98,6 +105,12 @@ public class Util {
      * @return whether a equals to b.
      */
     public static boolean array2DEquals(List<List<String>> a, List<List<String>> b) {
+        if (a == null) {
+            a = new ArrayList<>();
+        }
+        if (b == null) {
+            b = new ArrayList<>();
+        }
         if (a.size() != b.size()) {
             return false;
         }
@@ -138,6 +151,12 @@ public class Util {
      * @return whether a equals to b.
      */
     public static boolean setEquals(List<String> a, List<String> b) {
+        if (a == null) {
+            a = new ArrayList<>();
+        }
+        if (b == null) {
+            b = new ArrayList<>();
+        }
         if (a.size() != b.size()) {
             return false;
         }

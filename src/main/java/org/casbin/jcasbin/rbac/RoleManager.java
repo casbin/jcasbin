@@ -26,29 +26,48 @@ public interface RoleManager {
     /**
      * addLink adds the inheritance link between two roles. role: name1 and role: name2.
      * domain is a prefix to the roles.
+     *
+     * @param name1 the first role (or user).
+     * @param name2 the second role.
+     * @param domain the domain the roles belong to.
      */
     void addLink(String name1, String name2, String... domain);
 
     /**
      * deleteLink deletes the inheritance link between two roles. role: name1 and role: name2.
      * domain is a prefix to the roles.
+     *
+     * @param name1 the first role (or user).
+     * @param name2 the second role.
+     * @param domain the domain the roles belong to.
      */
     void deleteLink(String name1, String name2, String... domain);
 
     /**
      * hasLink determines whether a link exists between two roles. role: name1 inherits role: name2.
      * domain is a prefix to the roles.
+     *
+     * @param name1 the first role (or a user).
+     * @param name2 the second role.
+     * @param domain the domain the roles belong to.
+     * @return whether name1 inherits name2 (name1 has role name2).
      */
     boolean hasLink(String name1, String name2, String... domain);
 
     /**
      * getRoles gets the roles that a user inherits.
      * domain is a prefix to the roles.
+     *
+     * @param name the user (or a role).
+     * @param domain the domain the roles belong to.
+     * @return the roles.
      */
     List<String> getRoles(String name, String... domain);
 
     /**
      * getUsers gets the users that inherits a role.
+     * @param name the role.
+     * @return the users.
      */
     List<String> getUsers(String name);
 

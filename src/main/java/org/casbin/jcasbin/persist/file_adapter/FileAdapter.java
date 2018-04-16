@@ -33,6 +33,8 @@ public class FileAdapter implements Adapter {
 
     /**
      * FileAdapter is the constructor for FileAdapter.
+     *
+     * @param filePath the path of the policy file.
      */
     public FileAdapter(String filePath) {
         this.filePath = filePath;

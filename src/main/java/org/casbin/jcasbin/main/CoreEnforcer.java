@@ -63,6 +63,8 @@ public class CoreEnforcer {
 
     /**
      * newModel creates a model.
+     *
+     * @return an empty model.
      */
     public static Model newModel() {
         Model m = new Model();
@@ -72,6 +74,9 @@ public class CoreEnforcer {
 
     /**
      * newModel creates a model.
+     *
+     * @param text the model text.
+     * @return the model.
      */
     public static Model newModel(String text) {
         Model m = new Model();
@@ -83,6 +88,11 @@ public class CoreEnforcer {
 
     /**
      * newModel creates a model.
+     *
+     * @param modelPath the path of the model file.
+     * @param unused unused parameter, just for differentiating with
+     *               newModel(String text).
+     * @return the model.
      */
     public static Model newModel(String modelPath, String unused) {
         Model m = new Model();
@@ -97,7 +107,8 @@ public class CoreEnforcer {
 
     /**
      * loadModel reloads the model from the model CONF file.
-     * Because the policy is attached to a model, so the policy is invalidated and needs to be reloaded by calling LoadPolicy().
+     * Because the policy is attached to a model, so the policy is invalidated
+     * and needs to be reloaded by calling LoadPolicy().
      */
     public void loadModel() {
         model = newModel();
@@ -108,6 +119,8 @@ public class CoreEnforcer {
 
     /**
      * getModel gets the current model.
+     *
+     * @return the model of the enforcer.
      */
     public Model getModel() {
         return model;
@@ -115,6 +128,8 @@ public class CoreEnforcer {
 
     /**
      * setModel sets the current model.
+     *
+     * @param model the model.
      */
     public void setModel(Model model) {
         this.model = model;
@@ -123,6 +138,8 @@ public class CoreEnforcer {
 
     /**
      * getAdapter gets the current adapter.
+     *
+     * @return the adapter of the enforcer.
      */
     public Adapter getAdapter() {
         return adapter;
@@ -130,6 +147,8 @@ public class CoreEnforcer {
 
     /**
      * setAdapter sets the current adapter.
+     *
+     * @param adapter the adapter.
      */
     public void setAdapter(Adapter adapter) {
         this.adapter = adapter;
@@ -137,6 +156,8 @@ public class CoreEnforcer {
 
     /**
      * setWatcher sets the current watcher.
+     *
+     * @param watcher the watcher.
      */
     public void setWatcher(Watcher watcher) {
         this.watcher = watcher;
@@ -145,6 +166,8 @@ public class CoreEnforcer {
 
     /**
      * SetRoleManager sets the current role manager.
+     *
+     * @param rm the role manager.
      */
     public void setRoleManager(RoleManager rm) {
         this.rm = rm;
@@ -152,6 +175,8 @@ public class CoreEnforcer {
 
     /**
      * setEffector sets the current effector.
+     *
+     * @param eft the effector.
      */
     public void setEffector(Effector eft) {
         this.eft = eft;
@@ -179,19 +204,24 @@ public class CoreEnforcer {
 
     /**
      * loadFilteredPolicy reloads a filtered policy from file/database.
+     *
+     * @param filter the filter used to specify which type of policy should be loaded.
      */
     public void loadFilteredPolicy(Object filter) {
     }
 
     /**
      * isFiltered returns true if the loaded policy has been filtered.
+     *
+     * @return if the loaded policy has been filtered.
      */
     public boolean isFiltered() {
         return false;
     }
 
     /**
-     * savePolicy saves the current policy (usually after changed with Casbin API) back to file/database.
+     * savePolicy saves the current policy (usually after changed with
+     * Casbin API) back to file/database.
      */
     public void savePolicy() {
         if (isFiltered()) {
@@ -205,7 +235,10 @@ public class CoreEnforcer {
     }
 
     /**
-     * enableEnforce changes the enforcing state of Casbin, when Casbin is disabled, all access will be allowed by the Enforce() function.
+     * enableEnforce changes the enforcing state of Casbin, when Casbin is
+     * disabled, all access will be allowed by the enforce() function.
+     *
+     * @param enable whether to enable the enforcer.
      */
     public void enableEnforce(boolean enable) {
         this.enabled = enable;
@@ -213,20 +246,28 @@ public class CoreEnforcer {
 
     /**
      * enableLog changes whether to print Casbin log to the standard output.
+     *
+     * @param enable whether to enable Casbin's log.
      */
     public void enableLog(boolean enable) {
         Util.enableLog = enable;
     }
 
     /**
-     * enableAutoSave controls whether to save a policy rule automatically to the adapter when it is added or removed.
+     * enableAutoSave controls whether to save a policy rule automatically to
+     * the adapter when it is added or removed.
+     *
+     * @param autoSave whether to enable the AutoSave feature.
      */
     public void enableAutoSave(boolean autoSave) {
         this.autoSave = autoSave;
     }
 
     /**
-     * enableAutoBuildRoleLinks controls whether to save a policy rule automatically to the adapter when it is added or removed.
+     * enableAutoBuildRoleLinks controls whether to save a policy rule
+     * automatically to the adapter when it is added or removed.
+     *
+     * @param autoBuildRoleLinks whether to automatically build the role links.
      */
     public void enableAutoBuildRoleLinks(boolean autoBuildRoleLinks) {
         this.autoBuildRoleLinks = autoBuildRoleLinks;
@@ -242,7 +283,12 @@ public class CoreEnforcer {
     }
 
     /**
-     * enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
+     * enforce decides whether a "subject" can access a "object" with
+     * the operation "action", input parameters are usually: (sub, obj, act).
+     *
+     * @param rvals the request needs to be mediated, usually an array
+     *              of strings, can be class instances if ABAC is used.
+     * @return whether to allow the request.
      */
     public boolean enforce(Object... rvals) {
         if (!enabled) {

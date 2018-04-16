@@ -25,6 +25,8 @@ public class Util {
 
     /**
      * logPrint prints the log.
+     *
+     * @param v the log.
      */
     public static void logPrint(String v) {
         if (enableLog) {
@@ -34,6 +36,9 @@ public class Util {
 
     /**
      * logPrintf prints the log with the format.
+     *
+     * @param format the format of the log.
+     * @param v the log.
      */
     public static void logPrintf(String format, String... v) {
         if (enableLog) {
@@ -44,6 +49,9 @@ public class Util {
 
     /**
      * escapeAssertion escapes the dots in the assertion, because the expression evaluation doesn't support such variable names.
+     *
+     * @param s the value of the matcher and effect assertions.
+     * @return the escaped value.
      */
     public static String escapeAssertion(String s) {
         s = s.replace("r.", "r_");
@@ -53,6 +61,9 @@ public class Util {
 
     /**
      * removeComments removes the comments starting with # in the text.
+     *
+     * @param s a line in the model.
+     * @return the line without comments.
      */
     public static String removeComments(String s) {
         return s;
@@ -60,6 +71,10 @@ public class Util {
 
     /**
      * arrayEquals determines whether two string arrays are identical.
+     *
+     * @param a the first array.
+     * @param b the second array.
+     * @return whether a equals to b.
      */
     public static boolean arrayEquals(List<String> a, List<String> b) {
         if (a.size() != b.size()) {
@@ -76,6 +91,10 @@ public class Util {
 
     /**
      * array2DEquals determines whether two 2-dimensional string arrays are identical.
+     *
+     * @param a the first 2-dimensional array.
+     * @param b the second 2-dimensional array.
+     * @return whether a equals to b.
      */
     public static boolean array2DEquals(List<List<String>> a, List<List<String>> b) {
         if (a.size() != b.size()) {
@@ -92,6 +111,9 @@ public class Util {
 
     /**
      * arrayRemoveDuplicates removes any duplicated elements in a string array.
+     *
+     * @param s the array.
+     * @return the array without duplicates.
      */
     public static boolean arrayRemoveDuplicates(List<String> s) {
         return true;
@@ -99,6 +121,9 @@ public class Util {
 
     /**
      * arrayToString gets a printable string for a string array.
+     *
+     * @param s the array.
+     * @return the string joined by the array elements.
      */
     public static String arrayToString(List<String> s) {
         return String.join(", ", s);

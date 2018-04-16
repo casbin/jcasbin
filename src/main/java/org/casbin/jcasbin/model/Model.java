@@ -48,6 +48,11 @@ public class Model extends Policy {
 
     /**
      * addDef adds an assertion to the model.
+     *
+     * @param sec the section, "p" or "g".
+     * @param key the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param value the policy rule, separated by ", ".
+     * @return succeeds or not.
      */
     public boolean addDef(String sec, String key, String value) {
         Assertion ast = new Assertion();
@@ -96,6 +101,8 @@ public class Model extends Policy {
 
     /**
      * loadModel loads the model from model CONF file.
+     *
+     * @param path the path of the model file.
      */
     public void loadModel(String path) {
         Config cfg = Config.newConfig(path);
@@ -110,6 +117,8 @@ public class Model extends Policy {
 
     /**
      * loadModelFromText loads the model from the text.
+     *
+     * @param text the model text.
      */
     public void loadModelFromText(String text) {
         Config cfg = Config.newConfigFromText(text);

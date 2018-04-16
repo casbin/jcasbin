@@ -38,6 +38,9 @@ public class Config {
 
     /**
      * newConfig create an empty configuration representation from file.
+     *
+     * @param confName the path of the model file.
+     * @return the constructor of Config.
      */
     public static Config newConfig(String confName) {
         Config c = new Config();
@@ -47,6 +50,9 @@ public class Config {
 
     /**
      * newConfigFromText create an empty configuration representation from text.
+     *
+     * @param text the model text.
+     * @return the constructor of Config.
      */
     public static Config newConfigFromText(String text) {
         Config c = new Config();
@@ -57,7 +63,7 @@ public class Config {
     /**
      * addConfig adds a new section->key:value to the configuration.
      */
-    public boolean addConfig(String section, String option, String value) {
+    private boolean addConfig(String section, String option, String value) {
         if (section.equals("")) {
             section = DEFAULT_SECTION;
         }

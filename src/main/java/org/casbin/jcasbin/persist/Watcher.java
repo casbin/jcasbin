@@ -21,14 +21,16 @@ public interface Watcher {
     /**
      * SetUpdateCallback sets the callback function that the watcher will call
      * when the policy in DB has been changed by other instances.
-     * A classic callback is Enforcer.LoadPolicy().
+     * A classic callback is Enforcer.loadPolicy().
+     *
+     * @param runnable the callback function, will be called when policy is updated.
      */
     void setUpdateCallback(Runnable runnable);
 
     /**
      * Update calls the update callback of other instances to synchronize their policy.
-     * It is usually called after changing the policy in DB, like Enforcer.SavePolicy(),
-     * Enforcer.AddPolicy(), Enforcer.RemovePolicy(), etc.
+     * It is usually called after changing the policy in DB, like Enforcer.savePolicy(),
+     * Enforcer.addPolicy(), Enforcer.removePolicy(), etc.
      */
     void update();
 }

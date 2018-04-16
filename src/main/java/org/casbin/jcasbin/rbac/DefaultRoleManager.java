@@ -28,6 +28,8 @@ public class DefaultRoleManager implements RoleManager {
     /**
      * DefaultRoleManager is the constructor for creating an instance of the
      * default RoleManager implementation.
+     *
+     * @param maxHierarchyLevel the maximized allowed RBAC hierarchy level.
      */
     public DefaultRoleManager(int maxHierarchyLevel) {
         allRoles = new HashMap<>();

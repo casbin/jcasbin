@@ -26,6 +26,8 @@ public class Policy {
 
     /**
      * buildRoleLinks initializes the roles in RBAC.
+     *
+     * @param rm the role manager.
      */
     public void buildRoleLinks(RoleManager rm) {
         if (model.containsKey("g")) {
@@ -76,6 +78,10 @@ public class Policy {
 
     /**
      * getPolicy gets all rules in a policy.
+     *
+     * @param sec the section, "p" or "g".
+     * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
+     * @return the policy rules of section sec and policy type ptype.
      */
     public List<List<String>> getPolicy(String sec, String ptype) {
         return model.get(sec).get(ptype).policy;
@@ -83,6 +89,13 @@ public class Policy {
 
     /**
      * getFilteredPolicy gets rules based on field filters from a policy.
+     *
+     * @param sec the section, "p" or "g".
+     * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param fieldIndex the policy rule's start index to be matched.
+     * @param fieldValues the field values to be matched, value ""
+     *                    means not to match this field.
+     * @return the filtered policy rules of section sec and policy type ptype.
      */
     public List<List<String>> getFilteredPolicy(String sec, String ptype, int fieldIndex, String... fieldValues) {
         List<List<String>> res = new ArrayList<>();
@@ -107,6 +120,11 @@ public class Policy {
 
     /**
      * hasPolicy determines whether a model has the specified policy rule.
+     *
+     * @param sec the section, "p" or "g".
+     * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param rule the policy rule.
+     * @return whether the rule exists.
      */
     public boolean hasPolicy(String sec, String ptype, List<String> rule) {
         for (List<String> r : model.get(sec).get(ptype).policy) {
@@ -120,6 +138,11 @@ public class Policy {
 
     /**
      * addPolicy adds a policy rule to the model.
+     *
+     * @param sec the section, "p" or "g".
+     * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param rule the policy rule.
+     * @return succeeds or not.
      */
     public boolean addPolicy(String sec, String ptype, List<String> rule) {
         if (!hasPolicy(sec, ptype, rule)) {
@@ -131,6 +154,11 @@ public class Policy {
 
     /**
      * removePolicy removes a policy rule from the model.
+     *
+     * @param sec the section, "p" or "g".
+     * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param rule the policy rule.
+     * @return succeeds or not.
      */
     public boolean removePolicy(String sec, String ptype, List<String> rule) {
         for (int i = 0; i < model.get(sec).get(ptype).policy.size(); i ++) {
@@ -146,6 +174,13 @@ public class Policy {
 
     /**
      * removeFilteredPolicy removes policy rules based on field filters from the model.
+     *
+     * @param sec the section, "p" or "g".
+     * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param fieldIndex the policy rule's start index to be matched.
+     * @param fieldValues the field values to be matched, value ""
+     *                    means not to match this field.
+     * @return succeeds or not.
      */
     public boolean removeFilteredPolicy(String sec, String ptype, int fieldIndex, String... fieldValues) {
         List<List<String>> tmp = new ArrayList<>();
@@ -174,6 +209,11 @@ public class Policy {
 
     /**
      * getValuesForFieldInPolicy gets all values for a field for all rules in a policy, duplicated values are removed.
+     *
+     * @param sec the section, "p" or "g".
+     * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param fieldIndex the policy rule's index.
+     * @return the field values specified by fieldIndex.
      */
     public List<String> getValuesForFieldInPolicy(String sec, String ptype, int fieldIndex) {
         List<String> values = new ArrayList<>();

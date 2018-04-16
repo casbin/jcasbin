@@ -32,8 +32,8 @@ public class Util {
         assertEquals(res, e.enforce(sub, dom, obj, act));
     }
 
-    static void testGetPolicy(Enforcer e, List res) {
-        List myRes = e.getPolicy();
+    static void testGetPolicy(Enforcer e, List<List<String>> res) {
+        List<List<String>> myRes = e.getPolicy();
         org.casbin.jcasbin.util.Util.logPrint("Policy: " + myRes);
 
         if (!org.casbin.jcasbin.util.Util.array2DEquals(res, myRes)) {

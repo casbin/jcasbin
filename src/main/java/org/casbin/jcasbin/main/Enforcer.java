@@ -128,7 +128,14 @@ public class Enforcer extends ManagementEnforcer {
      * @return the users that has the role.
      */
     public List<String> getUsersForRole(String name) {
-        return model.model.get("g").get("g").rm.getUsers(name);
+        try {
+            return model.model.get("g").get("g").rm.getUsers(name);
+        } catch (Error e) {
+            if (!e.getMessage().equals("error: name does not exist")) {
+                throw e;
+            }
+        }
+        return null;
     }
 
     /**

@@ -6,7 +6,7 @@
 
     <groupId>org.casbin</groupId>
     <artifactId>jcasbin</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
 
     <parent>
         <groupId>org.sonatype.oss</groupId>

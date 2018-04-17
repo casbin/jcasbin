@@ -95,8 +95,14 @@ What Casbin does NOT do:
 
 ## Installation
 
+For Maven:
+
 ```
-git clone https://github.com/casbin/jcasbin
+<dependency>
+  <groupId>org.casbin</groupId>
+  <artifactId>jcasbin</artifactId>
+  <version>0.0.3</version>
+</dependency>
 ```
 
 ## Documentation

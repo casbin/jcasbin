@@ -132,4 +132,22 @@ public class TestUtil {
             fail(name + " has permission " + Util.arrayToString(permission) + ": " + myRes + ", supposed to be " + res);
         }
     }
+
+    static void testGetRolesInDomain(Enforcer e, String name, String domain, List<String> res) {
+        List<String> myRes = e.getRolesForUserInDomain(name, domain);
+        Util.logPrint("Roles for " + name + " under " + domain + ": " + myRes);
+
+        if (!Util.setEquals(res, myRes)) {
+            fail("Roles for " + name + " under " + domain + ": " + myRes + ", supposed to be " + res);
+        }
+    }
+
+    static void testGetPermissionsInDomain(Enforcer e, String name, String domain, List<List<String>> res) {
+        List<List<String>> myRes = e.getPermissionsForUserInDomain(name, domain);
+        Util.logPrint("Permissions for " + name + " under " + domain + ": " + myRes);
+
+        if (!Util.array2DEquals(res, myRes)) {
+            fail("Permissions for " + name + " under " + domain + ": " + myRes + ", supposed to be " + res);
+        }
+    }
 }

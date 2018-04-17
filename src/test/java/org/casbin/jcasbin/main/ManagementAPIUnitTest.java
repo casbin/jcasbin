@@ -16,6 +16,8 @@ package org.casbin.jcasbin.main;
 
 import org.junit.Test;
 
+import java.util.List;
+
 import static java.util.Arrays.asList;
 import static org.casbin.jcasbin.main.TestUtil.*;
 
@@ -59,5 +61,75 @@ public class ManagementAPIUnitTest {
 
         testHasGroupingPolicy(e, asList("alice", "data2_admin"), true);
         testHasGroupingPolicy(e, asList("bob", "data2_admin"), false);
+    }
+
+    @Test
+    public void testModifyPolicyAPI() {
+        Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
+
+        testGetPolicy(e, asList(
+                asList("alice", "data1", "read"),
+                asList("bob", "data2", "write"),
+                asList("data2_admin", "data2", "read"),
+                asList("data2_admin", "data2", "write")));
+
+        e.removePolicy("alice", "data1", "read");
+        e.removePolicy("bob", "data2", "write");
+        e.removePolicy("alice", "data1", "read");
+        e.addPolicy("eve", "data3", "read");
+        e.addPolicy("eve", "data3", "read");
+
+        List<String> namedPolicy = asList("eve", "data3", "read");
+        e.removeNamedPolicy("p", namedPolicy);
+        e.addNamedPolicy("p", namedPolicy);
+
+        testGetPolicy(e, asList(
+                asList("data2_admin", "data2", "read"),
+                asList("data2_admin", "data2", "write"),
+                asList("eve", "data3", "read")));
+
+        e.removeFilteredPolicy(1, "data2");
+
+        testGetPolicy(e, asList(asList("eve", "data3", "read")));
+    }
+
+    @Test
+    public void testModifyGroupingPolicyAPI() {
+        Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
+
+        testGetRoles(e, "alice", asList("data2_admin"));
+        testGetRoles(e, "bob", asList());
+        testGetRoles(e, "eve", asList());
+        testGetRoles(e, "non_exist", asList());
+
+        e.removeGroupingPolicy("alice", "data2_admin");
+        e.addGroupingPolicy("bob", "data1_admin");
+        e.addGroupingPolicy("eve", "data3_admin");
+
+        List<String> namedGroupingPolicy = asList("alice", "data2_admin");
+        testGetRoles(e, "alice", asList());
+        e.addNamedGroupingPolicy("g", namedGroupingPolicy);
+        testGetRoles(e, "alice", asList("data2_admin"));
+        e.removeNamedGroupingPolicy("g", namedGroupingPolicy);
+
+        testGetRoles(e, "alice", asList());
+        testGetRoles(e, "bob", asList("data1_admin"));
+        testGetRoles(e, "eve", asList("data3_admin"));
+        testGetRoles(e, "non_exist", asList());
+
+        testGetUsers(e, "data1_admin", asList("bob"));
+        testGetUsers(e, "data2_admin", asList());
+        testGetUsers(e, "data3_admin", asList("eve"));
+
+        e.removeFilteredGroupingPolicy(0, "bob");
+
+        testGetRoles(e, "alice", asList());
+        testGetRoles(e, "bob", asList());
+        testGetRoles(e, "eve", asList("data3_admin"));
+        testGetRoles(e, "non_exist", asList());
+
+        testGetUsers(e, "data1_admin", asList());
+        testGetUsers(e, "data2_admin", asList());
+        testGetUsers(e, "data3_admin", asList("eve"));
     }
 }

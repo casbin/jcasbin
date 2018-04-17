@@ -43,6 +43,51 @@ public class TestUtil {
         }
     }
 
+    static void testGetFilteredPolicy(Enforcer e, int fieldIndex, List<List<String>> res, String... fieldValues) {
+        List<List<String>> myRes = e.getFilteredPolicy(fieldIndex, fieldValues);
+        Util.logPrint("Policy for " + Util.paramsToString(fieldValues) + ": " + myRes);
+
+        if (!Util.array2DEquals(res, myRes)) {
+            fail("Policy for " + Util.paramsToString(fieldValues) + ": " + myRes + ", supposed to be " + res);
+        }
+    }
+
+    static void testGetGroupingPolicy(Enforcer e, List<List<String>> res) {
+        List<List<String>> myRes = e.getGroupingPolicy();
+        Util.logPrint("Grouping policy: " + myRes);
+
+        if (!Util.array2DEquals(res, myRes)) {
+            fail("Grouping policy: " + myRes + ", supposed to be " + res);
+        }
+    }
+
+    static void testGetFilteredGroupingPolicy(Enforcer e, int fieldIndex, List<List<String>> res, String... fieldValues) {
+        List<List<String>> myRes = e.getFilteredGroupingPolicy(fieldIndex, fieldValues);
+        Util.logPrint("Grouping policy for " + Util.paramsToString(fieldValues) + ": " + myRes);
+
+        if (!Util.array2DEquals(res, myRes)) {
+            fail("Grouping policy for " + Util.paramsToString(fieldValues) + ": " + myRes + ", supposed to be " + res);
+        }
+    }
+
+    static void testHasPolicy(Enforcer e, List<String> policy, boolean res) {
+        boolean myRes = e.hasPolicy(policy);
+        Util.logPrint("Has policy " + Util.arrayToString(policy) + ": " + myRes);
+
+        if (res != myRes) {
+            fail("Has policy " + Util.arrayToString(policy) + ": " + myRes + ", supposed to be " + res);
+        }
+    }
+
+    static void testHasGroupingPolicy(Enforcer e, List<String> policy, boolean res) {
+        boolean myRes = e.hasGroupingPolicy(policy);
+        Util.logPrint("Has grouping policy " + Util.arrayToString(policy) + ": " + myRes);
+
+        if (res != myRes) {
+            fail("Has grouping policy " + Util.arrayToString(policy) + ": " + myRes + ", supposed to be " + res);
+        }
+    }
+
     static void testGetRoles(Enforcer e, String name, List<String> res) {
         List<String> myRes = e.getRolesForUser(name);
         Util.logPrint("Roles for " + name + ": " + myRes);

@@ -144,6 +144,16 @@ public class Util {
     }
 
     /**
+     * paramsToString gets a printable string for variable number of parameters.
+     *
+     * @param s the parameters.
+     * @return the string joined by the parameters.
+     */
+    public static String paramsToString(String[] s) {
+        return String.join(", ", s);
+    }
+
+    /**
      * setEquals determines whether two string sets are identical.
      *
      * @param a the first set.

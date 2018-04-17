@@ -44,9 +44,9 @@ jCasbin is a powerful and efficient open-source access control library for Java 
 
 ## How it works?
 
-In Casbin, an access control model is abstracted into a CONF file based on the **PERM metamodel (Policy, Effect, Request, Matchers)**. So switching or upgrading the authorization mechanism for a project is just as simple as modifying a configuration. You can customize your own access control model by combining the available models. For example, you can get RBAC roles and ABAC attributes together inside one model and share one set of policy rules.
+In jCasbin, an access control model is abstracted into a CONF file based on the **PERM metamodel (Policy, Effect, Request, Matchers)**. So switching or upgrading the authorization mechanism for a project is just as simple as modifying a configuration. You can customize your own access control model by combining the available models. For example, you can get RBAC roles and ABAC attributes together inside one model and share one set of policy rules.
 
-The most basic and simplest model in Casbin is ACL. ACL's model CONF is:
+The most basic and simplest model in jCasbin is ACL. ACL's model CONF is:
 
 ```ini
 # Request definition
@@ -80,7 +80,7 @@ It means:
 
 ## Features
 
-What Casbin does:
+What jCasbin does:
 
 1. enforce the policy in the classic ``{subject, object, action}`` form or a customized form as you defined, both allow and deny authorizations are supported.
 2. handle the storage of the access control model and its policy.
@@ -88,10 +88,10 @@ What Casbin does:
 4. support built-in superuser like ``root`` or ``administrator``. A superuser can do anything without explict permissions.
 5. multiple built-in operators to support the rule matching. For example, ``keyMatch`` can map a resource key ``/foo/bar`` to the pattern ``/foo*``.
 
-What Casbin does NOT do:
+What jCasbin does NOT do:
 
 1. authentication (aka verify ``username`` and ``password`` when a user logs in)
-2. manage the list of users or roles. I believe it's more convenient for the project itself to manage these entities. Users usually have their passwords, and Casbin is not designed as a password container. However, Casbin stores the user-role mapping for the RBAC scenario. 
+2. manage the list of users or roles. I believe it's more convenient for the project itself to manage these entities. Users usually have their passwords, and jCasbin is not designed as a password container. However, jCasbin stores the user-role mapping for the RBAC scenario. 
 
 ## Installation
 
@@ -118,7 +118,7 @@ For documentation, please see: [Our Wiki](https://github.com/casbin/casbin/wiki)
 
 ## Get started
 
-1. New a Casbin enforcer with a model file and a policy file:
+1. New a jCasbin enforcer with a model file and a policy file:
 
     ```java
     Enforcer enforcer = new Enforcer("path/to/model.conf", "path/to/policy.csv");
@@ -140,7 +140,7 @@ Note: you can also initialize an enforcer with policy in DB instead of file, see
     }
     ```
 
-3. Besides the static policy file, Casbin also provides API for permission management at run-time. For example, You can get all the roles assigned to a user as below:
+3. Besides the static policy file, jCasbin also provides API for permission management at run-time. For example, You can get all the roles assigned to a user as below:
 
     ```java
     Roles roles = enforcer.getRoles("alice");
@@ -152,10 +152,10 @@ See [Policy management APIs](#policy-management) for more usage.
 
 ## Policy management
 
-Casbin provides two sets of APIs to manage permissions:
+jCasbin provides two sets of APIs to manage permissions:
 
-- [Management API](https://github.com/casbin/jcasbin/blob/master/src/main/java/org/casbin/jcasbin/main/ManagementEnforcer.java): the primitive API that provides full support for Casbin policy management. See [here](https://github.com/casbin/casbin/blob/master/management_api_test.go) for examples.
-- [RBAC API](https://github.com/casbin/jcasbin/blob/master/src/main/java/org/casbin/jcasbin/main/Enforcer.java): a more friendly API for RBAC. This API is a subset of Management API. The RBAC users could use this API to simplify the code. See [here](https://github.com/casbin/casbin/blob/master/rbac_api_test.go) for examples.
+- [Management API](https://github.com/casbin/jcasbin/blob/master/src/main/java/org/casbin/jcasbin/main/ManagementEnforcer.java): the primitive API that provides full support for jCasbin policy management. See [here](https://github.com/casbin/jcasbin/blob/master/src/test/java/org/casbin/jcasbin/main/ManagementAPIUnitTest.java) for examples.
+- [RBAC API](https://github.com/casbin/jcasbin/blob/master/src/main/java/org/casbin/jcasbin/main/Enforcer.java): a more friendly API for RBAC. This API is a subset of Management API. The RBAC users could use this API to simplify the code. See [here](https://github.com/casbin/jcasbin/blob/master/src/test/java/org/casbin/jcasbin/main/RbacAPIUnitTest.java) for examples.
 
 We also provide a web-based UI for model management and policy management:
 
@@ -165,21 +165,21 @@ We also provide a web-based UI for model management and policy management:
 
 ## Policy persistence
 
-In Casbin, the policy storage is implemented as an adapter (aka middleware for Casbin). To keep light-weight, we don't put adapter code in the main library (except the default file adapter). A complete list of Casbin adapters is provided as below. Any 3rd-party contribution on a new adapter is welcomed, please inform us and I will put it in this list:)
+In jCasbin, the policy storage is implemented as an adapter (aka middleware for jCasbin). To keep light-weight, we don't put adapter code in the main library (except the default file adapter). A complete list of jCasbin adapters is provided as below. Any 3rd-party contribution on a new adapter is welcomed, please inform us and I will put it in this list:)
 
 Adapter | Type | Author | Description
 ----|------|----|----
-[File Adapter (built-in)](https://github.com/casbin/casbin/wiki/Policy-persistence#file-adapter) | File | Casbin | Persistence for [.CSV (Comma-Separated Values)](https://en.wikipedia.org/wiki/Comma-separated_values) files
+[File Adapter (built-in)](https://github.com/casbin/casbin/wiki/Policy-persistence#file-adapter) | File | jCasbin | Persistence for [.CSV (Comma-Separated Values)](https://en.wikipedia.org/wiki/Comma-separated_values) files
 
 For details of adapters, please refer to the documentation: https://github.com/casbin/casbin/wiki/Policy-persistence
 
 ## Role manager
 
-The role manager is used to manage the RBAC role hierarchy (user-role mapping) in Casbin. A role manager can retrieve the role data from Casbin policy rules or external sources such as LDAP, Okta, Auth0, Azure AD, etc. We support different implementations of a role manager. To keep light-weight, we don't put role manager code in the main library (except the default role manager). A complete list of Casbin role managers is provided as below. Any 3rd-party contribution on a new role manager is welcomed, please inform us and I will put it in this list:)
+The role manager is used to manage the RBAC role hierarchy (user-role mapping) in jCasbin. A role manager can retrieve the role data from jCasbin policy rules or external sources such as LDAP, Okta, Auth0, Azure AD, etc. We support different implementations of a role manager. To keep light-weight, we don't put role manager code in the main library (except the default role manager). A complete list of jCasbin role managers is provided as below. Any 3rd-party contribution on a new role manager is welcomed, please inform us and I will put it in this list:)
 
 Role manager | Author | Description
 ----|----|----
-[Default Role Manager (built-in)](https://github.com/casbin/jcasbin/blob/master/src/main/java/org/casbin/jcasbin/rbac/DefaultRoleManager.java) | Casbin | Supports role hierarchy stored in Casbin policy
+[Default Role Manager (built-in)](https://github.com/casbin/jcasbin/blob/master/src/main/java/org/casbin/jcasbin/rbac/DefaultRoleManager.java) | jCasbin | Supports role hierarchy stored in jCasbin policy
 
 For developers: all role managers must implement the [RoleManager](https://github.com/casbin/jcasbin/blob/master/src/main/java/org/casbin/jcasbin/rbac/RoleManager.java) interface. [Default Role Manager](https://github.com/casbin/jcasbin/blob/master/src/main/java/org/casbin/jcasbin/rbac/DefaultRoleManager.java) can be used as a reference implementation.
 
@@ -201,12 +201,12 @@ Priority | [priority_model.conf](https://github.com/casbin/jcasbin/blob/master/e
 
 ## License
 
-This project is licensed under the [Apache 2.0 license](https://github.com/casbin/casbin/blob/master/LICENSE).
+This project is licensed under the [Apache 2.0 license](https://github.com/casbin/jasbin/blob/master/LICENSE).
 
 ## Contact
 
 If you have any issues or feature requests, please contact us. PR is welcomed.
-- https://github.com/casbin/casbin/issues
+- https://github.com/casbin/jcasbin/issues
 - hsluoyz@gmail.com
 - Tencent QQ group: [546057381](//shang.qq.com/wpa/qunwpa?idkey=8ac8b91fc97ace3d383d0035f7aa06f7d670fd8e8d4837347354a31c18fac885)
 

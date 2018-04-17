@@ -342,4 +342,57 @@ public class Enforcer extends ManagementEnforcer {
     public boolean hasPermissionForUser(String user, List<String> permission) {
         return hasPermissionForUser(user, permission.toArray(new String[0]));
     }
+
+    /**
+     * getRolesForUserInDomain gets the roles that a user has inside a domain.
+     *
+     * @param name the user.
+     * @param domain the domain.
+     * @return the roles that the user has in the domain.
+     */
+    public List<String> getRolesForUserInDomain(String name, String domain) {
+        try {
+            return model.model.get("g").get("g").rm.getRoles(name, domain);
+        } catch (Error e) {
+            if (!e.getMessage().equals("error: name does not exist")) {
+                throw e;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * getPermissionsForUserInDomain gets permissions for a user or role inside a domain.
+     *
+     * @param user the user.
+     * @param domain the domain.
+     * @return the permissions, a permission is usually like (obj, act). It is actually the rule without the subject.
+     */
+    public List<List<String>> getPermissionsForUserInDomain(String user, String domain) {
+        return getFilteredPolicy(0, user, domain);
+    }
+
+    /**
+     * addRoleForUserInDomain adds a role for a user inside a domain.
+     * Returns false if the user already has the role (aka not affected).
+     *
+     * @param user the user.
+     * @param role the role.
+     * @return succeeds or not.
+     */
+    public boolean addRoleForUserInDomain(String user, String role, String domain) {
+        return addGroupingPolicy(user, role, domain);
+    }
+
+    /**
+     * deleteRoleForUserInDomain deletes a role for a user inside a domain.
+     * Returns false if the user does not have the role (aka not affected).
+     *
+     * @param user the user.
+     * @param role the role.
+     * @return succeeds or not.
+     */
+    public boolean deleteRoleForUserInDomain(String user, String role, String domain) {
+        return removeGroupingPolicy(user, role, domain);
+    }
 }

@@ -3,6 +3,7 @@ jCasbin
 
 [![Build Status](https://travis-ci.org/casbin/jcasbin.svg?branch=master)](https://travis-ci.org/casbin/jcasbin)
 [![Coverage Status](https://coveralls.io/repos/github/casbin/jcasbin/badge.svg?branch=master)](https://coveralls.io/github/casbin/jcasbin?branch=master)
+[![Javadocs](https://www.javadoc.io/badge/org.casbin/jcasbin.svg)](https://www.javadoc.io/doc/org.casbin/jcasbin)
 [![Release](https://img.shields.io/github/release/casbin/jcasbin.svg)](https://github.com/casbin/jcasbin/releases/latest)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/casbin/lobby)
 [![Patreon](https://img.shields.io/badge/patreon-donate-yellow.svg)](http://www.patreon.com/yangluo)

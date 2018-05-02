@@ -29,6 +29,7 @@ jCasbin is a powerful and efficient open-source access control library for Java 
 - [Policy persistence](#policy-persistence)
 - [Role manager](#role-manager)
 - [Examples](#examples)
+- [Our adopters](#our-adopters)
 
 ## Supported models
 
@@ -200,6 +201,12 @@ ABAC | [abac_model.conf](https://github.com/casbin/jcasbin/blob/master/examples/
 RESTful | [keymatch_model.conf](https://github.com/casbin/jcasbin/blob/master/examples/keymatch_model.conf)  | [keymatch_policy.csv](https://github.com/casbin/jcasbin/blob/master/examples/keymatch_policy.csv)
 Deny-override | [rbac_model_with_deny.conf](https://github.com/casbin/jcasbin/blob/master/examples/rbac_with_deny_model.conf)  | [rbac_policy_with_deny.csv](https://github.com/casbin/jcasbin/blob/master/examples/rbac_with_deny_policy.csv)
 Priority | [priority_model.conf](https://github.com/casbin/jcasbin/blob/master/examples/priority_model.conf)  | [priority_policy.csv](https://github.com/casbin/jcasbin/blob/master/examples/priority_policy.csv)
+
+## Our adopters
+
+### Web frameworks
+
+- [Spring Boot](https://projects.spring.io/spring-boot/): Makes it easy to create Spring-powered, production-grade applications and services, via plugin: [jcasbin-springboot-plugin](https://github.com/jcasbin/jcasbin-springboot-plugin)
 
 ## License
 

@@ -104,7 +104,7 @@ For Maven:
 <dependency>
   <groupId>org.casbin</groupId>
   <artifactId>jcasbin</artifactId>
-  <version>0.0.3</version>
+  <version>0.0.4-FIX</version>
 </dependency>
 ```
 

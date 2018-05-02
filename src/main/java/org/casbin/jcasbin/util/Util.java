@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 public class Util {
     public static boolean enableLog = true;
 
-    static Logger logger = Logger.getLogger("casbin");
+    static Logger logger = Logger.getLogger("org.casbin.jcasbin");
 
     /**
      * logPrint prints the log.

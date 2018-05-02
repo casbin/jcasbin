@@ -312,6 +312,9 @@ public class CoreEnforcer {
             }
         }
         for (AviatorFunction f : functions.values()) {
+            if (AviatorEvaluator.containsFunction(f.getName())) {
+                AviatorEvaluator.removeFunction(f.getName());
+            }
             AviatorEvaluator.addFunction(f);
         }
 

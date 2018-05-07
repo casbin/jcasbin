@@ -8,7 +8,7 @@ jCasbin
 [![Release](https://img.shields.io/github/release/casbin/jcasbin.svg)](https://github.com/casbin/jcasbin/releases/latest)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/casbin/lobby)
 [![Patreon](https://img.shields.io/badge/patreon-donate-yellow.svg)](http://www.patreon.com/yangluo)
-[![Sourcegraph Badge](https://sourcegraph.com/github.com/casbin/jcasbin/-/badge.svg)](https://sourcegraph.com/github.com/casbin/jcasbin?badge)
+[![Sourcegraph Badge](https://sourcegraph.com/github.com/casbin/casbin/-/badge.svg)](https://sourcegraph.com/github.com/casbin/casbin?badge)
 
 **Note**: This project is a Java port of the original Golang [Casbin](https://github.com/casbin/casbin).
 
@@ -219,10 +219,3 @@ If you have any issues or feature requests, please contact us. PR is welcomed.
 - https://github.com/casbin/jcasbin/issues
 - hsluoyz@gmail.com
 - Tencent QQ group: [546057381](//shang.qq.com/wpa/qunwpa?idkey=8ac8b91fc97ace3d383d0035f7aa06f7d670fd8e8d4837347354a31c18fac885)
-
-## Donation
-
-[![Patreon](https://hsluoyz.github.io/donation/patreon.png)](http://www.patreon.com/yangluo)
-
-![Alipay](https://hsluoyz.github.io/donation/donate_alipay.png)
-![Wechat](https://hsluoyz.github.io/donation/donate_weixin.png)

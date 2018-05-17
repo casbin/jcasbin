@@ -207,6 +207,7 @@ Priority | [priority_model.conf](https://github.com/casbin/jcasbin/blob/master/e
 ### Web frameworks
 
 - [Spring Boot](https://projects.spring.io/spring-boot/): Makes it easy to create Spring-powered applications and services, via plugin: [jcasbin-springboot-plugin](https://github.com/jcasbin/jcasbin-springboot-plugin)
+- [Vert.x](https://vertx.io/): A tool-kit for building reactive applications on the JVM, via plugin: [vertx-auth-jcasbin](https://github.com/vert-x3/vertx-auth/pull/215)
 - [JFinal](http://www.jfinal.com/): A simple, light, rapid, independent and extensible Java WEB + ORM framework, via plugin: [jcasbin-jfinal-plugin](https://github.com/jcasbin/jcasbin-jfinal-plugin)
 - [Nutz](https://nutzam.com/): Web framework (MVC/IOC/AOP/DAO/JSON) for all Java developers, via plugin: [jcasbin-nutz-plugin](https://github.com/jcasbin/jcasbin-nutz-plugin)
 

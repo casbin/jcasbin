@@ -10,11 +10,15 @@ jCasbin
 [![Patreon](https://img.shields.io/badge/patreon-donate-yellow.svg)](http://www.patreon.com/yangluo)
 [![Sourcegraph Badge](https://sourcegraph.com/github.com/casbin/casbin/-/badge.svg)](https://sourcegraph.com/github.com/casbin/casbin?badge)
 
-**Note**: This project is a Java port of the original Golang [Casbin](https://github.com/casbin/casbin).
+**News**: still worry about how to write the correct jCasbin policy? ``Casbin online editor`` is coming to help! Try it at: http://casbin.org/editor/
 
 ![casbin Logo](casbin-logo.png)
 
-jCasbin is a powerful and efficient open-source access control library for Java projects. It provides support for enforcing authorization based on various [access control models](https://en.wikipedia.org/wiki/Computer_security_model).
+jCasbin is a powerful and efficient open-source access control library for Java projects. It provides support for enforcing authorization based on various [access control models](https://en.wikipedia.org/wiki/Computer_security_model). This project is a Java port of the original Golang [Casbin](https://github.com/casbin/casbin).
+
+### Supported by Auth0 <span><img src="https://user-images.githubusercontent.com/1801923/31792116-d4fca9ec-b512-11e7-92eb-56e8d3df8e70.png" height="28" align="top"></span>
+
+If you want to easily add authentication and authorization to your Java projects, feel free to check out Auth0's Java SDK and free plan at [auth0.com/overview](https://auth0.com/overview?utm_source=GHsponsor&utm_medium=GHsponsor&utm_campaign=casbin&utm_content=auth)
 
 ## Table of contents
 
@@ -23,6 +27,7 @@ jCasbin is a powerful and efficient open-source access control library for Java 
 - [Features](#features)
 - [Installation](#installation)
 - [Documentation](#documentation)
+- [Online editor](#online-editor)
 - [Tutorials](#tutorials)
 - [Get started](#get-started)
 - [Policy management](#policy-management)
@@ -111,6 +116,10 @@ For Maven:
 ## Documentation
 
 For documentation, please see: [Our Wiki](https://github.com/casbin/casbin/wiki)
+
+## Online editor
+
+You can also use the online editor (http://casbin.org/editor/) to write your jCasbin model and policy in your web browser. It provides functionality such as ``syntax highlighting`` and ``code completion``, just like an IDE for a programming language.
 
 ## Tutorials
 

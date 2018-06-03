@@ -78,7 +78,7 @@
         <dependency>
             <groupId>com.googlecode.aviator</groupId>
             <artifactId>aviator</artifactId>
-            <version>3.3.0</version>
+            <version>4.0.0-RC</version>
         </dependency>
         <dependency>
             <groupId>com.github.seancfoley</groupId>

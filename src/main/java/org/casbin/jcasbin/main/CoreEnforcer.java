@@ -15,6 +15,7 @@
 package org.casbin.jcasbin.main;
 
 import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import org.casbin.jcasbin.effect.DefaultEffector;
@@ -311,15 +312,13 @@ public class CoreEnforcer {
                 functions.put(key, BuiltInFunctions.generateGFunction(key, rm));
             }
         }
+        AviatorEvaluatorInstance eval = AviatorEvaluator.newInstance();
         for (AviatorFunction f : functions.values()) {
-            if (AviatorEvaluator.containsFunction(f.getName())) {
-                AviatorEvaluator.removeFunction(f.getName());
-            }
-            AviatorEvaluator.addFunction(f);
+            eval.addFunction(f);
         }
 
         String expString = model.model.get("m").get("m").value;
-        Expression expression = AviatorEvaluator.compile(expString);
+        Expression expression = eval.compile(expString);
 
         Effect policyEffects[];
         float matcherResults[];

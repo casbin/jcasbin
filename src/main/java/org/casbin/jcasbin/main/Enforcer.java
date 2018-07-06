@@ -378,6 +378,7 @@ public class Enforcer extends ManagementEnforcer {
      *
      * @param user the user.
      * @param role the role.
+     * @param domain the domain.
      * @return succeeds or not.
      */
     public boolean addRoleForUserInDomain(String user, String role, String domain) {
@@ -390,6 +391,7 @@ public class Enforcer extends ManagementEnforcer {
      *
      * @param user the user.
      * @param role the role.
+     * @param domain the domain.
      * @return succeeds or not.
      */
     public boolean deleteRoleForUserInDomain(String user, String role, String domain) {

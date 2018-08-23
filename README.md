@@ -7,13 +7,20 @@ jCasbin
 [![Javadocs](https://www.javadoc.io/badge/org.casbin/jcasbin.svg)](https://www.javadoc.io/doc/org.casbin/jcasbin)
 [![Maven central](https://maven-badges.herokuapp.com/maven-central/org.casbin/jcasbin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.casbin/jcasbin)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/casbin/lobby)
-[![Sourcegraph Badge](https://sourcegraph.com/github.com/casbin/casbin/-/badge.svg)](https://sourcegraph.com/github.com/casbin/casbin?badge)
 
 **News**: still worry about how to write the correct jCasbin policy? ``Casbin online editor`` is coming to help! Try it at: http://casbin.org/editor/
 
 ![casbin Logo](casbin-logo.png)
 
-jCasbin is a powerful and efficient open-source access control library for Java projects. It provides support for enforcing authorization based on various [access control models](https://en.wikipedia.org/wiki/Computer_security_model). This project is a Java port of the original Golang [Casbin](https://github.com/casbin/casbin).
+jCasbin is a powerful and efficient open-source access control library for Java projects. It provides support for enforcing authorization based on various [access control models](https://en.wikipedia.org/wiki/Computer_security_model).
+
+## All the languages supported by jCasbin:
+
+- Golang: [Casbin](https://github.com/casbin/casbin) (production-ready)
+- Java: [jCasbin](https://github.com/casbin/jcasbin) (production-ready)
+- Node.js: [node-casbin](https://github.com/casbin/node-casbin) (production-ready)
+- PHP: [PHP-Casbin](https://github.com/sstutz/php-casbin) (experimental)
+- C++: xCasbin (WIP)
 
 ## Table of contents
 

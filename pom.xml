@@ -8,6 +8,21 @@
     <artifactId>jcasbin</artifactId>
     <version>1.0.0</version>
 
+    <name>JCasbin Authorization Library</name>
+    <description>An authorization library that supports access control models like ACL, RBAC, ABAC in Java</description>
+    <url>https://casbin.org/</url>
+    <inceptionYear>2017</inceptionYear>
+
+    <issueManagement>
+        <system>Github</system>
+        <url>https://github.com/casbin/jcasbin/issues</url>
+    </issueManagement>
+
+    <ciManagement>
+        <system>Travis CI</system>
+        <url>https://travis-ci.org/casbin/jcasbin</url>
+    </ciManagement>
+
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
@@ -28,7 +43,7 @@
     <developers>
         <developer>
             <name>Yang Luo</name>
-            <email>hsluoyz@sohu.com</email>
+            <email>hsluoyz@qq.com</email>
             <url>https://github.com/hsluoyz</url>
         </developer>
     </developers>

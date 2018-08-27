@@ -28,14 +28,14 @@ import java.util.List;
  */
 public class Enforcer extends ManagementEnforcer {
     /**
-     * CoreEnforcer is the default constructor.
+     * Enforcer is the default constructor.
      */
     public Enforcer() {
         this("", "");
     }
 
     /**
-     * CoreEnforcer initializes an enforcer with a model file and a policy file.
+     * Enforcer initializes an enforcer with a model file and a policy file.
      *
      * @param modelPath the path of the model file.
      * @param policyFile the path of the policy file.
@@ -45,7 +45,7 @@ public class Enforcer extends ManagementEnforcer {
     }
 
     /**
-     * CoreEnforcer initializes an enforcer with a database adapter.
+     * Enforcer initializes an enforcer with a database adapter.
      *
      * @param modelPath the path of the model file.
      * @param adapter the adapter.
@@ -57,7 +57,7 @@ public class Enforcer extends ManagementEnforcer {
     }
 
     /**
-     * CoreEnforcer initializes an enforcer with a model and a database adapter.
+     * Enforcer initializes an enforcer with a model and a database adapter.
      *
      * @param m the model.
      * @param adapter the adapter.
@@ -78,7 +78,7 @@ public class Enforcer extends ManagementEnforcer {
     }
 
     /**
-     * CoreEnforcer initializes an enforcer with a model.
+     * Enforcer initializes an enforcer with a model.
      *
      * @param m the model.
      */
@@ -87,7 +87,7 @@ public class Enforcer extends ManagementEnforcer {
     }
 
     /**
-     * CoreEnforcer initializes an enforcer with a model file.
+     * Enforcer initializes an enforcer with a model file.
      *
      * @param modelPath the path of the model file.
      */
@@ -96,7 +96,7 @@ public class Enforcer extends ManagementEnforcer {
     }
 
     /**
-     * CoreEnforcer initializes an enforcer with a model file, a policy file and an enable log flag.
+     * Enforcer initializes an enforcer with a model file, a policy file and an enable log flag.
      *
      * @param modelPath the path of the model file.
      * @param policyFile the path of the policy file.

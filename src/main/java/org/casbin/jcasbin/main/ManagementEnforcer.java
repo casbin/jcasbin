@@ -20,6 +20,9 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * ManagementEnforcer = InternalEnforcer + Management API.
+ */
 public class ManagementEnforcer extends InternalEnforcer {
     /**
      * getAllSubjects gets the list of subjects that show up in the current policy.

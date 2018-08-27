@@ -16,6 +16,9 @@ package org.casbin.jcasbin.main;
 
 import java.util.List;
 
+/**
+ * InternalEnforcer = CoreEnforcer + Internal API.
+ */
 class InternalEnforcer extends CoreEnforcer {
     /**
      * addPolicy adds a rule to the current policy.

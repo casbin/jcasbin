@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Enforcer = ManagementEnforcer + RBAC API.
+ */
 public class Enforcer extends ManagementEnforcer {
     /**
      * CoreEnforcer is the default constructor.

@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * CoreEnforcer is the main interface for authorization enforcement and policy management.
+ * CoreEnforcer defines the core functionality of an enforcer.
  */
 public class CoreEnforcer {
     String modelPath;

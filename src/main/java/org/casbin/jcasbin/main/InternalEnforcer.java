@@ -25,24 +25,26 @@ class InternalEnforcer extends CoreEnforcer {
      */
     boolean addPolicy(String sec, String ptype, List<String> rule) {
         boolean ruleAdded = model.addPolicy(sec, ptype, rule);
+        if (!ruleAdded) {
+            return false;
+        }
 
-        if (ruleAdded) {
-            if (adapter != null && autoSave) {
-                try {
-                    adapter.addPolicy(sec, ptype, rule);
-                } catch (Error e) {
-                    if (!e.getMessage().equals("not implemented")) {
-                        throw e;
-                    }
+        if (adapter != null && autoSave) {
+            try {
+                adapter.addPolicy(sec, ptype, rule);
+            } catch (Error e) {
+                if (!e.getMessage().equals("not implemented")) {
+                    throw e;
                 }
+            }
 
-                if (watcher != null) {
-                    watcher.update();
-                }
+            if (watcher != null) {
+                // error intentionally ignored
+                watcher.update();
             }
         }
 
-        return ruleAdded;
+        return true;
     }
 
     /**
@@ -50,24 +52,26 @@ class InternalEnforcer extends CoreEnforcer {
      */
     boolean removePolicy(String sec, String ptype, List<String> rule) {
         boolean ruleRemoved = model.removePolicy(sec, ptype, rule);
+        if (!ruleRemoved) {
+            return false;
+        }
 
-        if (ruleRemoved) {
-            if (adapter != null && autoSave) {
-                try {
-                    adapter.removePolicy(sec, ptype, rule);
-                } catch (Error e) {
-                    if (!e.getMessage().equals("not implemented")) {
-                        throw e;
-                    }
+        if (adapter != null && autoSave) {
+            try {
+                adapter.removePolicy(sec, ptype, rule);
+            } catch (Error e) {
+                if (!e.getMessage().equals("not implemented")) {
+                    throw e;
                 }
+            }
 
-                if (watcher != null) {
-                    watcher.update();
-                }
+            if (watcher != null) {
+                // error intentionally ignored
+                watcher.update();
             }
         }
 
-        return ruleRemoved;
+        return true;
     }
 
     /**
@@ -75,23 +79,25 @@ class InternalEnforcer extends CoreEnforcer {
      */
     boolean removeFilteredPolicy(String sec, String ptype, int fieldIndex, String... fieldValues) {
         boolean ruleRemoved = model.removeFilteredPolicy(sec, ptype, fieldIndex, fieldValues);
+        if (!ruleRemoved) {
+            return false;
+        }
 
-        if (ruleRemoved) {
-            if (adapter != null && autoSave) {
-                try {
-                    adapter.removeFilteredPolicy(sec, ptype, fieldIndex, fieldValues);
-                } catch (Error e) {
-                    if (!e.getMessage().equals("not implemented")) {
-                        throw e;
-                    }
+        if (adapter != null && autoSave) {
+            try {
+                adapter.removeFilteredPolicy(sec, ptype, fieldIndex, fieldValues);
+            } catch (Error e) {
+                if (!e.getMessage().equals("not implemented")) {
+                    throw e;
                 }
+            }
 
-                if (watcher != null) {
-                    watcher.update();
-                }
+            if (watcher != null) {
+                // error intentionally ignored
+                watcher.update();
             }
         }
 
-        return ruleRemoved;
+        return true;
     }
 }

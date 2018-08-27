@@ -40,7 +40,7 @@ import java.util.Map;
  */
 public class CoreEnforcer {
     String modelPath;
-    public Model model;
+    Model model;
     FunctionMap fm;
     private Effector eft;
 

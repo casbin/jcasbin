@@ -30,7 +30,6 @@ jCasbin is a powerful and efficient open-source access control library for Java 
 - [Installation](#installation)
 - [Documentation](#documentation)
 - [Online editor](#online-editor)
-- [Tutorials](#tutorials)
 - [Get started](#get-started)
 - [Policy management](#policy-management)
 - [Policy persistence](#policy-persistence)
@@ -122,13 +121,6 @@ For documentation, please see: [Our Wiki](https://github.com/casbin/casbin/wiki)
 ## Online editor
 
 You can also use the online editor (http://casbin.org/editor/) to write your jCasbin model and policy in your web browser. It provides functionality such as ``syntax highlighting`` and ``code completion``, just like an IDE for a programming language.
-
-## Tutorials
-
-- [Basic Role-Based HTTP Authorization in Go with Casbin](https://zupzup.org/casbin-http-role-auth) (or [Chinese translation](https://studygolang.com/articles/12323))
-- [Using Casbin with Beego: 1. Get started and test (in Chinese)](http://blog.csdn.net/hotqin888/article/details/78460385)
-- [Using Casbin with Beego: 2. Policy storage (in Chinese)](http://blog.csdn.net/hotqin888/article/details/78571240)
-- [Using Casbin with Beego: 3. Policy query (in Chinese)](http://blog.csdn.net/hotqin888/article/details/78992250)
 
 ## Get started
 

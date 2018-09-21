@@ -221,7 +221,8 @@ This project is licensed under the [Apache 2.0 license](LICENSE).
 
 ## Contact
 
-If you have any issues or feature requests, please contact us. PR is welcomed.
-- https://github.com/casbin/jcasbin/issues
-- hsluoyz@gmail.com
-- Tencent QQ group: [546057381](//shang.qq.com/wpa/qunwpa?idkey=8ac8b91fc97ace3d383d0035f7aa06f7d670fd8e8d4837347354a31c18fac885)
+- GitHub: https://github.com/casbin/jcasbin/issues (bugs & PRs)
+- Mailing list: [casbin@googlegroups.com](mailto:casbin@googlegroups.com) (questions & discussions)
+- Project owner: [hsluoyz@gmail.com](mailto:hsluoyz@gmail.com) (commercial & partnership)
+- Gitter: https://gitter.im/casbin/lobby (IM)
+- Tencent QQ group: [546057381](//shang.qq.com/wpa/qunwpa?idkey=8ac8b91fc97ace3d383d0035f7aa06f7d670fd8e8d4837347354a31c18fac885) (IM)

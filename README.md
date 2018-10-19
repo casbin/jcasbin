@@ -30,6 +30,7 @@ jCasbin is a powerful and efficient open-source access control library for Java 
 - [Installation](#installation)
 - [Documentation](#documentation)
 - [Online editor](#online-editor)
+- [Tutorials](#tutorials)
 - [Get started](#get-started)
 - [Policy management](#policy-management)
 - [Policy persistence](#policy-persistence)
@@ -121,6 +122,10 @@ https://casbin.org/docs/en/overview
 ## Online editor
 
 You can also use the online editor (http://casbin.org/editor/) to write your jCasbin model and policy in your web browser. It provides functionality such as ``syntax highlighting`` and ``code completion``, just like an IDE for a programming language.
+
+## Tutorials
+
+https://casbin.org/docs/en/tutorials
 
 ## Get started
 

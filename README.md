@@ -19,7 +19,7 @@ jCasbin is a powerful and efficient open-source access control library for Java 
 - Golang: [Casbin](https://github.com/casbin/casbin) (production-ready)
 - Java: [jCasbin](https://github.com/casbin/jcasbin) (production-ready)
 - Node.js: [node-casbin](https://github.com/casbin/node-casbin) (production-ready)
-- PHP: [PHP-Casbin](https://github.com/sstutz/php-casbin) (experimental)
+- PHP: [PHP-Casbin](https://github.com/php-casbin/php-casbin) (experimental)
 - C++: xCasbin (WIP)
 
 ## Table of contents

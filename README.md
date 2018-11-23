@@ -218,6 +218,7 @@ Priority | [priority_model.conf](https://github.com/casbin/jcasbin/blob/master/e
 - [Vert.x](https://vertx.io/): A tool-kit for building reactive applications on the JVM, via plugin: [vertx-auth-jcasbin](https://github.com/vert-x3/vertx-auth/pull/215)
 - [JFinal](http://www.jfinal.com/): A simple, light, rapid, independent and extensible Java WEB + ORM framework, via plugin: [jcasbin-jfinal-plugin](https://github.com/jcasbin/jcasbin-jfinal-plugin)
 - [Nutz](https://nutzam.com/): Web framework (MVC/IOC/AOP/DAO/JSON) for all Java developers, via plugin: [jcasbin-nutz-plugin](https://github.com/jcasbin/jcasbin-nutz-plugin)
+- [mangoo I/O](https://github.com/svenkubiak/mangooio): An intuitive, lightweight, high performance full stack Java web framework, via built-in plugin: [AuthorizationService.java](https://github.com/svenkubiak/mangooio/blob/e8c647a3f7c427bce27377025bec074f6d767f50/mangooio-core/src/main/java/io/mangoo/services/AuthorizationService.java)
 
 ## License
 

@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Util {
     public static boolean enableLog = true;
@@ -56,9 +58,23 @@ public class Util {
      * @return the escaped value.
      */
     public static String escapeAssertion(String s) {
-        s = s.replace("r.", "r_");
-        s = s.replace("p.", "p_");
-        return s;
+
+        //Replace the first dot, because the string doesn't start with "m="
+        // and is not covered by the regex.
+        if (s.startsWith("r") || s.startsWith("p")) {
+            s = s.replaceFirst("\\.", "_");
+        }
+
+        String regex = "(\\|| |=|\\)|\\(|&|<|>|,|\\+|-|!|\\*|\\/)(r|p)\\.";
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(s);
+        StringBuffer sb = new StringBuffer();
+        while (m.find()) {
+            m.appendReplacement(sb, m.group().replace(".", "_") );
+        }
+        m.appendTail(sb);
+
+        return sb.toString();
     }
 
     /**
@@ -68,7 +84,11 @@ public class Util {
      * @return the line without comments.
      */
     public static String removeComments(String s) {
-        return s;
+        int pos = s.indexOf("#");
+        if (pos == -1) {
+            return s;
+        }
+        return s.substring(0,pos).trim();
     }
 
     /**

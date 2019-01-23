@@ -67,12 +67,12 @@ public class Util {
         Pattern p = Pattern.compile(regex);
         Matcher m = p.matcher(s);
         StringBuffer sb = new StringBuffer();
-        
+
         while (m.find()) {
             m.appendReplacement(sb, m.group().replace(".", "_") );
         }
+        
         m.appendTail(sb);
-
         return sb.toString();
     }
 

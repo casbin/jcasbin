@@ -172,7 +172,7 @@ jCasbin provides two sets of APIs to manage permissions:
 - [Management API](https://github.com/casbin/jcasbin/blob/master/src/main/java/org/casbin/jcasbin/main/ManagementEnforcer.java): the primitive API that provides full support for jCasbin policy management. See [here](https://github.com/casbin/jcasbin/blob/master/src/test/java/org/casbin/jcasbin/main/ManagementAPIUnitTest.java) for examples.
 - [RBAC API](https://github.com/casbin/jcasbin/blob/master/src/main/java/org/casbin/jcasbin/main/Enforcer.java): a more friendly API for RBAC. This API is a subset of Management API. The RBAC users could use this API to simplify the code. See [here](https://github.com/casbin/jcasbin/blob/master/src/test/java/org/casbin/jcasbin/main/RbacAPIUnitTest.java) for examples.
 
-We also provide a web-based UI for model management and policy management:
+We also provide a [web-based UI](https://github.com/casbin/web-ui) for model management and policy management:
 
 ![model editor](https://hsluoyz.github.io/casbin/ui_model_editor.png)
 

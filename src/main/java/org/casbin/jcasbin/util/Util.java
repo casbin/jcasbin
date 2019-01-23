@@ -58,17 +58,16 @@ public class Util {
      * @return the escaped value.
      */
     public static String escapeAssertion(String s) {
-
         //Replace the first dot, because the string doesn't start with "m="
         // and is not covered by the regex.
         if (s.startsWith("r") || s.startsWith("p")) {
             s = s.replaceFirst("\\.", "_");
         }
-
         String regex = "(\\|| |=|\\)|\\(|&|<|>|,|\\+|-|!|\\*|\\/)(r|p)\\.";
         Pattern p = Pattern.compile(regex);
         Matcher m = p.matcher(s);
         StringBuffer sb = new StringBuffer();
+        
         while (m.find()) {
             m.appendReplacement(sb, m.group().replace(".", "_") );
         }

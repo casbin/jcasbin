@@ -93,7 +93,7 @@
         <dependency>
             <groupId>com.googlecode.aviator</groupId>
             <artifactId>aviator</artifactId>
-            <version>4.0.0-RC</version>
+            <version>4.1.2</version>
         </dependency>
         <dependency>
             <groupId>com.github.seancfoley</groupId>

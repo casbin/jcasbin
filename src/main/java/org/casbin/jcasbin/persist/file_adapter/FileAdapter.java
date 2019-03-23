@@ -98,10 +98,8 @@ public class FileAdapter implements Adapter {
             fis.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            throw new Error("policy file not found");
         } catch (IOException e) {
             e.printStackTrace();
-            throw new Error("IO error occurred");
         }
     }
 
@@ -112,7 +110,6 @@ public class FileAdapter implements Adapter {
             fos.close();
         } catch (IOException e) {
             e.printStackTrace();
-            throw new Error("IO error occurred");
         }
     }
 
@@ -121,7 +118,7 @@ public class FileAdapter implements Adapter {
      */
     @Override
     public void addPolicy(String sec, String ptype, List<String> rule) {
-        throw new Error("not implemented");
+        throw new UnsupportedOperationException("not implemented");
     }
 
     /**
@@ -129,7 +126,7 @@ public class FileAdapter implements Adapter {
      */
     @Override
     public void removePolicy(String sec, String ptype, List<String> rule) {
-        throw new Error("not implemented");
+        throw new UnsupportedOperationException("not implemented");
     }
 
     /**
@@ -137,6 +134,7 @@ public class FileAdapter implements Adapter {
      */
     @Override
     public void removeFilteredPolicy(String sec, String ptype, int fieldIndex, String... fieldValues) {
-        throw new Error("not implemented");
+        throw new UnsupportedOperationException("not implemented");
     }
+
 }

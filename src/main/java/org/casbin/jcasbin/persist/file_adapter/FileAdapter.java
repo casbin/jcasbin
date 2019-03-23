@@ -118,7 +118,7 @@ public class FileAdapter implements Adapter {
      */
     @Override
     public void addPolicy(String sec, String ptype, List<String> rule) {
-        throw new UnsupportedOperationException("not implemented");
+        throw new Error("not implemented");
     }
 
     /**
@@ -126,7 +126,7 @@ public class FileAdapter implements Adapter {
      */
     @Override
     public void removePolicy(String sec, String ptype, List<String> rule) {
-        throw new UnsupportedOperationException("not implemented");
+        throw new Error("not implemented");
     }
 
     /**
@@ -134,7 +134,7 @@ public class FileAdapter implements Adapter {
      */
     @Override
     public void removeFilteredPolicy(String sec, String ptype, int fieldIndex, String... fieldValues) {
-        throw new UnsupportedOperationException("not implemented");
+        throw new Error("not implemented");
     }
 
 }

@@ -14,6 +14,11 @@
 
 package org.casbin.jcasbin.util;
 
+import org.casbin.jcasbin.model.Model;
+import org.casbin.jcasbin.persist.Helper;
+
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -200,4 +205,18 @@ public class Util {
         }
         return true;
     }
+
+    public static void loadPolicy(BufferedReader br, Model model, Helper.loadPolicyLineHandler<String, Model> handler) {
+        String line;
+        try {
+            while((line = br.readLine()) != null) {
+                handler.accept(line, model);
+            }
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new Error("IO error occurred");
+        }
+    }
+
 }

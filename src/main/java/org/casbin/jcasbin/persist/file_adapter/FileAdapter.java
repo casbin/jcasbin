@@ -91,24 +91,14 @@ public class FileAdapter implements Adapter {
 
 
     private void loadPolicyFile(Model model, Helper.loadPolicyLineHandler<String, Model> handler) {
-        FileInputStream fis;
         try {
-            fis = new FileInputStream(filePath);
+            FileInputStream fis = new FileInputStream(filePath);
+            BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+            Util.loadPolicy(br, model, handler);
+            fis.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             throw new Error("policy file not found");
-        }
-        BufferedReader br = new BufferedReader(new InputStreamReader(fis));
-
-        String line;
-        try {
-            while((line = br.readLine()) != null)
-            {
-                handler.accept(line, model);
-            }
-
-            fis.close();
-            br.close();
         } catch (IOException e) {
             e.printStackTrace();
             throw new Error("IO error occurred");

@@ -3,6 +3,7 @@ package org.casbin.jcasbin.persist.io;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.Helper;
+import org.casbin.jcasbin.util.Util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -44,16 +45,10 @@ public class InputStreamAdapter implements Adapter {
     }
 
     private void loadPolicyFromClassPath(Model model, Helper.loadPolicyLineHandler<String, Model> handler) {
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-
-        String line;
         try {
-            while((line = br.readLine()) != null) {
-                handler.accept(line, model);
-            }
-
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            Util.loadPolicy(br, model, handler);
             is.close();
-            br.close();
         } catch (IOException e) {
             e.printStackTrace();
             throw new Error("IO error occurred");

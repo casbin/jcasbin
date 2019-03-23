@@ -26,22 +26,22 @@ public class InputStreamAdapter implements Adapter {
 
     @Override
     public void savePolicy(Model model) {
-        throw new Error("not implemented");
+        throw new UnsupportedOperationException("not implemented");
     }
 
     @Override
     public void addPolicy(String sec, String ptype, List<String> rule) {
-        throw new Error("not implemented");
+        throw new UnsupportedOperationException("not implemented");
     }
 
     @Override
     public void removePolicy(String sec, String ptype, List<String> rule) {
-        throw new Error("not implemented");
+        throw new UnsupportedOperationException("not implemented");
     }
 
     @Override
     public void removeFilteredPolicy(String sec, String ptype, int fieldIndex, String... fieldValues) {
-        throw new Error("not implemented");
+        throw new UnsupportedOperationException("not implemented");
     }
 
     private void loadPolicyFromClassPath(Model model, Helper.loadPolicyLineHandler<String, Model> handler) {
@@ -51,7 +51,6 @@ public class InputStreamAdapter implements Adapter {
             is.close();
         } catch (IOException e) {
             e.printStackTrace();
-            throw new Error("IO error occurred");
         }
     }
 

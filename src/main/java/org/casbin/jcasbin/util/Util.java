@@ -206,17 +206,12 @@ public class Util {
         return true;
     }
 
-    public static void loadPolicy(BufferedReader br, Model model, Helper.loadPolicyLineHandler<String, Model> handler) {
+    public static void loadPolicy(BufferedReader br, Model model, Helper.loadPolicyLineHandler<String, Model> handler) throws IOException {
         String line;
-        try {
-            while((line = br.readLine()) != null) {
-                handler.accept(line, model);
-            }
-            br.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new Error("IO error occurred");
+        while((line = br.readLine()) != null) {
+            handler.accept(line, model);
         }
+        br.close();
     }
 
 }

@@ -18,10 +18,15 @@ import org.casbin.jcasbin.model.FunctionMap;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
+import org.casbin.jcasbin.persist.io.InputStreamAdapter;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Enforcer = ManagementEnforcer + RBAC API.
@@ -42,6 +47,32 @@ public class Enforcer extends ManagementEnforcer {
      */
     public Enforcer(String modelPath, String policyFile) {
         this(modelPath, new FileAdapter(policyFile));
+    }
+
+    /**
+     * Enforcer initializes an enforcer with a model and a policy loaded from input streams.
+     *
+     * @param modelStream data representing model.
+     * @param policyStream data representing policy.
+     */
+    public Enforcer(InputStream modelStream, InputStream policyStream) {
+        model = new Model();
+        Adapter adapter = new InputStreamAdapter(policyStream);
+        String text = new BufferedReader(new InputStreamReader(modelStream))
+                .lines().collect(Collectors.joining("\n"));
+        model.loadModelFromText(text);
+
+        this.adapter = adapter;
+        this.watcher = null;
+
+        model.printModel();
+        fm = FunctionMap.loadFunctionMap();
+
+        initialize();
+
+        if (this.adapter != null) {
+            loadPolicy();
+        }
     }
 
     /**

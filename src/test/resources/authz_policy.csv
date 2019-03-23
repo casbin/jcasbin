@@ -1,0 +1,7 @@
+p, ROLE_USER, /services/data/list, GET
+p, ROLE_ADMIN, /services/data/list, GET
+p, ROLE_ADMIN, /services/data/id/*, PUT
+p, ROLE_ADMIN, /services/data/id/*, DELETE
+g, alice, ROLE_USER
+g, bob, ROLE_USER
+g, bob, ROLE_ADMIN

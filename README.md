@@ -180,14 +180,7 @@ We also provide a [web-based UI](https://github.com/casbin/web-ui) for model man
 
 ## Policy persistence
 
-In jCasbin, the policy storage is implemented as an adapter (aka middleware for jCasbin). To keep light-weight, we don't put adapter code in the main library (except the default file adapter). A complete list of jCasbin adapters is provided as below. Any 3rd-party contribution on a new adapter is welcomed, please inform us and I will put it in this list:)
-
-Adapter | Type | Author | Description
-----|------|----|----
-[File Adapter (built-in)](https://github.com/casbin/casbin/wiki/Policy-persistence#file-adapter) | File | jCasbin | Persistence for [.CSV (Comma-Separated Values)](https://en.wikipedia.org/wiki/Comma-separated_values) files
-[JDBC Adapter](https://github.com/jcasbin/jdbc-adapter) | JDBC | jCasbin | MySQL, Oracle, PostgreSQL, DB2, Sybase, SQL Server are supported by [JDBC](https://docs.oracle.com/cd/E19226-01/820-7688/gawms/index.html)
-
-For details of adapters, please refer to the documentation: https://github.com/casbin/casbin/wiki/Policy-persistence
+https://casbin.org/docs/en/adapters
 
 ## Role manager
 

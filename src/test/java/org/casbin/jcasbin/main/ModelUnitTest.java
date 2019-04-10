@@ -19,9 +19,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.casbin.jcasbin.main.TestUtil.testDomainEnforce;
-import static org.casbin.jcasbin.main.TestUtil.testEnforce;
-import static org.casbin.jcasbin.main.TestUtil.testEnforceWithoutUsers;
+import static org.casbin.jcasbin.main.TestUtil.*;
 
 public class ModelUnitTest {
     @Test
@@ -153,47 +151,51 @@ public class ModelUnitTest {
     @Test
     public void testRBACModelWithDomainsAtRuntime() {
         Enforcer e = new Enforcer("examples/rbac_with_domains_model.conf");
+        try {
 
-        e.addPolicy("admin", "domain1", "data1", "read");
-        e.addPolicy("admin", "domain1", "data1", "write");
-        e.addPolicy("admin", "domain2", "data2", "read");
-        e.addPolicy("admin", "domain2", "data2", "write");
+            e.addPolicy("admin", "domain1", "data1", "read");
+            e.addPolicy("admin", "domain1", "data1", "write");
+            e.addPolicy("admin", "domain2", "data2", "read");
+            e.addPolicy("admin", "domain2", "data2", "write");
 
-        e.addGroupingPolicy("alice", "admin", "domain1");
-        e.addGroupingPolicy("bob", "admin", "domain2");
+            e.addGroupingPolicy("alice", "admin", "domain1");
+            e.addGroupingPolicy("bob", "admin", "domain2");
 
-        testDomainEnforce(e, "alice", "domain1", "data1", "read", true);
-        testDomainEnforce(e, "alice", "domain1", "data1", "write", true);
-        testDomainEnforce(e, "alice", "domain1", "data2", "read", false);
-        testDomainEnforce(e, "alice", "domain1", "data2", "write", false);
-        testDomainEnforce(e, "bob", "domain2", "data1", "read", false);
-        testDomainEnforce(e, "bob", "domain2", "data1", "write", false);
-        testDomainEnforce(e, "bob", "domain2", "data2", "read", true);
-        testDomainEnforce(e, "bob", "domain2", "data2", "write", true);
+            testDomainEnforce(e, "alice", "domain1", "data1", "read", true);
+            testDomainEnforce(e, "alice", "domain1", "data1", "write", true);
+            testDomainEnforce(e, "alice", "domain1", "data2", "read", false);
+            testDomainEnforce(e, "alice", "domain1", "data2", "write", false);
+            testDomainEnforce(e, "bob", "domain2", "data1", "read", false);
+            testDomainEnforce(e, "bob", "domain2", "data1", "write", false);
+            testDomainEnforce(e, "bob", "domain2", "data2", "read", true);
+            testDomainEnforce(e, "bob", "domain2", "data2", "write", true);
 
-        // Remove all policy rules related to domain1 and data1.
-        e.removeFilteredPolicy(1, "domain1", "data1");
+            // Remove all policy rules related to domain1 and data1.
+            e.removeFilteredPolicy(1, "domain1", "data1");
 
-        testDomainEnforce(e, "alice", "domain1", "data1", "read", false);
-        testDomainEnforce(e, "alice", "domain1", "data1", "write", false);
-        testDomainEnforce(e, "alice", "domain1", "data2", "read", false);
-        testDomainEnforce(e, "alice", "domain1", "data2", "write", false);
-        testDomainEnforce(e, "bob", "domain2", "data1", "read", false);
-        testDomainEnforce(e, "bob", "domain2", "data1", "write", false);
-        testDomainEnforce(e, "bob", "domain2", "data2", "read", true);
-        testDomainEnforce(e, "bob", "domain2", "data2", "write", true);
+            testDomainEnforce(e, "alice", "domain1", "data1", "read", false);
+            testDomainEnforce(e, "alice", "domain1", "data1", "write", false);
+            testDomainEnforce(e, "alice", "domain1", "data2", "read", false);
+            testDomainEnforce(e, "alice", "domain1", "data2", "write", false);
+            testDomainEnforce(e, "bob", "domain2", "data1", "read", false);
+            testDomainEnforce(e, "bob", "domain2", "data1", "write", false);
+            testDomainEnforce(e, "bob", "domain2", "data2", "read", true);
+            testDomainEnforce(e, "bob", "domain2", "data2", "write", true);
 
-        // Remove the specified policy rule.
-        e.removePolicy("admin", "domain2", "data2", "read");
+            // Remove the specified policy rule.
+            e.removePolicy("admin", "domain2", "data2", "read");
 
-        testDomainEnforce(e, "alice", "domain1", "data1", "read", false);
-        testDomainEnforce(e, "alice", "domain1", "data1", "write", false);
-        testDomainEnforce(e, "alice", "domain1", "data2", "read", false);
-        testDomainEnforce(e, "alice", "domain1", "data2", "write", false);
-        testDomainEnforce(e, "bob", "domain2", "data1", "read", false);
-        testDomainEnforce(e, "bob", "domain2", "data1", "write", false);
-        testDomainEnforce(e, "bob", "domain2", "data2", "read", false);
-        testDomainEnforce(e, "bob", "domain2", "data2", "write", true);
+            testDomainEnforce(e, "alice", "domain1", "data1", "read", false);
+            testDomainEnforce(e, "alice", "domain1", "data1", "write", false);
+            testDomainEnforce(e, "alice", "domain1", "data2", "read", false);
+            testDomainEnforce(e, "alice", "domain1", "data2", "write", false);
+            testDomainEnforce(e, "bob", "domain2", "data1", "read", false);
+            testDomainEnforce(e, "bob", "domain2", "data1", "write", false);
+            testDomainEnforce(e, "bob", "domain2", "data2", "read", false);
+            testDomainEnforce(e, "bob", "domain2", "data2", "write", true);
+        } catch (UnsupportedOperationException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 
     @Test
@@ -224,35 +226,41 @@ public class ModelUnitTest {
         // You can add custom data to a grouping policy, Casbin will ignore it. It is only meaningful to the caller.
         // This feature can be used to store information like whether "bob" is an end user (so no subject will inherit "bob")
         // For Casbin, it is equivalent to: e.addGroupingPolicy("bob", "data2_admin")
-        e.addGroupingPolicy("bob", "data2_admin", "custom_data");
+        try {
+            e.addGroupingPolicy("bob", "data2_admin", "custom_data");
 
-        testEnforce(e, "alice", "data1", "read", true);
-        testEnforce(e, "alice", "data1", "write", false);
-        testEnforce(e, "alice", "data2", "read", true);
-        testEnforce(e, "alice", "data2", "write", true);
-        testEnforce(e, "bob", "data1", "read", false);
-        testEnforce(e, "bob", "data1", "write", false);
-        testEnforce(e, "bob", "data2", "read", true);
-        testEnforce(e, "bob", "data2", "write", true);
+            testEnforce(e, "alice", "data1", "read", true);
+            testEnforce(e, "alice", "data1", "write", false);
+            testEnforce(e, "alice", "data2", "read", true);
+            testEnforce(e, "alice", "data2", "write", true);
+            testEnforce(e, "bob", "data1", "read", false);
+            testEnforce(e, "bob", "data1", "write", false);
+            testEnforce(e, "bob", "data2", "read", true);
+            testEnforce(e, "bob", "data2", "write", true);
 
-        // You should also take the custom data as a parameter when deleting a grouping policy.
-        // e.removeGroupingPolicy("bob", "data2_admin") won't work.
-        // Or you can remove it by using removeFilteredGroupingPolicy().
-        e.removeGroupingPolicy("bob", "data2_admin", "custom_data");
+            // You should also take the custom data as a parameter when deleting a grouping policy.
+            // e.removeGroupingPolicy("bob", "data2_admin") won't work.
+            // Or you can remove it by using removeFilteredGroupingPolicy().
+            e.removeGroupingPolicy("bob", "data2_admin", "custom_data");
 
-        testEnforce(e, "alice", "data1", "read", true);
-        testEnforce(e, "alice", "data1", "write", false);
-        testEnforce(e, "alice", "data2", "read", true);
-        testEnforce(e, "alice", "data2", "write", true);
-        testEnforce(e, "bob", "data1", "read", false);
-        testEnforce(e, "bob", "data1", "write", false);
-        testEnforce(e, "bob", "data2", "read", false);
-        testEnforce(e, "bob", "data2", "write", true);
+            testEnforce(e, "alice", "data1", "read", true);
+            testEnforce(e, "alice", "data1", "write", false);
+            testEnforce(e, "alice", "data2", "read", true);
+            testEnforce(e, "alice", "data2", "write", true);
+            testEnforce(e, "bob", "data1", "read", false);
+            testEnforce(e, "bob", "data1", "write", false);
+            testEnforce(e, "bob", "data2", "read", false);
+            testEnforce(e, "bob", "data2", "write", true);
+        } catch (UnsupportedOperationException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 
     class CustomRoleManager implements RoleManager {
         public void clear() {}
+
         public void addLink(String name1, String name2, String... domain) {}
+
         public void deleteLink(String name1, String name2, String... domain) {}
 
         public boolean hasLink(String name1, String name2, String... domain) {
@@ -267,7 +275,9 @@ public class ModelUnitTest {
         }
 
         public List<String> getRoles(String name, String... domain) { return null; }
+
         public List<String> getUsers(String name) { return null; }
+
         public void printRoles() {}
     }
 

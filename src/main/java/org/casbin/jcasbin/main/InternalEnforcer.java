@@ -30,14 +30,7 @@ class InternalEnforcer extends CoreEnforcer {
         }
 
         if (adapter != null && autoSave) {
-            try {
-                adapter.addPolicy(sec, ptype, rule);
-            } catch (Error e) {
-                if (!e.getMessage().equals("not implemented")) {
-                    throw e;
-                }
-            }
-
+            adapter.addPolicy(sec, ptype, rule);
             if (watcher != null) {
                 // error intentionally ignored
                 watcher.update();
@@ -57,14 +50,7 @@ class InternalEnforcer extends CoreEnforcer {
         }
 
         if (adapter != null && autoSave) {
-            try {
-                adapter.removePolicy(sec, ptype, rule);
-            } catch (Error e) {
-                if (!e.getMessage().equals("not implemented")) {
-                    throw e;
-                }
-            }
-
+            adapter.removePolicy(sec, ptype, rule);
             if (watcher != null) {
                 // error intentionally ignored
                 watcher.update();
@@ -84,14 +70,7 @@ class InternalEnforcer extends CoreEnforcer {
         }
 
         if (adapter != null && autoSave) {
-            try {
-                adapter.removeFilteredPolicy(sec, ptype, fieldIndex, fieldValues);
-            } catch (Error e) {
-                if (!e.getMessage().equals("not implemented")) {
-                    throw e;
-                }
-            }
-
+            adapter.removeFilteredPolicy(sec, ptype, fieldIndex, fieldValues);
             if (watcher != null) {
                 // error intentionally ignored
                 watcher.update();

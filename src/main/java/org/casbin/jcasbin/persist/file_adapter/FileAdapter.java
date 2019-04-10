@@ -15,6 +15,7 @@
 package org.casbin.jcasbin.persist.file_adapter;
 
 import org.apache.commons.io.IOUtils;
+import org.casbin.jcasbin.exception.CasbinFileAdapterException;
 import org.casbin.jcasbin.model.Assertion;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
@@ -34,31 +35,30 @@ public class FileAdapter implements Adapter {
     private String filePath = null;
 
     private boolean readOnly = false;
-    private ByteArrayOutputStream byteArrayOutputStream = null;
+    private ByteArrayInputStream byteArrayInputStream = null;
 
     /**
      * FileAdapter is the constructor for FileAdapter.
      *
      * @param filePath the path of the policy file.
      */
-    public FileAdapter(String filePath) throws FileNotFoundException {
-        File file = new File(filePath);
-        if (!file.exists()) {
-            throw new FileNotFoundException("Policy file can not be found. Path: " + filePath);
-        }
+    public FileAdapter(String filePath) {
         this.filePath = filePath;
     }
 
     /**
      * FileAdapter is the constructor for FileAdapter.
      *
-     * @param inputStream
+     * @param inputStream the policy file.inputStream
      */
-    public FileAdapter(InputStream inputStream) throws IOException {
+    public FileAdapter(InputStream inputStream) {
         readOnly = true;
-        byteArrayOutputStream = new ByteArrayOutputStream();
-        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
-        IOUtils.copy(bufferedInputStream, byteArrayOutputStream);
+        try {
+            byteArrayInputStream = new ByteArrayInputStream(IOUtils.toByteArray(inputStream));
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new CasbinFileAdapterException("File adapter ini error");
+        }
     }
 
     /**
@@ -74,14 +74,8 @@ public class FileAdapter implements Adapter {
                 throw new Error("file operator error");
             }
         }
-        if (byteArrayOutputStream != null) {
-            byteArrayOutputStream.reset();
-            try (ByteArrayInputStream bis = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
-                loadPolicyData(model, Helper::loadPolicyLine, bis);
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new Error("file operator error");
-            }
+        if (byteArrayInputStream != null) {
+            loadPolicyData(model, Helper::loadPolicyLine, byteArrayInputStream);
         }
     }
 

@@ -42,6 +42,7 @@ production-ready | experimental | WIP | WIP
 - [Examples](#examples)
 - [Middlewares](#middlewares)
 - [Our adopters](#our-adopters)
+- [Spring Boot support](#spring-boot-support)
 
 ## Supported models
 
@@ -210,6 +211,20 @@ Authz middlewares for web frameworks: https://casbin.org/docs/en/middlewares
 ## Our adopters
 
 https://casbin.org/docs/en/adopters
+
+## Spring Boot support
+
+We provide Spring Boot support, you can use [casbin-spring-boot-starter](https://github.com/jcasbin/casbin-spring-boot-starter) to quickly develop in SpringBoot
+
+In casbin-spring-boot-starter, we made the following adjustments.
+1. Rewrite JDBCAdapter to support a variety of commonly used JDBC databases 
+2. Implement RedisWatcher 
+4. IDEA Editor Configuration Tips 
+5. Provide default configuration, automatic assembly
+6. SpringSecurity integration (future) 
+7. Shiro integration (future) 
+
+https://github.com/jcasbin/casbin-spring-boot-starter
 
 ## License
 

@@ -14,6 +14,7 @@
 
 package org.casbin.jcasbin.persist.file_adapter;
 
+import org.apache.commons.io.IOUtils;
 import org.casbin.jcasbin.model.Assertion;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
@@ -21,6 +22,7 @@ import org.casbin.jcasbin.persist.Helper;
 import org.casbin.jcasbin.util.Util;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
@@ -29,15 +31,34 @@ import java.util.Map;
  * It can load policy from file or save policy to file.
  */
 public class FileAdapter implements Adapter {
-    private String filePath;
+    private String filePath = null;
+
+    private boolean readOnly = false;
+    private ByteArrayOutputStream byteArrayOutputStream = null;
 
     /**
      * FileAdapter is the constructor for FileAdapter.
      *
      * @param filePath the path of the policy file.
      */
-    public FileAdapter(String filePath) {
+    public FileAdapter(String filePath) throws FileNotFoundException {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            throw new FileNotFoundException("Policy file can not be found. Path: " + filePath);
+        }
         this.filePath = filePath;
+    }
+
+    /**
+     * FileAdapter is the constructor for FileAdapter.
+     *
+     * @param inputStream
+     */
+    public FileAdapter(InputStream inputStream) throws IOException {
+        readOnly = true;
+        byteArrayOutputStream = new ByteArrayOutputStream();
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+        IOUtils.copy(bufferedInputStream, byteArrayOutputStream);
     }
 
     /**
@@ -45,12 +66,23 @@ public class FileAdapter implements Adapter {
      */
     @Override
     public void loadPolicy(Model model) {
-        if (filePath.equals("")) {
-            // throw new Error("invalid file path, file path cannot be empty");
-            return;
+        if (filePath != null && !"".equals(filePath)) {
+            try (FileInputStream fis = new FileInputStream(filePath)) {
+                loadPolicyData(model, Helper::loadPolicyLine, fis);
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new Error("file operator error");
+            }
         }
-
-        loadPolicyFile(model, Helper::loadPolicyLine);
+        if (byteArrayOutputStream != null) {
+            byteArrayOutputStream.reset();
+            try (ByteArrayInputStream bis = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
+                loadPolicyData(model, Helper::loadPolicyLine, bis);
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new Error("file operator error");
+            }
+        }
     }
 
     /**
@@ -58,7 +90,10 @@ public class FileAdapter implements Adapter {
      */
     @Override
     public void savePolicy(Model model) {
-        if (filePath.equals("")) {
+        if (readOnly) {
+            throw new Error("Policy file can not writer, because use inputStream is readOnly");
+        }
+        if (filePath != null && !"".equals(filePath)) {
             throw new Error("invalid file path, file path cannot be empty");
         }
 
@@ -90,39 +125,22 @@ public class FileAdapter implements Adapter {
     }
 
 
-    private void loadPolicyFile(Model model, Helper.loadPolicyLineHandler<String, Model> handler) {
-        FileInputStream fis;
+    private void loadPolicyData(Model model, Helper.loadPolicyLineHandler<String, Model> handler, InputStream inputStream) {
         try {
-            fis = new FileInputStream(filePath);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            throw new Error("policy file not found");
-        }
-        BufferedReader br = new BufferedReader(new InputStreamReader(fis));
-
-        String line;
-        try {
-            while((line = br.readLine()) != null)
-            {
-                handler.accept(line, model);
-            }
-
-            fis.close();
-            br.close();
+            List<String> lines = IOUtils.readLines(inputStream, Charset.forName("UTF-8"));
+            lines.forEach(x -> handler.accept(x, model));
         } catch (IOException e) {
             e.printStackTrace();
-            throw new Error("IO error occurred");
+            throw new Error("Policy load error");
         }
     }
 
     private void savePolicyFile(String text) {
-        try {
-            FileOutputStream fos = new FileOutputStream(filePath);
-            fos.write(text.getBytes());
-            fos.close();
+        try (FileOutputStream fos = new FileOutputStream(filePath)) {
+            IOUtils.write(text, fos, Charset.forName("UTF-8"));
         } catch (IOException e) {
             e.printStackTrace();
-            throw new Error("IO error occurred");
+            throw new Error("Policy save error");
         }
     }
 
@@ -131,7 +149,7 @@ public class FileAdapter implements Adapter {
      */
     @Override
     public void addPolicy(String sec, String ptype, List<String> rule) {
-        throw new Error("not implemented");
+        throw new UnsupportedOperationException("not implemented");
     }
 
     /**
@@ -139,7 +157,7 @@ public class FileAdapter implements Adapter {
      */
     @Override
     public void removePolicy(String sec, String ptype, List<String> rule) {
-        throw new Error("not implemented");
+        throw new UnsupportedOperationException("not implemented");
     }
 
     /**
@@ -147,6 +165,6 @@ public class FileAdapter implements Adapter {
      */
     @Override
     public void removeFilteredPolicy(String sec, String ptype, int fieldIndex, String... fieldValues) {
-        throw new Error("not implemented");
+        throw new UnsupportedOperationException("not implemented");
     }
 }

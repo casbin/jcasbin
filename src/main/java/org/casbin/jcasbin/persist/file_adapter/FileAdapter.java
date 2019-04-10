@@ -87,7 +87,7 @@ public class FileAdapter implements Adapter {
         if (readOnly) {
             throw new Error("Policy file can not writer, because use inputStream is readOnly");
         }
-        if (filePath != null && !"".equals(filePath)) {
+        if (filePath == null || "".equals(filePath)) {
             throw new Error("invalid file path, file path cannot be empty");
         }
 

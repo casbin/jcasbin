@@ -402,4 +402,23 @@ public class EnforcerUnitTest {
 
         testEnforce(e, "alice", "/alice_data/resource1", "GET", true);
     }
+
+    @Test
+    public void testInitEmpty2() {
+        Enforcer e = new Enforcer();
+
+        Model m = newModel();
+        m.addDef("r", "r", "sub, obj, act");
+        m.addDef("p", "p", "sub, obj, act");
+        m.addDef("e", "e", "some(where (p.eft == allow))");
+        m.addDef("m", "m", "r.sub == p.sub && keyMatch(r.obj, p.obj) && regexMatch(r.act, p.act)");
+
+        Adapter a = new FileAdapter(getClass().getClassLoader().getResourceAsStream("examples/keymatch_policy.csv"));
+
+        e.setModel(m);
+        e.setAdapter(a);
+        e.loadPolicy();
+
+        testEnforce(e, "alice", "/alice_data/resource1", "GET", true);
+    }
 }

@@ -69,18 +69,19 @@ public class FileAdapter implements Adapter {
         }
 
         List<String> policy = new ArrayList<>();
+        policy.addAll(getModelPolicy(model, "p"));
+        policy.addAll(getModelPolicy(model, "g"));
 
-        model.model.get("p").forEach((k, v) -> {
+        savePolicyFile(String.join("\n", policy));
+    }
+
+    private List<String> getModelPolicy(Model model, String ptype) {
+        List<String> policy = new ArrayList<>();
+        model.model.get(ptype).forEach((k, v) -> {
             List<String> p = v.policy.parallelStream().map(x -> k + ", " + Util.arrayToString(x)).collect(Collectors.toList());
             policy.addAll(p);
         });
-
-        model.model.get("g").forEach((k, v) -> {
-            List<String> g = v.policy.parallelStream().map(x -> k + ", " + Util.arrayToString(x)).collect(Collectors.toList());
-            policy.addAll(g);
-        });
-
-        savePolicyFile(String.join("\n", policy));
+        return policy;
     }
 
     private void loadPolicyData(Model model, Helper.loadPolicyLineHandler<String, Model> handler, InputStream inputStream) {

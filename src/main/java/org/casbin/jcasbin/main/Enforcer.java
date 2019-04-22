@@ -400,4 +400,52 @@ public class Enforcer extends ManagementEnforcer {
     public boolean deleteRoleForUserInDomain(String user, String role, String domain) {
         return removeGroupingPolicy(user, role, domain);
     }
+
+    /**
+     * getImplicitRolesForUser gets implicit roles that a user has.
+     * Compared to getRolesForUser(), this function retrieves indirect roles besides direct roles.
+     * For example:
+     * g, alice, role:admin
+     * g, role:admin, role:user
+     * <p>
+     * getRolesForUser("alice") can only get: ["role:admin"].
+     * But getImplicitRolesForUser("alice") will get: ["role:admin", "role:user"].
+     *
+     * @param name   the user
+     * @param domain the domain
+     * @return implicit roles that a user has.
+     */
+    public List<String> getImplicitRolesForUser(String name, String... domain) {
+        List<String> roles = this.rm.getRoles(name, domain);
+        List<String> res = new ArrayList<>(roles);
+        for (String n : roles) {
+            res.addAll(this.getImplicitRolesForUser(n, domain));
+        }
+        return res;
+    }
+
+    /**
+     * getImplicitPermissionsForUser gets implicit permissions for a user or role.
+     * Compared to getPermissionsForUser(), this function retrieves permissions for inherited roles.
+     * For example:
+     * p, admin, data1, read
+     * p, alice, data2, read
+     * g, alice, admin
+     * <p>
+     * getPermissionsForUser("alice") can only get: [["alice", "data2", "read"]].
+     * But getImplicitPermissionsForUser("alice") will get: [["admin", "data1", "read"], ["alice", "data2", "read"]].
+     *
+     * @param user the user.
+     * @return implicit permissions for a user or role.
+     */
+    public List<List<String>> getImplicitPermissionsForUser(String user) {
+        List<String> roles = new ArrayList<>();
+        roles.add(user);
+        roles.addAll(this.getImplicitRolesForUser(user));
+        List<List<String>> res = new ArrayList<>();
+        for (String n : roles) {
+            res.addAll(this.getPermissionsForUser(n));
+        }
+        return res;
+    }
 }

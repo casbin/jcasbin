@@ -18,6 +18,7 @@ import org.junit.Test;
 
 import static java.util.Arrays.asList;
 import static org.casbin.jcasbin.main.TestUtil.*;
+import static org.junit.Assert.assertEquals;
 
 public class RbacAPIUnitTest {
     @Test
@@ -124,5 +125,27 @@ public class RbacAPIUnitTest {
         testEnforceWithoutUsers(e, "alice", "write", false);
         testEnforceWithoutUsers(e, "bob", "read", false);
         testEnforceWithoutUsers(e, "bob", "write", false);
+    }
+
+    @Test
+    public void testImplicitRoleAPI() {
+        Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_with_hierarchy_policy.csv");
+        assertEquals(e.getImplicitRolesForUser("alice"), asList("admin", "data1_admin", "data2_admin"));
+    }
+
+    @Test
+    public void testImplicitPermissionAPI() {
+        Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_with_hierarchy_policy.csv");
+        assertEquals(
+                e.getImplicitPermissionsForUser("alice"),
+                asList(
+                        asList("alice", "data1", "read"),
+                        asList("data1_admin", "data1", "read"),
+                        asList("data1_admin", "data1", "write"),
+                        asList("data2_admin", "data2", "read"),
+                        asList("data2_admin", "data2", "write")
+                )
+        );
+
     }
 }

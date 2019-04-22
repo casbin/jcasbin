@@ -46,7 +46,7 @@ public class CoreEnforcer {
 
     Adapter adapter;
     Watcher watcher;
-    private RoleManager rm;
+    RoleManager rm;
 
     private boolean enabled;
     boolean autoSave;

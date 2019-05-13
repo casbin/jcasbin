@@ -20,10 +20,7 @@ import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.Helper;
 import org.casbin.jcasbin.util.Util;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +32,8 @@ import java.util.stream.Collectors;
  */
 public class FileAdapter implements Adapter {
     private String filePath;
+    private boolean readOnly = false;
+    private ByteArrayInputStream byteArrayInputStream;
 
     /**
      * FileAdapter is the constructor for FileAdapter.
@@ -43,6 +42,21 @@ public class FileAdapter implements Adapter {
      */
     public FileAdapter(String filePath) {
         this.filePath = filePath;
+    }
+
+    /**
+     * FileAdapter is the constructor for FileAdapter.
+     *
+     * @param inputStream the policy file.inputStream
+     */
+    public FileAdapter(InputStream inputStream) {
+        readOnly = true;
+        try {
+            byteArrayInputStream = new ByteArrayInputStream(IOUtils.toByteArray(inputStream));
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new Error("File adapter ini error");
+        }
     }
 
     /**
@@ -57,6 +71,9 @@ public class FileAdapter implements Adapter {
                 throw new Error("file operator error", e.getCause());
             }
         }
+        if (byteArrayInputStream != null) {
+            loadPolicyData(model, Helper::loadPolicyLine, byteArrayInputStream);
+        }
     }
 
     /**
@@ -64,6 +81,9 @@ public class FileAdapter implements Adapter {
      */
     @Override
     public void savePolicy(Model model) {
+        if (byteArrayInputStream != null && readOnly) {
+            throw new Error("Policy file can not writer, because use inputStream is readOnly");
+        }
         if (filePath == null || "".equals(filePath)) {
             throw new Error("invalid file path, file path cannot be empty");
         }

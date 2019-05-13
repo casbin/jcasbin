@@ -19,6 +19,9 @@ import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
 import org.junit.Test;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+
 import static java.util.Arrays.asList;
 import static org.casbin.jcasbin.main.CoreEnforcer.newModel;
 import static org.casbin.jcasbin.main.TestUtil.testEnforce;
@@ -401,5 +404,29 @@ public class EnforcerUnitTest {
         e.loadPolicy();
 
         testEnforce(e, "alice", "/alice_data/resource1", "GET", true);
+    }
+
+    @Test
+    public void testInitEmptyByInputStream() {
+        Enforcer e = new Enforcer();
+
+        Model m = newModel();
+        m.addDef("r", "r", "sub, obj, act");
+        m.addDef("p", "p", "sub, obj, act");
+        m.addDef("e", "e", "some(where (p.eft == allow))");
+        m.addDef("m", "m", "r.sub == p.sub && keyMatch(r.obj, p.obj) && regexMatch(r.act, p.act)");
+
+        try (FileInputStream fis = new FileInputStream("examples/keymatch_policy.csv")) {
+            Adapter a = new FileAdapter(fis);
+
+            e.setModel(m);
+            e.setAdapter(a);
+            e.loadPolicy();
+
+            testEnforce(e, "alice", "/alice_data/resource1", "GET", true);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
     }
 }

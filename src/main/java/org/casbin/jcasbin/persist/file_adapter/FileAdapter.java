@@ -55,7 +55,7 @@ public class FileAdapter implements Adapter {
             byteArrayInputStream = new ByteArrayInputStream(IOUtils.toByteArray(inputStream));
         } catch (IOException e) {
             e.printStackTrace();
-            throw new Error("File adapter ini error");
+            throw new Error("File adapter init error");
         }
     }
 
@@ -82,7 +82,7 @@ public class FileAdapter implements Adapter {
     @Override
     public void savePolicy(Model model) {
         if (byteArrayInputStream != null && readOnly) {
-            throw new Error("Policy file can not writer, because use inputStream is readOnly");
+            throw new Error("Policy file can not write, because use inputStream is readOnly");
         }
         if (filePath == null || "".equals(filePath)) {
             throw new Error("invalid file path, file path cannot be empty");

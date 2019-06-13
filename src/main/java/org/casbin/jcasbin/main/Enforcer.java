@@ -116,8 +116,8 @@ public class Enforcer extends ManagementEnforcer {
     public List<String> getRolesForUser(String name) {
         try {
             return model.model.get("g").get("g").rm.getRoles(name);
-        } catch (Error e) {
-            if (!e.getMessage().equals("error: name does not exist")) {
+        } catch (IllegalArgumentException e) {
+            if (!"error: name does not exist".equals(e.getMessage())) {
                 throw e;
             }
         }
@@ -133,8 +133,8 @@ public class Enforcer extends ManagementEnforcer {
     public List<String> getUsersForRole(String name) {
         try {
             return model.model.get("g").get("g").rm.getUsers(name);
-        } catch (Error e) {
-            if (!e.getMessage().equals("error: name does not exist")) {
+        } catch (IllegalArgumentException e) {
+            if (!"error: name does not exist".equals(e.getMessage())) {
                 throw e;
             }
         }
@@ -356,8 +356,8 @@ public class Enforcer extends ManagementEnforcer {
     public List<String> getRolesForUserInDomain(String name, String domain) {
         try {
             return model.model.get("g").get("g").rm.getRoles(name, domain);
-        } catch (Error e) {
-            if (!e.getMessage().equals("error: name does not exist")) {
+        } catch (IllegalArgumentException e) {
+            if (!"error: name does not exist".equals(e.getMessage())) {
                 throw e;
             }
         }

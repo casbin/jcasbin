@@ -60,7 +60,7 @@ public class GroupRoleManager extends DefaultRoleManager {
                         return true;
                     }
                 }
-            } catch (Error e) {
+            } catch (IllegalArgumentException ignore) {
                 return false;
             }
         }

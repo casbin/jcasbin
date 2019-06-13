@@ -21,6 +21,7 @@ import com.googlecode.aviator.runtime.type.AviatorFunction;
 import org.casbin.jcasbin.effect.DefaultEffector;
 import org.casbin.jcasbin.effect.Effect;
 import org.casbin.jcasbin.effect.Effector;
+import org.casbin.jcasbin.exception.CasbinMatcherException;
 import org.casbin.jcasbin.model.Assertion;
 import org.casbin.jcasbin.persist.Watcher;
 import org.casbin.jcasbin.model.FunctionMap;
@@ -226,7 +227,7 @@ public class CoreEnforcer {
      */
     public void savePolicy() {
         if (isFiltered()) {
-            throw new Error("cannot save a filtered policy");
+            throw new IllegalArgumentException("cannot save a filtered policy");
         }
 
         adapter.savePolicy(model);
@@ -358,7 +359,7 @@ public class CoreEnforcer {
                         matcherResults[i] = (float) result;
                     }
                 } else {
-                    throw new Error("matcher result should be bool, int or float");
+                    throw new CasbinMatcherException("matcher result should be bool, int or float");
                 }
                 if (parameters.containsKey("p_eft")) {
                     String eft = (String) parameters.get("p_eft");

@@ -45,10 +45,10 @@ public class Assertion {
         }
         for (List<String> rule : policy) {
             if (count < 2) {
-                throw new Error("the number of \"_\" in role definition should be at least 2");
+                throw new IllegalArgumentException("the number of \"_\" in role definition should be at least 2");
             }
             if (rule.size() < count) {
-                throw new Error("grouping policy elements do not meet role definition");
+                throw new IllegalArgumentException("grouping policy elements do not meet role definition");
             }
 
             if (count == 2) {

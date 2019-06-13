@@ -14,6 +14,8 @@
 
 package org.casbin.jcasbin.config;
 
+import org.casbin.jcasbin.exception.CasbinConfigException;
+
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,7 +58,11 @@ public class Config {
      */
     public static Config newConfigFromText(String text) {
         Config c = new Config();
-        c.parseBuffer(new BufferedReader(new StringReader(text)));
+        try {
+            c.parseBuffer(new BufferedReader(new StringReader(text)));
+        } catch (IOException e) {
+            throw new CasbinConfigException(e.getMessage(), e.getCause());
+        }
         return c;
     }
 
@@ -79,44 +85,32 @@ public class Config {
 
     private void parse(String fname) {
         lock.lock();
-        FileInputStream fis;
-        try {
-            fis = new FileInputStream(fname);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            throw new Error("model file not found");
-        }
-
-        BufferedReader buf = new BufferedReader(new InputStreamReader(fis));
-        parseBuffer(buf);
-        lock.unlock();
-        try {
-            fis.close();
+        try (FileInputStream fis = new FileInputStream(fname)) {
+            BufferedReader buf = new BufferedReader(new InputStreamReader(fis));
+            parseBuffer(buf);
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new Error("IO error occurred");
+            throw new CasbinConfigException(e.getMessage(), e.getCause());
+        } finally {
+            lock.unlock();
         }
     }
 
-    private void parseBuffer(BufferedReader buf) {
+    private void parseBuffer(BufferedReader buf) throws IOException {
         String section = "";
         int lineNum = 0;
         String line;
 
         while (true) {
-            lineNum ++;
-            try {
-                if ((line = buf.readLine()) != null) {
-                    if (line.equals("")) {
-                        continue;
-                    }
-                } else {
-                    break;
+            lineNum++;
+
+            if ((line = buf.readLine()) != null) {
+                if ("".equals(line)) {
+                    continue;
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new Error("IO error occurred");
+            } else {
+                break;
             }
+
 
             line = line.trim();
             if (line.startsWith(DEFAULT_COMMENT)) {
@@ -128,7 +122,7 @@ public class Config {
             } else {
                 String[] optionVal = line.split("=", 2);
                 if (optionVal.length != 2) {
-                    throw new Error(String.format("parse the content error : line %d , %s = ? ", lineNum, optionVal[0]));
+                    throw new IllegalArgumentException(String.format("parse the content error : line %d , %s = ? ", lineNum, optionVal[0]));
                 }
                 String option = optionVal[0].trim();
                 String value = optionVal[1].trim();
@@ -164,7 +158,7 @@ public class Config {
     public void set(String key, String value) {
         lock.lock();
         if (key.length() == 0) {
-            throw new Error("key is empty");
+            throw new IllegalArgumentException("key is empty");
         }
 
         String section = "";

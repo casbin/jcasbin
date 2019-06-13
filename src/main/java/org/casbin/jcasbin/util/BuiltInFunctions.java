@@ -119,7 +119,7 @@ public class BuiltInFunctions {
             ipas1.validateIPv4();
         } catch (AddressStringException e) {
             e.printStackTrace();
-            throw new Error("invalid argument: ip1 in IPMatch() function is not an IP address.");
+            throw new IllegalArgumentException("invalid argument: ip1 in IPMatch() function is not an IP address.");
         }
 
         IPAddressString ipas2 = new IPAddressString(ip2);
@@ -127,7 +127,7 @@ public class BuiltInFunctions {
             ipas2.validate();
         } catch (AddressStringException e) {
             e.printStackTrace();
-            throw new Error("invalid argument: ip2 in IPMatch() function is neither an IP address nor a CIDR.");
+            throw new IllegalArgumentException("invalid argument: ip2 in IPMatch() function is neither an IP address nor a CIDR.");
         }
 
         if (ipas1.equals(ipas2)) {
@@ -141,7 +141,7 @@ public class BuiltInFunctions {
             ipa2 = ipas2.toAddress();
         } catch (AddressStringException e) {
             e.printStackTrace();
-            throw new Error("invalid argument: ip1 or ip2 in IPMatch() function is not an IP address.");
+            throw new IllegalArgumentException("invalid argument: ip1 or ip2 in IPMatch() function is not an IP address.");
         }
 
         Integer prefix = ipa2.getNetworkPrefixLength();

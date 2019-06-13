@@ -15,6 +15,8 @@
 package org.casbin.jcasbin.persist.file_adapter;
 
 import org.apache.commons.io.IOUtils;
+import org.casbin.jcasbin.exception.CasbinAdapterException;
+import org.casbin.jcasbin.exception.CasbinPolicyFileNotFoundException;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.Helper;
@@ -55,7 +57,7 @@ public class FileAdapter implements Adapter {
             byteArrayInputStream = new ByteArrayInputStream(IOUtils.toByteArray(inputStream));
         } catch (IOException e) {
             e.printStackTrace();
-            throw new Error("File adapter init error");
+            throw new CasbinAdapterException("File adapter init error");
         }
     }
 
@@ -68,7 +70,7 @@ public class FileAdapter implements Adapter {
             try (FileInputStream fis = new FileInputStream(filePath)) {
                 loadPolicyData(model, Helper::loadPolicyLine, fis);
             } catch (IOException e) {
-                throw new Error("file operator error", e.getCause());
+                throw new CasbinAdapterException("Load policy file error", e.getCause());
             }
         }
         if (byteArrayInputStream != null) {
@@ -82,10 +84,10 @@ public class FileAdapter implements Adapter {
     @Override
     public void savePolicy(Model model) {
         if (byteArrayInputStream != null && readOnly) {
-            throw new Error("Policy file can not write, because use inputStream is readOnly");
+            throw new CasbinAdapterException("Policy file can not write, because use inputStream is readOnly");
         }
-        if (filePath == null || "".equals(filePath)) {
-            throw new Error("invalid file path, file path cannot be empty");
+        if (filePath == null || "".equals(filePath) || !new File(filePath).exists()) {
+            throw new CasbinPolicyFileNotFoundException("invalid file path: " + filePath);
         }
 
         List<String> policy = new ArrayList<>();
@@ -110,7 +112,7 @@ public class FileAdapter implements Adapter {
             lines.forEach(x -> handler.accept(x, model));
         } catch (IOException e) {
             e.printStackTrace();
-            throw new Error("Policy load error");
+            throw new CasbinAdapterException("Policy load error");
         }
     }
 
@@ -119,7 +121,7 @@ public class FileAdapter implements Adapter {
             IOUtils.write(text, fos, Charset.forName("UTF-8"));
         } catch (IOException e) {
             e.printStackTrace();
-            throw new Error("Policy save error");
+            throw new CasbinAdapterException("Policy save error");
         }
     }
 
@@ -128,7 +130,7 @@ public class FileAdapter implements Adapter {
      */
     @Override
     public void addPolicy(String sec, String ptype, List<String> rule) {
-        throw new Error("not implemented");
+        throw new UnsupportedOperationException("not implemented");
     }
 
     /**
@@ -136,7 +138,7 @@ public class FileAdapter implements Adapter {
      */
     @Override
     public void removePolicy(String sec, String ptype, List<String> rule) {
-        throw new Error("not implemented");
+        throw new UnsupportedOperationException("not implemented");
     }
 
     /**
@@ -144,6 +146,6 @@ public class FileAdapter implements Adapter {
      */
     @Override
     public void removeFilteredPolicy(String sec, String ptype, int fieldIndex, String... fieldValues) {
-        throw new Error("not implemented");
+        throw new UnsupportedOperationException("not implemented");
     }
 }

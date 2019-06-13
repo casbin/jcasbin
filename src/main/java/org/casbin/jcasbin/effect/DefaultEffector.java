@@ -27,6 +27,7 @@ public class DefaultEffector implements Effector {
     /**
      * mergeEffects merges all matching results collected by the enforcer into a single decision.
      */
+    @Override
     public boolean mergeEffects(String expr, Effect[] effects, float[] results) {
         boolean result;
         if (expr.equals("some(where (p_eft == allow))")) {
@@ -68,7 +69,7 @@ public class DefaultEffector implements Effector {
                 }
             }
         } else {
-            throw new Error("unsupported effect");
+            throw new UnsupportedOperationException("unsupported effect");
         }
 
         return result;

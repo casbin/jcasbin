@@ -14,6 +14,8 @@
 
 package org.casbin.jcasbin.main;
 
+import org.casbin.jcasbin.util.Util;
+
 import java.util.List;
 
 /**
@@ -28,10 +30,8 @@ class InternalEnforcer extends CoreEnforcer {
         if (adapter != null && autoSave) {
             try {
                 adapter.addPolicy(sec, ptype, rule);
-            } catch (Error e) {
-                if (!e.getMessage().equals("not implemented")) {
-                    throw e;
-                }
+            } catch (UnsupportedOperationException ignored) {
+                Util.logPrintf("Method not implemented");
             }
 
             if (watcher != null) {
@@ -51,10 +51,8 @@ class InternalEnforcer extends CoreEnforcer {
         if (adapter != null && autoSave) {
             try {
                 adapter.removePolicy(sec, ptype, rule);
-            } catch (Error e) {
-                if (!e.getMessage().equals("not implemented")) {
-                    throw e;
-                }
+            } catch (UnsupportedOperationException ignored) {
+                Util.logPrintf("Method not implemented");
             }
 
             if (watcher != null) {
@@ -63,7 +61,7 @@ class InternalEnforcer extends CoreEnforcer {
             }
         }
 
-        return model.removePolicy(sec, ptype, rule);
+        return  model.removePolicy(sec, ptype, rule);
     }
 
     /**
@@ -74,10 +72,8 @@ class InternalEnforcer extends CoreEnforcer {
         if (adapter != null && autoSave) {
             try {
                 adapter.removeFilteredPolicy(sec, ptype, fieldIndex, fieldValues);
-            } catch (Error e) {
-                if (!e.getMessage().equals("not implemented")) {
-                    throw e;
-                }
+            } catch (UnsupportedOperationException ignored) {
+                Util.logPrintf("Method not implemented");
             }
 
             if (watcher != null) {

@@ -69,7 +69,7 @@ public class DefaultRoleManager implements RoleManager {
             name1 = domain[0] + "::" + name1;
             name2 = domain[0] + "::" + name2;
         } else if (domain.length > 1) {
-            throw new Error("error: domain should be 1 parameter");
+            throw new IllegalArgumentException("error: domain should be 1 parameter");
         }
 
         Role role1 = createRole(name1);
@@ -88,11 +88,11 @@ public class DefaultRoleManager implements RoleManager {
             name1 = domain[0] + "::" + name1;
             name2 = domain[0] + "::" + name2;
         } else if (domain.length > 1) {
-            throw new Error("error: domain should be 1 parameter");
+            throw new IllegalArgumentException("error: domain should be 1 parameter");
         }
 
         if (!hasRole(name1) || !hasRole(name2)) {
-            throw new Error("error: name1 or name2 does not exist");
+            throw new IllegalArgumentException("error: name1 or name2 does not exist");
         }
 
         Role role1 = createRole(name1);
@@ -110,7 +110,7 @@ public class DefaultRoleManager implements RoleManager {
             name1 = domain[0] + "::" + name1;
             name2 = domain[0] + "::" + name2;
         } else if (domain.length > 1) {
-            throw new Error("error: domain should be 1 parameter");
+            throw new IllegalArgumentException("error: domain should be 1 parameter");
         }
 
         if (name1.equals(name2)) {
@@ -134,11 +134,11 @@ public class DefaultRoleManager implements RoleManager {
         if (domain.length == 1) {
             name = domain[0] + "::" + name;
         } else if (domain.length > 1) {
-            throw new Error("error: domain should be 1 parameter");
+            throw new IllegalArgumentException("error: domain should be 1 parameter");
         }
 
         if (!hasRole(name)) {
-            throw new Error("error: name does not exist");
+            throw new IllegalArgumentException("error: name does not exist");
         }
 
         List<String> roles = createRole(name).getRoles();
@@ -157,7 +157,7 @@ public class DefaultRoleManager implements RoleManager {
     @Override
     public List<String> getUsers(String name) {
         if (!hasRole(name)) {
-            throw new Error("error: name does not exist");
+            throw new IllegalArgumentException("error: name does not exist");
         }
 
         List<String> names = new ArrayList<>();

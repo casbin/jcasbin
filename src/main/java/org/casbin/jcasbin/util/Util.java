@@ -14,18 +14,19 @@
 
 package org.casbin.jcasbin.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Util {
     public static boolean enableLog = true;
 
-    static Logger logger = Logger.getLogger("org.casbin.jcasbin");
+    private static Logger LOGGER = LoggerFactory.getLogger("org.casbin.jcasbin");
 
     /**
      * logPrint prints the log.
@@ -34,7 +35,7 @@ public class Util {
      */
     public static void logPrint(String v) {
         if (enableLog) {
-            logger.log(Level.INFO, v);
+            LOGGER.info(v);
         }
     }
 
@@ -47,7 +48,31 @@ public class Util {
     public static void logPrintf(String format, String... v) {
         if (enableLog) {
             String tmp = String.format(format, (Object[]) v);
-            logger.log(Level.INFO, tmp);
+            LOGGER.info(tmp);
+        }
+    }
+
+    /**
+     * logPrintf prints the log with the format as a warning.
+     *
+     * @param format the format of the log.
+     * @param v the log.
+     */
+    public static void logPrintfWarn(String format, Object... v) {
+        if (enableLog) {
+            LOGGER.warn(format, v);
+        }
+    }
+
+    /**
+     * logPrintf prints the log with the format as an error.
+     *
+     * @param format the format of the log.
+     * @param v the log.
+     */
+    public static void logPrintfError(String format, Object... v) {
+        if (enableLog) {
+            LOGGER.error(format, v);
         }
     }
 

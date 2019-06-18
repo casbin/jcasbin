@@ -23,10 +23,10 @@ import org.casbin.jcasbin.effect.Effect;
 import org.casbin.jcasbin.effect.Effector;
 import org.casbin.jcasbin.exception.CasbinMatcherException;
 import org.casbin.jcasbin.model.Assertion;
-import org.casbin.jcasbin.persist.Watcher;
 import org.casbin.jcasbin.model.FunctionMap;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
+import org.casbin.jcasbin.persist.Watcher;
 import org.casbin.jcasbin.rbac.DefaultRoleManager;
 import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.BuiltInFunctions;
@@ -332,7 +332,6 @@ public class CoreEnforcer {
                 List<String> pvals = model.model.get("p").get("p").policy.get(i);
 
                 // Util.logPrint("Policy Rule: " + pvals);
-
                 Map<String, Object> parameters = new HashMap<>();
                 for (int j = 0; j < model.model.get("r").get("r").tokens.length; j ++) {
                     String token = model.model.get("r").get("r").tokens[j];
@@ -418,5 +417,26 @@ public class CoreEnforcer {
         Util.logPrint(reqStr.toString());
 
         return result;
+    }
+
+    public boolean validateEnforce(Object... rvals){
+        return  validateEnforceSection("r",rvals);
+    }
+
+    private boolean validateEnforceSection(String section, Object... rvals) {
+        int expectedParamSize = getModel().model.entrySet().stream()
+                .filter(stringMapEntry -> stringMapEntry.getKey().equals(section))
+                .flatMap(stringMapEntry -> stringMapEntry.getValue().entrySet().stream())
+                .filter(stringAssertionEntry -> stringAssertionEntry.getKey().equals(section))
+                .findFirst().orElseThrow(
+                        () -> new CasbinMatcherException("Could not find " + section + " definition in model"))
+                .getValue().tokens.length;
+
+        if (rvals.length != expectedParamSize) {
+            Util.logPrintfWarn("Incorrect number of attributes to check for policy (expected {} but got {})",
+                    expectedParamSize, rvals.length);
+            return rvals.length >= expectedParamSize;
+        }
+        return true;
     }
 }

@@ -332,7 +332,6 @@ public class CoreEnforcer {
                 List<String> pvals = model.model.get("p").get("p").policy.get(i);
 
                 // Util.logPrint("Policy Rule: " + pvals);
-                validateEnforceSection("r", rvals);
                 Map<String, Object> parameters = new HashMap<>();
                 for (int j = 0; j < model.model.get("r").get("r").tokens.length; j ++) {
                     String token = model.model.get("r").get("r").tokens[j];
@@ -381,7 +380,6 @@ public class CoreEnforcer {
         } else {
             policyEffects = new Effect[1];
             matcherResults = new float[1];
-            validateEnforceSection("r", rvals);
 
             Map<String, Object> parameters = new HashMap<>();
             for (int j = 0; j < model.model.get("r").get("r").tokens.length; j ++) {
@@ -421,7 +419,11 @@ public class CoreEnforcer {
         return result;
     }
 
-    private void validateEnforceSection(String section, Object... rvals) {
+    public boolean validateEnforce(Object... rvals){
+        return  validateEnforceSection("r",rvals);
+    }
+
+    private boolean validateEnforceSection(String section, Object... rvals) {
         int expectedParamSize = getModel().model.entrySet().stream()
                 .filter(stringMapEntry -> stringMapEntry.getKey().equals(section))
                 .flatMap(stringMapEntry -> stringMapEntry.getValue().entrySet().stream())
@@ -431,13 +433,10 @@ public class CoreEnforcer {
                 .getValue().tokens.length;
 
         if (rvals.length != expectedParamSize) {
-            String issue = String.format("Incorrect number of attributes to check for policy (expected %s but got %s)",
+            Util.logPrintfWarn("Incorrect number of attributes to check for policy (expected {} but got {})",
                     expectedParamSize, rvals.length);
-
-            Util.logPrint(issue);
-            if (rvals.length < expectedParamSize) {
-                throw new CasbinMatcherException(issue);
-            }//else take it as a warning (and ignore at your own peril)
+            return rvals.length >= expectedParamSize;
         }
+        return true;
     }
 }

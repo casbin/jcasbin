@@ -14,7 +14,6 @@
 
 package org.casbin.jcasbin.main;
 
-import org.casbin.jcasbin.exception.CasbinMatcherException;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
@@ -27,6 +26,8 @@ import static java.util.Arrays.asList;
 import static org.casbin.jcasbin.main.CoreEnforcer.newModel;
 import static org.casbin.jcasbin.main.TestUtil.testEnforce;
 import static org.casbin.jcasbin.main.TestUtil.testGetPolicy;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class EnforcerUnitTest {
     @Test
@@ -431,11 +432,10 @@ public class EnforcerUnitTest {
 
     }
 
-    @Test(expected = CasbinMatcherException.class)
+    @Test
     public void testEnforceParamCheck(){
         Enforcer e = new Enforcer("examples/rbac_model.conf");
-        e.enforce("user501", "data9", "read","too many params"); //warn only
-
-        e.enforce("data9", "read");//throw error
+        assertTrue(e.validateEnforce("user501", "data9", "read", "too many params")); //warn only
+        assertFalse(e.validateEnforce("data9", "read"));//throw error
     }
 }

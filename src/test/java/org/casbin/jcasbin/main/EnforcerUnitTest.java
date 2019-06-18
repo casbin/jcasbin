@@ -14,6 +14,7 @@
 
 package org.casbin.jcasbin.main;
 
+import org.casbin.jcasbin.exception.CasbinMatcherException;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
@@ -428,5 +429,13 @@ public class EnforcerUnitTest {
             ex.printStackTrace();
         }
 
+    }
+
+    @Test(expected = CasbinMatcherException.class)
+    public void testEnforceParamCheck(){
+        Enforcer e = new Enforcer("examples/rbac_model.conf");
+        e.enforce("user501", "data9", "read","too many params"); //warn only
+
+        e.enforce("data9", "read");//throw error
     }
 }

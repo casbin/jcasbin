@@ -17,16 +17,19 @@ package org.casbin.jcasbin.main;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
-import org.casbin.jcasbin.util.Util;
 import org.junit.Test;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static java.util.Arrays.asList;
 import static org.casbin.jcasbin.main.CoreEnforcer.newModel;
 import static org.casbin.jcasbin.main.TestUtil.testEnforce;
 import static org.casbin.jcasbin.main.TestUtil.testGetPolicy;
+import static org.casbin.jcasbin.util.Util.LOGGER;
+import static org.junit.Assert.assertEquals;
 
 public class EnforcerUnitTest {
     @Test
@@ -430,5 +433,16 @@ public class EnforcerUnitTest {
             ex.printStackTrace();
         }
 
+    }
+
+    @Test public void testPolicyToString() throws IOException {
+        String policyFile = "examples/rbac_with_resource_roles_policy.csv";
+        Enforcer e = new Enforcer("examples/rbac_with_resource_roles_model.conf", policyFile);
+
+        String expected = new String(Files.readAllBytes(Paths.get(policyFile)));
+        String actual = e.getPolicyString();
+
+        LOGGER.info(actual);
+        assertEquals(expected, actual);
     }
 }

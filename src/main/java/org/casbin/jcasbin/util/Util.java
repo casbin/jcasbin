@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 public class Util {
     public static boolean enableLog = true;
 
-    private static Logger LOGGER = LoggerFactory.getLogger("org.casbin.jcasbin");
+    public static final Logger LOGGER = LoggerFactory.getLogger("org.casbin.jcasbin");
 
     /**
      * logPrint prints the log.

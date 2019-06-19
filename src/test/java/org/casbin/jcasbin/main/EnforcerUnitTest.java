@@ -17,6 +17,7 @@ package org.casbin.jcasbin.main;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
+import org.casbin.jcasbin.util.Util;
 import org.junit.Test;
 
 import java.io.FileInputStream;
@@ -165,6 +166,7 @@ public class EnforcerUnitTest {
             + "m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act\n";
 
         Model m = newModel(text);
+
         // The above is the same as:
         // Model m = newModel();
         // m.loadModelFromText(text);

@@ -15,11 +15,11 @@
 package org.casbin.jcasbin.model;
 
 import org.casbin.jcasbin.config.Config;
-import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.Util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -141,5 +141,40 @@ public class Model extends Policy {
                 Util.logPrintf("%s.%s: %s", entry.getKey(), entry2.getKey(), entry2.getValue().value);
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+
+        sectionNameMap.forEach((key, tag) -> {
+            if (model.containsKey(key)) {
+                builder.append(String.format("[%s]\n", tag));
+                model.get(key).forEach((sub, assertion) -> {
+
+                    String value = assertion.value;
+                    if (!sub.contains("g")) {
+                        value = value.replace("_", ".");
+                    }
+
+                    builder.append(String.format("%s = ", sub)).append(value);
+
+                    if(!sub.matches("g[0-9]+") && !(model.get(key).size()>1)){
+                        builder.append("\n");
+                    }
+
+                    if((model.get(key).size()>1)
+                            && new ArrayList<>(model.get(key).keySet()).indexOf(sub) == model.get(key).size() - 1) {
+                        builder.append("\n");
+                    }
+
+                    if (!sub.equals("m")) {
+                        builder.append("\n");
+                    }
+                });
+            }
+        });
+
+        return builder.toString().trim();
     }
 }

@@ -15,8 +15,8 @@
 package org.casbin.jcasbin.main;
 
 import com.googlecode.aviator.runtime.type.AviatorFunction;
+import org.casbin.jcasbin.util.Util;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
@@ -552,5 +552,21 @@ public class ManagementEnforcer extends InternalEnforcer {
      */
     public void addFunction(String name, AviatorFunction function) {
         fm.addFunction(name, function);
+    }
+
+
+    public String getPolicyString() {
+        StringBuilder builder = new StringBuilder();
+        this.getPolicy().forEach(policy -> {
+            builder.append("p, ").append(Util.arrayToString(policy));
+            builder.append("\n");
+        });
+
+        model.model.get("g").keySet().forEach(s -> this.getNamedGroupingPolicy(s).forEach(group -> {
+            builder.append(s).append(", ").append(Util.arrayToString(group));
+            builder.append("\n");
+        }));
+
+        return builder.toString().trim();
     }
 }

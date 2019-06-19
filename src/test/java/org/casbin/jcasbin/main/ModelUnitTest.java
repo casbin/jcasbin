@@ -14,15 +14,29 @@
 
 package org.casbin.jcasbin.main;
 
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.rbac.RoleManager;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
+import static org.casbin.jcasbin.main.CoreEnforcer.newModel;
 import static org.casbin.jcasbin.main.TestUtil.testDomainEnforce;
 import static org.casbin.jcasbin.main.TestUtil.testEnforce;
 import static org.casbin.jcasbin.main.TestUtil.testEnforceWithoutUsers;
+import static org.casbin.jcasbin.util.Util.LOGGER;
+import static org.junit.Assert.assertTrue;
 
+@RunWith(JUnitParamsRunner.class)
 public class ModelUnitTest {
     @Test
     public void testBasicModel() {
@@ -404,5 +418,25 @@ public class ModelUnitTest {
         Enforcer e = new Enforcer("examples/priority_model.conf", "examples/priority_indeterminate_policy.csv");
 
         testEnforce(e, "alice", "data1", "read", false);
+    }
+
+    @Test
+    @Parameters(method = "getModels")
+    public void testToString(File file) throws IOException {
+
+        LOGGER.info("Testing toString for {}", file.getName());
+        String expected = new String(Files.readAllBytes(file.toPath()));
+        Model m = newModel(expected);
+        String actual = m.toString();
+        LOGGER.debug("toString model \n{}", actual);
+        assertTrue(Arrays.asList(actual.split("\n")).containsAll(Arrays.asList(expected.split("\n"))));
+    }
+
+    private Object[] getModels(){
+        return Arrays.stream(Objects.requireNonNull(Paths.get("examples").toFile().listFiles()))
+                .filter(File::isFile)
+                .filter(file -> file.getName().contains(".conf"))
+                .filter(file -> !file.getName().equals("rbac_with_not_deny_model.conf")) //TODO see why this is outlier
+                .toArray();
     }
 }

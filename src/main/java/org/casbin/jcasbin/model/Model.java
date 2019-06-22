@@ -132,6 +132,53 @@ public class Model extends Policy {
     }
 
     /**
+     * saveSectionToText saves the section to the text.
+     *
+     * @return the section text.
+     */
+    private String saveSectionToText(String sec) {
+        StringBuilder res = new StringBuilder("[" + sectionNameMap.get(sec) + "]\n");
+
+        Map<String, Assertion> section = model.get(sec);
+        if (section == null) {
+            return "";
+        }
+
+        for (Map.Entry<String, Assertion> entry : section.entrySet()) {
+            res.append(String.format("%s = %s\n", entry.getKey(), entry.getValue().value.replace("_", ".")));
+        }
+
+        return res.toString();
+    }
+
+    /**
+     * saveModelToText saves the model to the text.
+     *
+     * @return the model text.
+     */
+    public String saveModelToText() {
+        StringBuilder res = new StringBuilder();
+
+        res.append(saveSectionToText("r"));
+        res.append("\n");
+        res.append(saveSectionToText("p"));
+        res.append("\n");
+
+        String g = saveSectionToText("g");
+        g = g.replace(".", "_");
+        res.append(g);
+        if (!g.equals("")) {
+            res.append("\n");
+        }
+
+        res.append(saveSectionToText("e"));
+        res.append("\n");
+        res.append(saveSectionToText("m"));
+
+        return res.toString();
+    }
+
+    /**
      * printModel prints the model to the log.
      */
     public void printModel() {

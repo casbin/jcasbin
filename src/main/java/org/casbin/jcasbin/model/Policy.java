@@ -60,6 +60,37 @@ public class Policy {
     }
 
     /**
+     * savePolicyToText saves the policy to the text.
+     *
+     * @return the policy text.
+     */
+    public String savePolicyToText() {
+        StringBuilder res = new StringBuilder();
+
+        if (model.containsKey("p")) {
+            for (Map.Entry<String, Assertion> entry : model.get("p").entrySet()) {
+                String key = entry.getKey();
+                Assertion ast = entry.getValue();
+                for (List<String> rule : ast.policy) {
+                    res.append(String.format("%s, %s\n", key, String.join(", ", rule)));
+                }
+            }
+        }
+
+        if (model.containsKey("g")) {
+            for (Map.Entry<String, Assertion> entry : model.get("g").entrySet()) {
+                String key = entry.getKey();
+                Assertion ast = entry.getValue();
+                for (List<String> rule : ast.policy) {
+                    res.append(String.format("%s, %s\n", key, String.join(", ", rule)));
+                }
+            }
+        }
+
+        return res.toString();
+    }
+
+    /**
      * clearPolicy clears all current policy.
      */
     public void clearPolicy() {

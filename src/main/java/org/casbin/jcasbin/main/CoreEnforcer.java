@@ -35,6 +35,7 @@ import org.casbin.jcasbin.util.Util;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * CoreEnforcer defines the core functionality of an enforcer.
@@ -324,36 +325,38 @@ public class CoreEnforcer {
         Effect policyEffects[];
         float matcherResults[];
         int policyLen;
-        if ((policyLen = model.model.get("p").get("p").policy.size()) != 0) {
+        List<List<String>> policy = model.model.get("p").get("p").policy;
+        if ((policyLen = policy.size()) != 0) {
             policyEffects = new Effect[policyLen];
             matcherResults = new float[policyLen];
-
-            for (int i = 0; i < model.model.get("p").get("p").policy.size(); i ++) {
-                List<String> pvals = model.model.get("p").get("p").policy.get(i);
+            //
+            AtomicInteger atomic = new AtomicInteger(0);
+            policy.parallelStream().anyMatch(pvals -> {
 
                 // Util.logPrint("Policy Rule: " + pvals);
+                final int i = atomic.getAndIncrement();
                 Map<String, Object> parameters = new HashMap<>();
-                for (int j = 0; j < model.model.get("r").get("r").tokens.length; j ++) {
+                for (int j = 0; j < model.model.get("r").get("r").tokens.length; j++) {
                     String token = model.model.get("r").get("r").tokens[j];
                     parameters.put(token, rvals[j]);
                 }
-                for (int j = 0; j < model.model.get("p").get("p").tokens.length; j ++) {
+                for (int j = 0; j < model.model.get("p").get("p").tokens.length; j++) {
                     String token = model.model.get("p").get("p").tokens[j];
                     parameters.put(token, pvals.get(j));
                 }
 
-                Object result =  expression.execute(parameters);
+                Object result = expression.execute(parameters);
                 // Util.logPrint("Result: " + result);
 
                 if (result instanceof Boolean) {
                     if (!((boolean) result)) {
                         policyEffects[i] = Effect.Indeterminate;
-                        continue;
+                        return false;
                     }
                 } else if (result instanceof Float) {
                     if ((float) result == 0) {
                         policyEffects[i] = Effect.Indeterminate;
-                        continue;
+                        return false;
                     } else {
                         matcherResults[i] = (float) result;
                     }
@@ -374,9 +377,10 @@ public class CoreEnforcer {
                 }
 
                 if (model.model.get("e").get("e").value.equals("priority(p_eft) || deny")) {
-                    break;
+                    return true;
                 }
-            }
+                return false;
+            });
         } else {
             policyEffects = new Effect[1];
             matcherResults = new float[1];

@@ -313,7 +313,7 @@ public class CoreEnforcer {
                 functions.put(key, BuiltInFunctions.generateGFunction(key, rm));
             }
         }
-        AviatorEvaluatorInstance eval = AviatorEvaluator.newInstance();
+        AviatorEvaluatorInstance eval = AviatorEvaluatorInstanceSharer.getInstance();
         for (AviatorFunction f : functions.values()) {
             eval.addFunction(f);
         }

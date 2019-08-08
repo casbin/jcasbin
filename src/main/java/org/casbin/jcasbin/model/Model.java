@@ -15,6 +15,7 @@
 package org.casbin.jcasbin.model;
 
 import org.casbin.jcasbin.config.Config;
+import org.casbin.jcasbin.main.AviatorEvaluatorInstanceSharer;
 import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.Util;
 
@@ -55,6 +56,7 @@ public class Model extends Policy {
      * @return succeeds or not.
      */
     public boolean addDef(String sec, String key, String value) {
+        AviatorEvaluatorInstanceSharer.updateInstance();
         Assertion ast = new Assertion();
         ast.key = key;
         ast.value = value;

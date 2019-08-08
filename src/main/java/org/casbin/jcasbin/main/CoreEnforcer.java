@@ -319,7 +319,7 @@ public class CoreEnforcer {
         }
 
         String expString = model.model.get("m").get("m").value;
-        Expression expression = eval.compile(expString);
+        Expression expression = eval.compile(expString,true);
 
         Effect policyEffects[];
         float matcherResults[];

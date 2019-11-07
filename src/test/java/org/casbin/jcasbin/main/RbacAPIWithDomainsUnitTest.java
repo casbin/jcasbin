@@ -62,4 +62,11 @@ public class RbacAPIWithDomainsUnitTest {
         testGetPermissionsInDomain(e, "admin", "domain2", asList(asList("admin", "domain2", "data2", "read"), asList("admin", "domain2", "data2", "write")));
         testGetPermissionsInDomain(e, "non_exist", "domain2", asList());
     }
+
+    @Test
+    public void testImplicitPermissionAPIInDomain() {
+        Enforcer e = new Enforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv");
+
+        testGetImplicitPermissionsInDomain(e, "alice", "domain1", asList(asList("admin", "domain1", "data1", "read"), asList("admin", "domain1", "data1", "write")));
+    }
 }

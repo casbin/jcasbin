@@ -448,4 +448,22 @@ public class Enforcer extends ManagementEnforcer {
         }
         return res;
     }
+
+    /**
+     * getImplicitPermissionsForUserInDomain gets implicit permissions for a user or role in domain.
+     *
+     * @param user the user.
+     * @param domain the domain.
+     * @return implicit permissions for a user or role in domain.
+     */
+    public List<List<String>> getImplicitPermissionsForUserInDomain(String user, String domain) {
+        List<String> roles = new ArrayList<>();
+        roles.add(user);
+        roles.addAll(this.getImplicitRolesForUser(user, domain));
+        List<List<String>> res = new ArrayList<>();
+        for (String n : roles) {
+            res.addAll(this.getPermissionsForUserInDomain(n, domain));
+        }
+        return res;
+    }
 }

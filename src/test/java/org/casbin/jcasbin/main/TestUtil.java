@@ -150,4 +150,13 @@ public class TestUtil {
             fail("Permissions for " + name + " under " + domain + ": " + myRes + ", supposed to be " + res);
         }
     }
+
+    static void testGetImplicitPermissionsInDomain(Enforcer e, String name, String domain, List<List<String>> res) {
+        List<List<String>> myRes = e.getImplicitPermissionsForUserInDomain(name, domain);
+        Util.logPrint("Permissions for " + name + " under " + domain + ": " + myRes);
+
+        if (!Util.array2DEquals(res, myRes)) {
+            fail("Permissions for " + name + " under " + domain + ": " + myRes + ", supposed to be " + res);
+        }
+    }
 }

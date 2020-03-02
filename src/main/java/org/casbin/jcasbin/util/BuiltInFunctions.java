@@ -28,6 +28,10 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public class BuiltInFunctions {
+
+    private static Pattern keyMatch2Pattern = Pattern.compile("(.*):[^/]+(.*)");
+    private static Pattern keyMatch3Pattern = Pattern.compile("(.*)\\{[^/]+\\}(.*)");
+
     /**
      * keyMatch determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
      * For example, "/foo/bar" matches "/foo/*"
@@ -58,14 +62,12 @@ public class BuiltInFunctions {
      */
     public static boolean keyMatch2(String key1, String key2) {
         key2 = key2.replace("/*", "/.*");
-
-        Pattern p = Pattern.compile("(.*):[^/]+(.*)");
         while (true) {
             if (!key2.contains("/:")) {
                 break;
             }
 
-            key2 = "^" + p.matcher(key2).replaceAll("$1[^/]+$2") + "$";
+            key2 = "^" + keyMatch2Pattern.matcher(key2).replaceAll("$1[^/]+$2") + "$";
         }
 
         return regexMatch(key1, key2);
@@ -82,13 +84,12 @@ public class BuiltInFunctions {
     public static boolean keyMatch3(String key1, String key2) {
         key2 = key2.replace("/*", "/.*");
 
-        Pattern p = Pattern.compile("(.*)\\{[^/]+\\}(.*)");
         while (true) {
             if (!key2.contains("/{")) {
                 break;
             }
 
-            key2 = p.matcher(key2).replaceAll("$1[^/]+$2");
+            key2 = keyMatch3Pattern.matcher(key2).replaceAll("$1[^/]+$2");
         }
 
         return regexMatch(key1, key2);

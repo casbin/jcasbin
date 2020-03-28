@@ -158,6 +158,7 @@ public class Config {
     public void set(String key, String value) {
         lock.lock();
         if (key.length() == 0) {
+            lock.unlock();
             throw new IllegalArgumentException("key is empty");
         }
 
@@ -173,6 +174,7 @@ public class Config {
         }
 
         addConfig(section, option, value);
+        lock.unlock()
     }
 
     public String get(String key) {

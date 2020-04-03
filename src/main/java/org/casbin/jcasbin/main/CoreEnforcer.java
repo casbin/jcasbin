@@ -332,17 +332,10 @@ public class CoreEnforcer {
                 List<String> pvals = model.model.get("p").get("p").policy.get(i);
 
                 // Util.logPrint("Policy Rule: " + pvals);
-                // Select the rule based on request size
                 Map<String, Object> parameters = new HashMap<>();
-                for(String rKey : model.model.get("r").keySet()) {
-                  if(rvals.length == model.model.get("r").get(rKey).tokens.length) {
-                    for (int j = 0; j < model.model.get("r").get(rKey).tokens.length; j ++) {
-                      String token = model.model.get("r").get(rKey).tokens[j];
-                      parameters.put(token, rvals[j]);
-                    }
-                    break;
-                  }
-                }
+                
+                // Select the rule based on request size
+                getRTokens(parameters, rvals);
                 for (int j = 0; j < model.model.get("p").get("p").tokens.length; j ++) {
                     String token = model.model.get("p").get("p").tokens[j];
                     parameters.put(token, pvals.get(j));
@@ -424,6 +417,17 @@ public class CoreEnforcer {
 
         return result;
     }
+    
+    private void getRTokens(Map<String, Object> parameters, Object ...rvals) {
+      for(String rKey : model.model.get("r").keySet()) {
+        if(!(rvals.length == model.model.get("r").get(rKey).tokens.length)) { continue; }
+        for (int j = 0; j < model.model.get("r").get(rKey).tokens.length; j ++) {
+          String token = model.model.get("r").get(rKey).tokens[j];
+          parameters.put(token, rvals[j]);
+        }
+   
+      }
+    }    
 
     public boolean validateEnforce(Object... rvals){
         return  validateEnforceSection("r",rvals);

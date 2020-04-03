@@ -15,8 +15,6 @@
 package org.casbin.jcasbin.main;
 
 import com.googlecode.aviator.runtime.type.AviatorFunction;
-
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 

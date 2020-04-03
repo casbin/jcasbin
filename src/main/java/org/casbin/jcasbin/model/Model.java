@@ -15,11 +15,9 @@
 package org.casbin.jcasbin.model;
 
 import org.casbin.jcasbin.config.Config;
-import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.Util;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

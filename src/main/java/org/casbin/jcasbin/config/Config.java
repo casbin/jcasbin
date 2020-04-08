@@ -174,7 +174,7 @@ public class Config {
         }
 
         addConfig(section, option, value);
-        lock.unlock()
+        lock.unlock();
     }
 
     public String get(String key) {

@@ -869,7 +869,7 @@ public class SyncedEnforcer extends Enforcer {
     public boolean removeNamedGroupingPolicy(String ptype, List<String> params) {
         try {
             READ_WRITE_LOCK.writeLock().lock();
-            return super.removeNamedPolicy(ptype, params);
+            return super.removeNamedGroupingPolicy(ptype, params);
         } finally {
             READ_WRITE_LOCK.writeLock().unlock();
         }

@@ -206,6 +206,7 @@ public class CoreEnforcer {
 
     /**
      * loadFilteredPolicy reloads a filtered policy from file/database.
+     * <b>Not currently implemented</b>
      *
      * @param filter the filter used to specify which type of policy should be loaded.
      */

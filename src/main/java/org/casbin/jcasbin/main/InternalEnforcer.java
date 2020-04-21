@@ -26,6 +26,9 @@ class InternalEnforcer extends CoreEnforcer {
      * addPolicy adds a rule to the current policy.
      */
     boolean addPolicy(String sec, String ptype, List<String> rule) {
+        if (model.hasPolicy(sec, ptype, rule)) {
+            return false;
+        }
 
         if (adapter != null && autoSave) {
             try {
@@ -47,6 +50,9 @@ class InternalEnforcer extends CoreEnforcer {
      * removePolicy removes a rule from the current policy.
      */
     boolean removePolicy(String sec, String ptype, List<String> rule) {
+        if (!model.hasPolicy(sec, ptype, rule)) {
+            return false;
+        }
 
         if (adapter != null && autoSave) {
             try {
@@ -61,7 +67,7 @@ class InternalEnforcer extends CoreEnforcer {
             }
         }
 
-        return  model.removePolicy(sec, ptype, rule);
+        return model.removePolicy(sec, ptype, rule);
     }
 
     /**

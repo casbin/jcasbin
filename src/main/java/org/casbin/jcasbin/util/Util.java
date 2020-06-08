@@ -96,7 +96,7 @@ public class Util {
         while (m.find()) {
             m.appendReplacement(sb, m.group().replace(".", "_") );
         }
-        
+
         m.appendTail(sb);
         return sb.toString();
     }
@@ -195,6 +195,21 @@ public class Util {
      */
     public static String paramsToString(String[] s) {
         return String.join(", ", s);
+    }
+
+    /**
+     * splitCommaDelimited splits a comma-delimited string into a string array. It assumes that any
+     * number of whitespace might exist before or after the comma and that tokens do not include
+     * whitespace as part of their value.
+     *
+     * @param s the comma-delimited string.
+     * @return the array with the string tokens.
+     */
+    public static String[] splitCommaDelimited(String s) {
+        if (s == null) {
+            return null;
+        }
+        return s.trim().split("\\s*,\\s*");
     }
 
     /**

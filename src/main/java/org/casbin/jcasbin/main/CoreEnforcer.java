@@ -21,11 +21,13 @@ import com.googlecode.aviator.runtime.type.AviatorFunction;
 import org.casbin.jcasbin.effect.DefaultEffector;
 import org.casbin.jcasbin.effect.Effect;
 import org.casbin.jcasbin.effect.Effector;
+import org.casbin.jcasbin.exception.CasbinAdapterException;
 import org.casbin.jcasbin.exception.CasbinMatcherException;
 import org.casbin.jcasbin.model.Assertion;
 import org.casbin.jcasbin.model.FunctionMap;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
+import org.casbin.jcasbin.persist.file_adapter.FilteredAdapter;
 import org.casbin.jcasbin.persist.Watcher;
 import org.casbin.jcasbin.rbac.DefaultRoleManager;
 import org.casbin.jcasbin.rbac.RoleManager;
@@ -210,6 +212,22 @@ public class CoreEnforcer {
      * @param filter the filter used to specify which type of policy should be loaded.
      */
     public void loadFilteredPolicy(Object filter) {
+        model.clearPolicy();
+        FilteredAdapter filteredAdapter;
+        if (adapter instanceof FilteredAdapter) {
+            filteredAdapter = (FilteredAdapter) adapter;
+        } else {
+            throw new CasbinAdapterException("Filtered policies are not supported by this adapter.");
+        }
+        try {
+            filteredAdapter.loadFilteredPolicy(model, filter);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        model.printPolicy();
+        if (autoBuildRoleLinks) {
+            buildRoleLinks();
+        }
     }
 
     /**
@@ -218,6 +236,9 @@ public class CoreEnforcer {
      * @return if the loaded policy has been filtered.
      */
     public boolean isFiltered() {
+        if (adapter instanceof FilteredAdapter) {
+            return ((FilteredAdapter) adapter).isFiltered();
+        }
         return false;
     }
 

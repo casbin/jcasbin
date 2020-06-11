@@ -37,8 +37,15 @@ public class Model extends Policy {
         sectionNameMap.put("m", "matchers");
     }
 
+    // used by CoreEnforcer to detect changes to Model
+    protected int modCount;
+
     public Model() {
         model = new HashMap<>();
+    }
+
+    public int getModCount() {
+        return modCount;
     }
 
     private boolean loadAssertion(Model model, Config cfg, String sec, String key) {
@@ -77,6 +84,7 @@ public class Model extends Policy {
         }
 
         model.get(sec).put(key, ast);
+        modCount++;
         return true;
     }
 

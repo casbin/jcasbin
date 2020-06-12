@@ -55,6 +55,12 @@ public class CoreEnforcer {
     boolean autoSave;
     boolean autoBuildRoleLinks;
 
+    // cached instance of AviatorEvaluatorInstance
+    AviatorEvaluatorInstance aviatorEval;
+
+    // detect changes in Model so that we can invalidate AviatorEvaluatorInstance cache
+    int modelModCount;
+
     void initialize() {
         rm = new DefaultRoleManager(10);
         eft = new DefaultEffector();
@@ -119,6 +125,7 @@ public class CoreEnforcer {
         model.loadModel(this.modelPath);
         model.printModel();
         fm = FunctionMap.loadFunctionMap();
+        aviatorEval = null;
     }
 
     /**
@@ -138,6 +145,7 @@ public class CoreEnforcer {
     public void setModel(Model model) {
         this.model = model;
         fm = FunctionMap.loadFunctionMap();
+        aviatorEval = null;
     }
 
     /**
@@ -318,29 +326,35 @@ public class CoreEnforcer {
             return true;
         }
 
-        Map<String, AviatorFunction> functions = new HashMap<>();
-        for (Map.Entry<String, AviatorFunction> entry : fm.fm.entrySet()) {
-            String key = entry.getKey();
-            AviatorFunction function = entry.getValue();
-
-            functions.put(key, function);
-        }
-        if (model.model.containsKey("g")) {
-            for (Map.Entry<String, Assertion> entry : model.model.get("g").entrySet()) {
+        if (aviatorEval == null || modelModCount != model.getModCount()) {
+            // AviatorEvaluator instance must be rebuild
+            Map<String, AviatorFunction> functions = new HashMap<>();
+            for (Map.Entry<String, AviatorFunction> entry : fm.fm.entrySet()) {
                 String key = entry.getKey();
-                Assertion ast = entry.getValue();
+                AviatorFunction function = entry.getValue();
 
-                RoleManager rm = ast.rm;
-                functions.put(key, BuiltInFunctions.generateGFunction(key, rm));
+                functions.put(key, function);
             }
-        }
-        AviatorEvaluatorInstance eval = AviatorEvaluator.newInstance();
-        for (AviatorFunction f : functions.values()) {
-            eval.addFunction(f);
+            if (model.model.containsKey("g")) {
+                for (Map.Entry<String, Assertion> entry : model.model.get("g").entrySet()) {
+                    String key = entry.getKey();
+                    Assertion ast = entry.getValue();
+
+                    RoleManager rm = ast.rm;
+                    functions.put(key, BuiltInFunctions.generateGFunction(key, rm));
+                }
+            }
+
+            aviatorEval = AviatorEvaluator.newInstance();
+            for (AviatorFunction f : functions.values()) {
+                aviatorEval.addFunction(f);
+            }
+
+            modelModCount = model.getModCount();
         }
 
         String expString = model.model.get("m").get("m").value;
-        Expression expression = eval.compile(expString);
+        Expression expression = aviatorEval.compile(expString, true);
 
         Effect policyEffects[];
         float matcherResults[];
@@ -459,5 +473,13 @@ public class CoreEnforcer {
             return rvals.length >= expectedParamSize;
         }
         return true;
+    }
+
+    /**
+     * Invalidate cache of compiled model matcher expression. This is done automatically most of the time, but you may
+     * need to call it explicitly if you manipulate directly Model.
+     */
+    public void resetExpressionEvaluator() {
+        aviatorEval = null;
     }
 }

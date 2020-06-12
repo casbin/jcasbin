@@ -451,6 +451,7 @@ public class ManagementEnforcer extends InternalEnforcer {
         if (autoBuildRoleLinks) {
             buildRoleLinks();
         }
+        aviatorEval = null;
         return ruleAdded;
     }
 
@@ -512,6 +513,7 @@ public class ManagementEnforcer extends InternalEnforcer {
         if (autoBuildRoleLinks) {
             buildRoleLinks();
         }
+        aviatorEval = null;
         return ruleRemoved;
     }
 
@@ -541,6 +543,7 @@ public class ManagementEnforcer extends InternalEnforcer {
         if (autoBuildRoleLinks) {
             buildRoleLinks();
         }
+        aviatorEval = null;
         return ruleRemoved;
     }
 
@@ -552,5 +555,6 @@ public class ManagementEnforcer extends InternalEnforcer {
      */
     public void addFunction(String name, AviatorFunction function) {
         fm.addFunction(name, function);
+        aviatorEval = null;
     }
 }

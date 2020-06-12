@@ -17,10 +17,12 @@ package org.casbin.jcasbin.main;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
+import org.casbin.jcasbin.util.Util;
 import org.junit.Test;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static org.casbin.jcasbin.main.CoreEnforcer.newModel;
@@ -437,5 +439,39 @@ public class EnforcerUnitTest {
         Enforcer e = new Enforcer("examples/rbac_model.conf");
         assertTrue(e.validateEnforce("user501", "data9", "read", "too many params")); //warn only
         assertFalse(e.validateEnforce("data9", "read"));//throw error
+    }
+
+    @Test
+    public void testGetPermittedActions() {
+        Enforcer e = new Enforcer("examples/rbac_with_deny_model.conf", "examples/rbac_with_deny_policy.csv", true);
+        String sub = "alice";
+        String obj = "data1";
+        Set<String> actions = e.getPermittedActions(sub, obj);
+        Util.logPrint(sub + " has permissions to access " + obj + " with following actions:");
+        for (String action :actions) {
+            Util.logPrint(action); //alice should have read-only access to data1
+        }
+
+        obj = "data2";
+
+        actions = e.getPermittedActions(sub, obj);
+        Util.logPrint(sub + " has permissions to access " + obj + " with following actions:");
+        for (String action :actions) {
+            Util.logPrint(action); //alice should have read and write access to data2
+        }
+
+        e = new Enforcer("examples/abac_model.conf", "", true);
+        ModelUnitTest.TestResource data1 = new ModelUnitTest.TestResource("data1", "alice");
+        actions = e.getPermittedActions(sub, data1);
+
+        Util.logPrint(sub + " has permissions to access " + data1.name + " with following actions:");
+        for (String action :actions) {
+            // The result shows that alice should have no access to data1,
+            // because no action defines.
+            // This method has no meaning for ABAC model,
+            // because under this model,
+            // the owner of a resource has any permission to the resource it owns.
+            Util.logPrint(action);
+        }
     }
 }

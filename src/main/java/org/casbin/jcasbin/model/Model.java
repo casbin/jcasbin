@@ -14,6 +14,8 @@
 
 package org.casbin.jcasbin.model;
 
+import static org.casbin.jcasbin.util.Util.splitCommaDelimited;
+
 import org.casbin.jcasbin.config.Config;
 import org.casbin.jcasbin.util.Util;
 
@@ -24,7 +26,7 @@ import java.util.Map;
  * Model represents the whole access control model.
  */
 public class Model extends Policy {
-    private static Map<String, String> sectionNameMap;
+    private static final Map<String, String> sectionNameMap;
 
     static {
         sectionNameMap = new HashMap<>();
@@ -35,8 +37,15 @@ public class Model extends Policy {
         sectionNameMap.put("m", "matchers");
     }
 
+    // used by CoreEnforcer to detect changes to Model
+    protected int modCount;
+
     public Model() {
         model = new HashMap<>();
+    }
+
+    public int getModCount() {
+        return modCount;
     }
 
     private boolean loadAssertion(Model model, Config cfg, String sec, String key) {
@@ -62,7 +71,7 @@ public class Model extends Policy {
         }
 
         if (sec.equals("r") || sec.equals("p")) {
-            ast.tokens = ast.value.split(", ");
+            ast.tokens = splitCommaDelimited(ast.value);
             for (int i = 0; i < ast.tokens.length; i ++) {
                 ast.tokens[i] = key + "_" + ast.tokens[i];
             }
@@ -75,6 +84,7 @@ public class Model extends Policy {
         }
 
         model.get(sec).put(key, ast);
+        modCount++;
         return true;
     }
 

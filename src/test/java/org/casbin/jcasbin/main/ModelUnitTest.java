@@ -288,11 +288,11 @@ public class ModelUnitTest {
         testEnforce(e, "bob", "data2", "write", true);
     }
 
-    public class TestResource {
+    public static class TestResource {
         String name;
         String owner;
 
-        TestResource(String name, String owner) {
+        public TestResource(String name, String owner) {
             this.name = name;
             this.owner = owner;
         }

@@ -15,8 +15,12 @@
 package org.casbin.jcasbin.main;
 
 import com.googlecode.aviator.runtime.type.AviatorFunction;
-import java.util.Arrays;
-import java.util.List;
+import org.casbin.jcasbin.effect.Effect;
+import org.casbin.jcasbin.model.Assertion;
+import org.casbin.jcasbin.util.Util;
+
+import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  * ManagementEnforcer = InternalEnforcer + Management API.
@@ -449,6 +453,7 @@ public class ManagementEnforcer extends InternalEnforcer {
         if (autoBuildRoleLinks) {
             buildRoleLinks();
         }
+        aviatorEval = null;
         return ruleAdded;
     }
 
@@ -510,6 +515,7 @@ public class ManagementEnforcer extends InternalEnforcer {
         if (autoBuildRoleLinks) {
             buildRoleLinks();
         }
+        aviatorEval = null;
         return ruleRemoved;
     }
 
@@ -539,6 +545,7 @@ public class ManagementEnforcer extends InternalEnforcer {
         if (autoBuildRoleLinks) {
             buildRoleLinks();
         }
+        aviatorEval = null;
         return ruleRemoved;
     }
 
@@ -550,5 +557,89 @@ public class ManagementEnforcer extends InternalEnforcer {
      */
     public void addFunction(String name, AviatorFunction function) {
         fm.addFunction(name, function);
+        aviatorEval = null;
+    }
+
+    /**
+     * getPermittedActions returns all valid actions to specific object for current subject.
+     * At present, the execution efficiency of this method is not high. Please avoid calling this method frequently.
+     *
+     * @param sub the subject(usually means user).
+     * @param obj the object(usually means resources).
+     * @return all valid actions to specific object for current subject.
+     */
+    public Set<String> getPermittedActions(Object sub, Object obj) {
+        Assertion ast = model.model.get("p").get("p"); //"sub, obj, act, ..."
+        List<List<String>> relations;
+        if (model.model.get("g") != null) {
+            relations = model.model.get("g").get("g").policy;
+        } else {
+            relations = Collections.emptyList();
+        }
+
+        int actIndex = getElementIndex(ast, "act");
+        int objIndex = getElementIndex(ast, "obj");
+        int subIndex = getElementIndex(ast, "sub");
+        int eftIndex = getElementIndex(ast, "eft");
+
+        Set<String> users = new HashSet<String>() {
+            @Override
+            public boolean contains(Object o) {
+                if (super.contains(o)) return true;
+                if (o == null) return super.contains(null);
+                for (String s : this) {
+                    if (s.equals(o)) return true;
+                }
+                return false;
+            }
+        };
+        users.add((String)sub);
+        int size;
+        do {
+            size = users.size();
+            for (List<String> relation : relations) {
+                if (users.contains(relation.get(0))) {
+                    users.add(relation.get(1));
+                }
+            }
+        } while (size != users.size());
+
+        List<List<String>> policy = getPolicy();
+        Set<String> actionSet = new HashSet<>();
+        for (List<String> role : policy) {
+            boolean isThisUser = false;
+            for (String user : users) {
+                if (role.get(subIndex).equals(user)) {
+                    isThisUser = true;
+                    break;
+                }
+            }
+            if (isThisUser && role.get(objIndex).equals(obj) ) {
+                if (eftIndex == -1 || role.get(eftIndex).equalsIgnoreCase(Effect.Allow.toString())) {
+                    actionSet.add(role.get(actIndex));
+                }
+            }
+        }
+        return actionSet;
+    }
+
+    /**
+     * getElementIndex returns the index of a specific element.
+     * @param policy the policy. For example: policy.value = "sub, obj, act"
+     * @param elementName the element's name. For example: elementName = "act"
+     * @return the index of a specific element.
+     *         If the above two example parameters are passed in, it will return 2.
+     *         <tt>-1</tt> if the element does not exist.
+     */
+    private int getElementIndex(Assertion policy, String elementName) {
+        String[] tokens = Util.splitCommaDelimited(policy.value);
+        int i = 0;
+        for (String token : tokens) {
+            if (token.equals(elementName)) {
+                return i;
+            }
+            i++;
+        }
+        return -1;
     }
 }

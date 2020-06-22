@@ -14,6 +14,8 @@
 
 package org.casbin.jcasbin.persist;
 
+import static org.casbin.jcasbin.util.Util.splitCommaDelimited;
+
 import org.casbin.jcasbin.model.Model;
 
 import java.util.Arrays;
@@ -32,7 +34,7 @@ public class Helper {
             return;
         }
 
-        String[] tokens = line.split(", ");
+        String[] tokens = splitCommaDelimited(line);
 
         String key = tokens[0];
         String sec = key.substring(0, 1);

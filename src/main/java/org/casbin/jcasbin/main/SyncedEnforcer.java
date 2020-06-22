@@ -16,6 +16,7 @@ package org.casbin.jcasbin.main;
 
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
+import org.casbin.jcasbin.persist.Watcher;
 
 import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -96,6 +97,296 @@ public class SyncedEnforcer extends Enforcer {
     }
 
     /**
+     * setWatcher sets the current watcher.
+     *
+     * @param watcher the watcher.
+     */
+    public void setWatcher(Watcher watcher) {
+        this.watcher = watcher;
+        watcher.setUpdateCallback(this::loadPolicy);
+    }
+
+    /**
+     * clearPolicy clears all policy.
+     */
+    public void clearPolicy() {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            super.clearPolicy();
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
+    }
+
+    /**
+     * loadPolicy reloads the policy from file/database.
+     */
+    public void loadPolicy() {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            super.loadPolicy();
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
+    }
+
+    /**
+     * loadFilteredPolicy reloads a filtered policy from file/database.
+     *
+     * @param filter the filter used to specify which type of policy should be loaded.
+     */
+    public void loadFilteredPolicy(Object filter) {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            super.loadFilteredPolicy(filter);
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
+    }
+
+    /**
+     * savePolicy saves the current policy (usually after changed with
+     * Casbin API) back to file/database.
+     */
+    public void savePolicy() {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            super.savePolicy();
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * buildRoleLinks manually rebuild the
+     * role inheritance relations.
+     */
+    public void buildRoleLinks() {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            super.buildRoleLinks();
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * enforce decides whether a "subject" can access a "object" with
+     * the operation "action", input parameters are usually: (sub, obj, act).
+     *
+     * @param rvals the request needs to be mediated, usually an array
+     *              of strings, can be class instances if ABAC is used.
+     * @return whether to allow the request.
+     */
+    public boolean enforce(Object... rvals) {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            return super.enforce(rvals);
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
+    }
+
+    /**
+     * getAllSubjects gets the list of subjects that show up in the current policy.
+     *
+     * @return all the subjects in "p" policy rules. It actually collects the
+     *         0-index elements of "p" policy rules. So make sure your subject
+     *         is the 0-index element, like (sub, obj, act). Duplicates are removed.
+     */
+    public List<String> getAllSubjects() {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.getAllSubjects();
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * getAllObjects gets the list of objects that show up in the current policy.
+     *
+     * @return all the objects in "p" policy rules. It actually collects the
+     *         1-index elements of "p" policy rules. So make sure your object
+     *         is the 1-index element, like (sub, obj, act).
+     *         Duplicates are removed.
+     */
+    public List<String> getAllObjects() {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.getAllObjects();
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * getAllNamedObjects gets the list of objects that show up in the current named policy.
+     *
+     * @param ptype the policy type, can be "p", "p2", "p3", ..
+     * @return all the objects in policy rules of the ptype type. It actually
+     *         collects the 1-index elements of the policy rules. So make sure
+     *         your object is the 1-index element, like (sub, obj, act).
+     *         Duplicates are removed.
+     */
+    public List<String> getAllNamedObjects(String ptype) {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.getAllNamedObjects(ptype);
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * getAllActions gets the list of actions that show up in the current policy.
+     *
+     * @return all the actions in "p" policy rules. It actually collects
+     *         the 2-index elements of "p" policy rules. So make sure your action
+     *         is the 2-index element, like (sub, obj, act).
+     *         Duplicates are removed.
+     */
+    public List<String> getAllActions() {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.getAllActions();
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * GetAllNamedActions gets the list of actions that show up in the current named policy.
+     *
+     * @param ptype the policy type, can be "p", "p2", "p3", ..
+     * @return all the actions in policy rules of the ptype type. It actually
+     *         collects the 2-index elements of the policy rules. So make sure
+     *         your action is the 2-index element, like (sub, obj, act).
+     *         Duplicates are removed.
+     */
+    public List<String> getAllNamedActions(String ptype) {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.getAllNamedActions(ptype);
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * getAllRoles gets the list of roles that show up in the current policy.
+     *
+     * @return all the roles in "g" policy rules. It actually collects
+     *         the 1-index elements of "g" policy rules. So make sure your
+     *         role is the 1-index element, like (sub, role).
+     *         Duplicates are removed.
+     */
+    public List<String> getAllRoles() {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.getAllRoles();
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * getAllNamedRoles gets the list of roles that show up in the current named policy.
+     *
+     * @param ptype the policy type, can be "g", "g2", "g3", ..
+     * @return all the subjects in policy rules of the ptype type. It actually
+     *         collects the 0-index elements of the policy rules. So make
+     *         sure your subject is the 0-index element, like (sub, obj, act).
+     *         Duplicates are removed.
+     */
+    public List<String> getAllNamedRoles(String ptype) {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.getAllNamedRoles(ptype);
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * getPolicy gets all the authorization rules in the policy.
+     *
+     * @return all the "p" policy rules.
+     */
+    public List<List<String>> getPolicy() {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.getPolicy();
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * getFilteredPolicy gets all the authorization rules in the policy, field filters can be specified.
+     *
+     * @param fieldIndex the policy rule's start index to be matched.
+     * @param fieldValues the field values to be matched, value ""
+     *                    means not to match this field.
+     * @return the filtered "p" policy rules.
+     */
+    public List<List<String>> getFilteredPolicy(int fieldIndex, String... fieldValues) {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.getFilteredPolicy(fieldIndex, fieldValues);
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * getNamedPolicy gets all the authorization rules in the named policy.
+     *
+     * @param ptype the policy type, can be "p", "p2", "p3", ..
+     * @return the "p" policy rules of the specified ptype.
+     */
+    public List<List<String>> getNamedPolicy(String ptype) {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.getNamedPolicy(ptype);
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * getFilteredNamedPolicy gets all the authorization rules in the named policy, field filters can be specified.
+     *
+     * @param ptype the policy type, can be "p", "p2", "p3", ..
+     * @param fieldIndex the policy rule's start index to be matched.
+     * @param fieldValues the field values to be matched, value ""
+     *                    means not to match this field.
+     * @return the filtered "p" policy rules of the specified ptype.
+     */
+    public List<List<String>> getFilteredNamedPolicy(String ptype, int fieldIndex, String... fieldValues) {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.getFilteredNamedPolicy(ptype, fieldIndex, fieldValues);
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * getGroupingPolicy gets all the role inheritance rules in the policy.
+     *
+     * @return all the "g" policy rules.
+     */
+    public List<List<String>> getGroupingPolicy() {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.getGroupingPolicy();
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
      * getRolesForUser gets the roles that a user has.
      *
      * @param name the user.
@@ -108,6 +399,513 @@ public class SyncedEnforcer extends Enforcer {
             return super.getRolesForUser(name);
         } finally {
             READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * getFilteredGroupingPolicy gets all the role inheritance rules in the policy, field filters can be specified.
+     *
+     * @param fieldIndex the policy rule's start index to be matched.
+     * @param fieldValues the field values to be matched, value ""
+                          means not to match this field.
+     * @return the filtered "g" policy rules.
+     */
+    public List<List<String>> getFilteredGroupingPolicy(int fieldIndex, String... fieldValues) {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.getFilteredGroupingPolicy(fieldIndex, fieldValues);
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * getNamedGroupingPolicy gets all the role inheritance rules in the policy.
+     *
+     * @param ptype the policy type, can be "g", "g2", "g3", ..
+     * @return the "g" policy rules of the specified ptype.
+     */
+    public List<List<String>> getNamedGroupingPolicy(String ptype) {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.getNamedGroupingPolicy(ptype);
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * getFilteredNamedGroupingPolicy gets all the role inheritance rules in the policy, field filters can be specified.
+     *
+     * @param ptype the policy type, can be "g", "g2", "g3", ..
+     * @param fieldIndex the policy rule's start index to be matched.
+     * @param fieldValues the field values to be matched, value ""
+     *                    means not to match this field.
+     * @return the filtered "g" policy rules of the specified ptype.
+     */
+    public List<List<String>> getFilteredNamedGroupingPolicy(String ptype, int fieldIndex, String... fieldValues) {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.getFilteredNamedGroupingPolicy(ptype, fieldIndex, fieldValues);
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * hasPolicy determines whether an authorization rule exists.
+     *
+     * @param params the "p" policy rule, ptype "p" is implicitly used.
+     * @return whether the rule exists.
+     */
+    public boolean hasPolicy(List<String> params) {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.hasPolicy(params);
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * hasPolicy determines whether an authorization rule exists.
+     *
+     * @param params the "p" policy rule, ptype "p" is implicitly used.
+     * @return whether the rule exists.
+     */
+    public boolean hasPolicy(String... params) {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.hasPolicy(params);
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * hasNamedPolicy determines whether a named authorization rule exists.
+     *
+     * @param ptype the policy type, can be "p", "p2", "p3", ..
+     * @param params the "p" policy rule.
+     * @return whether the rule exists.
+     */
+    public boolean hasNamedPolicy(String ptype, List<String> params) {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.hasNamedPolicy(ptype, params);
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+    /**
+     * hasNamedPolicy determines whether a named authorization rule exists.
+     *
+     * @param ptype the policy type, can be "p", "p2", "p3", ..
+     * @param params the "p" policy rule.
+     * @return whether the rule exists.
+     */
+    public boolean hasNamedPolicy(String ptype, String... params) {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.hasNamedPolicy(ptype, params);
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * addPolicy adds an authorization rule to the current policy.
+     * If the rule already exists, the function returns false and the rule will not be added.
+     * Otherwise the function returns true by adding the new rule.
+     *
+     * @param params the "p" policy rule, ptype "p" is implicitly used.
+     * @return succeeds or not.
+     */
+    public boolean addPolicy(List<String> params) {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            return super.addPolicy(params);
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
+    }
+    
+    /**
+     * addPolicy adds an authorization rule to the current policy.
+     * If the rule already exists, the function returns false and the rule will not be added.
+     * Otherwise the function returns true by adding the new rule.
+     *
+     * @param params the "p" policy rule, ptype "p" is implicitly used.
+     * @return succeeds or not.
+     */
+    public boolean addPolicy(String... params) {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            return super.addPolicy(params);
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
+    }
+
+    /**
+     * AddNamedPolicy adds an authorization rule to the current named policy.
+     * If the rule already exists, the function returns false and the rule will not be added.
+     * Otherwise the function returns true by adding the new rule.
+     *
+     * @param ptype the policy type, can be "p", "p2", "p3", ..
+     * @param params the "p" policy rule.
+     * @return succeeds or not.
+     */
+    public boolean addNamedPolicy(String ptype, List<String> params) {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            return super.addNamedPolicy(ptype, params);
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
+    }
+
+    /**
+     * AddNamedPolicy adds an authorization rule to the current named policy.
+     * If the rule already exists, the function returns false and the rule will not be added.
+     * Otherwise the function returns true by adding the new rule.
+     *
+     * @param ptype the policy type, can be "p", "p2", "p3", ..
+     * @param params the "p" policy rule.
+     * @return succeeds or not.
+     */
+    public boolean addNamedPolicy(String ptype, String... params) {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            return super.addNamedPolicy(ptype, params);
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
+    }
+
+    /**
+     * removePolicy removes an authorization rule from the current policy.
+     *
+     * @param params the "p" policy rule, ptype "p" is implicitly used.
+     * @return succeeds or not.
+     */
+    public boolean removePolicy(List<String> params) {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            return super.removePolicy(params);
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
+    }
+
+    /**
+     * removePolicy removes an authorization rule from the current policy.
+     *
+     * @param params the "p" policy rule, ptype "p" is implicitly used.
+     * @return succeeds or not.
+     */
+    public boolean removePolicy(String... params) {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            return super.removePolicy(params);
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
+    }
+
+    /**
+     * removeFilteredPolicy removes an authorization rule from the current policy, field filters can be specified.
+     *
+     * @param fieldIndex the policy rule's start index to be matched.
+     * @param fieldValues the field values to be matched, value ""
+     *                    means not to match this field.
+     * @return succeeds or not.
+     */
+    public boolean removeFilteredPolicy(int fieldIndex, String... fieldValues) {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            return super.removeFilteredPolicy(fieldIndex, fieldValues);
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
+    }
+
+    /**
+     * removeNamedPolicy removes an authorization rule from the current named policy.
+     *
+     * @param ptype the policy type, can be "p", "p2", "p3", ..
+     * @param params the "p" policy rule.
+     * @return succeeds or not.
+     */
+    public boolean removeNamedPolicy(String ptype, List<String> params) {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            return super.removeNamedPolicy(ptype, params);
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
+    }
+
+    /**
+     * removeNamedPolicy removes an authorization rule from the current named policy.
+     *
+     * @param ptype the policy type, can be "p", "p2", "p3", ..
+     * @param params the "p" policy rule.
+     * @return succeeds or not.
+     */
+    public boolean removeNamedPolicy(String ptype, String... params) {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            return super.removeNamedPolicy(ptype, params);
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
+    }
+
+    /**
+     * removeFilteredNamedPolicy removes an authorization rule from the current named policy, field filters can be specified.
+     *
+     * @param ptype the policy type, can be "p", "p2", "p3", ..
+     * @param fieldIndex the policy rule's start index to be matched.
+     * @param fieldValues the field values to be matched, value ""
+     *                    means not to match this field.
+     * @return succeeds or not.
+     */
+    public boolean removeFilteredNamedPolicy(String ptype, int fieldIndex, String... fieldValues) {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            return super.removeFilteredNamedPolicy(ptype, fieldIndex, fieldValues);
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
+    }
+
+    /**
+     * hasGroupingPolicy determines whether a role inheritance rule exists.
+     *
+     * @param params the "g" policy rule, ptype "g" is implicitly used.
+     * @return whether the rule exists.
+     */
+    public boolean hasGroupingPolicy(List<String> params) {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.hasGroupingPolicy(params);
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * hasGroupingPolicy determines whether a role inheritance rule exists.
+     *
+     * @param params the "g" policy rule, ptype "g" is implicitly used.
+     * @return whether the rule exists.
+     */
+    public boolean hasGroupingPolicy(String... params) {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.hasGroupingPolicy(params);
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * hasNamedGroupingPolicy determines whether a named role inheritance rule exists.
+     *
+     * @param ptype the policy type, can be "g", "g2", "g3", ..
+     * @param params the "g" policy rule.
+     * @return whether the rule exists.
+     */
+    public boolean hasNamedGroupingPolicy(String ptype, List<String> params) {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.hasNamedGroupingPolicy(ptype, params);
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * hasNamedGroupingPolicy determines whether a named role inheritance rule exists.
+     *
+     * @param ptype the policy type, can be "g", "g2", "g3", ..
+     * @param params the "g" policy rule.
+     * @return whether the rule exists.
+     */
+    public boolean hasNamedGroupingPolicy(String ptype, String... params) {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.hasNamedGroupingPolicy(ptype, params);
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * addGroupingPolicy adds a role inheritance rule to the current policy.
+     * If the rule already exists, the function returns false and the rule will not be added.
+     * Otherwise the function returns true by adding the new rule.
+     *
+     * @param params the "g" policy rule, ptype "g" is implicitly used.
+     * @return succeeds or not.
+     */
+    public boolean addGroupingPolicy(List<String> params) {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            return super.addGroupingPolicy(params);
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
+    }
+
+    /**
+     * addGroupingPolicy adds a role inheritance rule to the current policy.
+     * If the rule already exists, the function returns false and the rule will not be added.
+     * Otherwise the function returns true by adding the new rule.
+     *
+     * @param params the "g" policy rule, ptype "g" is implicitly used.
+     * @return succeeds or not.
+     */
+    public boolean addGroupingPolicy(String... params) {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            return super.addGroupingPolicy(params);
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
+    }
+
+    /**
+     * addNamedGroupingPolicy adds a named role inheritance rule to the current policy.
+     * If the rule already exists, the function returns false and the rule will not be added.
+     * Otherwise the function returns true by adding the new rule.
+     *
+     * @param ptype the policy type, can be "g", "g2", "g3", ..
+     * @param params the "g" policy rule.
+     * @return succeeds or not.
+     */
+    public boolean addNamedGroupingPolicy(String ptype, List<String> params) {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            return super.addNamedGroupingPolicy(ptype, params);
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
+    }
+
+    /**
+     * addNamedGroupingPolicy adds a named role inheritance rule to the current policy.
+     * If the rule already exists, the function returns false and the rule will not be added.
+     * Otherwise the function returns true by adding the new rule.
+     *
+     * @param ptype the policy type, can be "g", "g2", "g3", ..
+     * @param params the "g" policy rule.
+     * @return succeeds or not.
+     */
+    public boolean addNamedGroupingPolicy(String ptype, String... params) {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            return super.addNamedGroupingPolicy(ptype, params);
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
+    }
+
+    /**
+     * removeGroupingPolicy removes a role inheritance rule from the current policy.
+     *
+     * @param params the "g" policy rule, ptype "g" is implicitly used.
+     * @return succeeds or not.
+     */
+    public boolean removeGroupingPolicy(List<String> params) {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            return super.removeGroupingPolicy(params);
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
+    }
+
+    /**
+     * removeGroupingPolicy removes a role inheritance rule from the current policy.
+     *
+     * @param params the "g" policy rule, ptype "g" is implicitly used.
+     * @return succeeds or not.
+     */
+    public boolean removeGroupingPolicy(String... params) {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            return super.removeGroupingPolicy(params);
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
+    }
+
+    /**
+     * removeFilteredGroupingPolicy removes a role inheritance rule from the current policy, field filters can be specified.
+     *
+     * @param fieldIndex the policy rule's start index to be matched.
+     * @param fieldValues the field values to be matched, value ""
+     *                    means not to match this field.
+     * @return succeeds or not.
+     */
+    public boolean removeFilteredGroupingPolicy(int fieldIndex, String... fieldValues) {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            return super.removeFilteredGroupingPolicy(fieldIndex, fieldValues);
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
+    }
+
+    /**
+     * removeNamedGroupingPolicy removes a role inheritance rule from the current named policy.
+     *
+     * @param ptype the policy type, can be "g", "g2", "g3", ..
+     * @param params the "g" policy rule.
+     * @return succeeds or not.
+     */
+    public boolean removeNamedGroupingPolicy(String ptype, List<String> params) {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            return super.removeNamedGroupingPolicy(ptype, params);
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
+    }
+
+    /**
+     * removeNamedGroupingPolicy removes a role inheritance rule from the current named policy.
+     *
+     * @param ptype the policy type, can be "g", "g2", "g3", ..
+     * @param params the "g" policy rule.
+     * @return succeeds or not.
+     */
+    public boolean removeNamedGroupingPolicy(String ptype, String... params) {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            return super.removeNamedGroupingPolicy(ptype, params);
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
+    }
+
+    /**
+     * removeFilteredNamedGroupingPolicy removes a role inheritance rule from the current named policy, field filters can be specified.
+     *
+     * @param ptype the policy type, can be "g", "g2", "g3", ..
+     * @param fieldIndex the policy rule's start index to be matched.
+     * @param fieldValues the field values to be matched, value ""
+     *                    means not to match this field.
+     * @return succeeds or not.
+     */
+    public boolean removeFilteredNamedGroupingPolicy(String ptype, int fieldIndex, String... fieldValues) {
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            return super.removeFilteredNamedGroupingPolicy(ptype, fieldIndex, fieldValues); 
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
         }
     }
 
@@ -401,6 +1199,23 @@ public class SyncedEnforcer extends Enforcer {
             READ_WRITE_LOCK.readLock().unlock();
         }
     }
+
+    /**
+     * getUsersForRoleInDomain gets the users that has a role inside a domain.
+     *
+     * @param name   the user.
+     * @param domain the domain.
+     * @return the users for role in a domain.
+     */
+//    @Override
+//    public List<String> getUsersForRoleInDomain(String name, String domain) {
+//        try {
+//            READ_WRITE_LOCK.readLock().lock();
+//            return super.getUsersForRoleInDomain(name, domain);
+//        } finally {
+//            READ_WRITE_LOCK.readLock().unlock();
+//        }
+//    }
 
     /**
      * getRolesForUserInDomain gets the roles that a user has inside a domain.

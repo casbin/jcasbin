@@ -21,11 +21,13 @@ import com.googlecode.aviator.runtime.type.AviatorFunction;
 import org.casbin.jcasbin.effect.DefaultEffector;
 import org.casbin.jcasbin.effect.Effect;
 import org.casbin.jcasbin.effect.Effector;
+import org.casbin.jcasbin.exception.CasbinAdapterException;
 import org.casbin.jcasbin.exception.CasbinMatcherException;
 import org.casbin.jcasbin.model.Assertion;
 import org.casbin.jcasbin.model.FunctionMap;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
+import org.casbin.jcasbin.persist.file_adapter.FilteredAdapter;
 import org.casbin.jcasbin.persist.Watcher;
 import org.casbin.jcasbin.rbac.DefaultRoleManager;
 import org.casbin.jcasbin.rbac.RoleManager;
@@ -52,6 +54,12 @@ public class CoreEnforcer {
     private boolean enabled;
     boolean autoSave;
     boolean autoBuildRoleLinks;
+
+    // cached instance of AviatorEvaluatorInstance
+    AviatorEvaluatorInstance aviatorEval;
+
+    // detect changes in Model so that we can invalidate AviatorEvaluatorInstance cache
+    int modelModCount;
 
     void initialize() {
         rm = new DefaultRoleManager(10);
@@ -117,6 +125,7 @@ public class CoreEnforcer {
         model.loadModel(this.modelPath);
         model.printModel();
         fm = FunctionMap.loadFunctionMap();
+        aviatorEval = null;
     }
 
     /**
@@ -136,6 +145,7 @@ public class CoreEnforcer {
     public void setModel(Model model) {
         this.model = model;
         fm = FunctionMap.loadFunctionMap();
+        aviatorEval = null;
     }
 
     /**
@@ -210,6 +220,22 @@ public class CoreEnforcer {
      * @param filter the filter used to specify which type of policy should be loaded.
      */
     public void loadFilteredPolicy(Object filter) {
+        model.clearPolicy();
+        FilteredAdapter filteredAdapter;
+        if (adapter instanceof FilteredAdapter) {
+            filteredAdapter = (FilteredAdapter) adapter;
+        } else {
+            throw new CasbinAdapterException("Filtered policies are not supported by this adapter.");
+        }
+        try {
+            filteredAdapter.loadFilteredPolicy(model, filter);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        model.printPolicy();
+        if (autoBuildRoleLinks) {
+            buildRoleLinks();
+        }
     }
 
     /**
@@ -218,6 +244,9 @@ public class CoreEnforcer {
      * @return if the loaded policy has been filtered.
      */
     public boolean isFiltered() {
+        if (adapter instanceof FilteredAdapter) {
+            return ((FilteredAdapter) adapter).isFiltered();
+        }
         return false;
     }
 
@@ -297,29 +326,35 @@ public class CoreEnforcer {
             return true;
         }
 
-        Map<String, AviatorFunction> functions = new HashMap<>();
-        for (Map.Entry<String, AviatorFunction> entry : fm.fm.entrySet()) {
-            String key = entry.getKey();
-            AviatorFunction function = entry.getValue();
-
-            functions.put(key, function);
-        }
-        if (model.model.containsKey("g")) {
-            for (Map.Entry<String, Assertion> entry : model.model.get("g").entrySet()) {
+        if (aviatorEval == null || modelModCount != model.getModCount()) {
+            // AviatorEvaluator instance must be rebuild
+            Map<String, AviatorFunction> functions = new HashMap<>();
+            for (Map.Entry<String, AviatorFunction> entry : fm.fm.entrySet()) {
                 String key = entry.getKey();
-                Assertion ast = entry.getValue();
+                AviatorFunction function = entry.getValue();
 
-                RoleManager rm = ast.rm;
-                functions.put(key, BuiltInFunctions.generateGFunction(key, rm));
+                functions.put(key, function);
             }
-        }
-        AviatorEvaluatorInstance eval = AviatorEvaluator.newInstance();
-        for (AviatorFunction f : functions.values()) {
-            eval.addFunction(f);
+            if (model.model.containsKey("g")) {
+                for (Map.Entry<String, Assertion> entry : model.model.get("g").entrySet()) {
+                    String key = entry.getKey();
+                    Assertion ast = entry.getValue();
+
+                    RoleManager rm = ast.rm;
+                    functions.put(key, BuiltInFunctions.generateGFunction(key, rm));
+                }
+            }
+
+            aviatorEval = AviatorEvaluator.newInstance();
+            for (AviatorFunction f : functions.values()) {
+                aviatorEval.addFunction(f);
+            }
+
+            modelModCount = model.getModCount();
         }
 
         String expString = model.model.get("m").get("m").value;
-        Expression expression = eval.compile(expString);
+        Expression expression = aviatorEval.compile(expString, true);
 
         Effect policyEffects[];
         float matcherResults[];
@@ -448,5 +483,13 @@ public class CoreEnforcer {
             return rvals.length >= expectedParamSize;
         }
         return true;
+    }
+
+    /**
+     * Invalidate cache of compiled model matcher expression. This is done automatically most of the time, but you may
+     * need to call it explicitly if you manipulate directly Model.
+     */
+    public void resetExpressionEvaluator() {
+        aviatorEval = null;
     }
 }

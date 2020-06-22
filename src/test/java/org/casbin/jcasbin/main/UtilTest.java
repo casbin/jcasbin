@@ -1,6 +1,8 @@
 package org.casbin.jcasbin.main;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import org.casbin.jcasbin.util.Util;
 import org.junit.Test;
@@ -31,5 +33,14 @@ public class UtilTest {
     assertEquals("r.act == p.act", Util.removeComments("r.act == p.act###"));
     assertEquals("", Util.removeComments("### comments"));
     assertEquals("r.act == p.act", Util.removeComments("r.act == p.act"));
+  }
+
+  @Test
+  public void testSplitCommaDelimited(){
+    assertNull(Util.splitCommaDelimited(null));
+    assertArrayEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("a,b,c"));
+    assertArrayEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("a, b, c"));
+    assertArrayEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("a ,b ,c"));
+    assertArrayEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("  a,     b   ,c     "));
   }
 }

@@ -121,7 +121,7 @@ public class Enforcer extends ManagementEnforcer {
                 throw e;
             }
         }
-        return null;
+        return Collections.emptyList();
     }
 
     /**
@@ -138,7 +138,7 @@ public class Enforcer extends ManagementEnforcer {
                 throw e;
             }
         }
-        return null;
+        return Collections.emptyList();
     }
 
     /**
@@ -361,7 +361,7 @@ public class Enforcer extends ManagementEnforcer {
                 throw e;
             }
         }
-        return null;
+        return Collections.emptyList();
     }
 
     /**

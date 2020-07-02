@@ -22,7 +22,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class TestUtil {
-    static void testEnforce(Enforcer e, String sub, Object obj, String act, boolean res) {
+    static void testEnforce(Enforcer e, Object sub, Object obj, String act, boolean res) {
         assertEquals(res, e.enforce(sub, obj, act));
     }
 

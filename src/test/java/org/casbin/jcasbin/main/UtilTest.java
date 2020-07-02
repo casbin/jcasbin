@@ -43,4 +43,9 @@ public class UtilTest {
     assertArrayEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("a ,b ,c"));
     assertArrayEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("  a,     b   ,c     "));
   }
+
+  @Test
+  public void testReplaceEval() {
+      Util.logPrint(Util.replaceEval("eval(test)", "$1testEval"));
+  }
 }

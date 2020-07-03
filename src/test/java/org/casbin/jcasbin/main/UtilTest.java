@@ -46,6 +46,6 @@ public class UtilTest {
 
   @Test
   public void testReplaceEval() {
-      Util.logPrint(Util.replaceEval("eval(test)", "$1testEval"));
+      Util.logPrint(Util.replaceEval("eval(test)", "testEval"));
   }
 }

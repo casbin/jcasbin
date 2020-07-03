@@ -1,0 +1,6 @@
+p, r.domain.equals("domain1"), admin, domain1, data1, read
+p, r.domain.equals("domain1"), admin, domain1, data1, write
+p, r.domain.equals("domain2"), admin, domain2, data2, read
+p, r.domain.equals("domain2"), admin, domain2, data2, write
+g, alice, admin, domain1
+g, bob, admin, domain2

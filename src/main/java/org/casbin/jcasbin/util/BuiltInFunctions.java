@@ -26,8 +26,7 @@ import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
 import org.casbin.jcasbin.rbac.RoleManager;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class BuiltInFunctions {
@@ -38,12 +37,6 @@ public class BuiltInFunctions {
 
     static {
         interpreter = new Interpreter();
-        try {
-            interpreter.eval("import org.casbin.jcasbin.util.BuiltInFunctions.EvalModel;");
-            interpreter.eval("import java.lang.reflect.*");
-        } catch (EvalError evalError) {
-            evalError.printStackTrace();
-        }
     }
 
     /**
@@ -216,10 +209,15 @@ public class BuiltInFunctions {
      * @return The result of the eval.
      */
     public static boolean eval(String eval, Map<String, Object> env) {
-        Map<String, EvalModel> evalModels = getEvalModels(env);
+        Map<String, Map<String, Object>> evalModels = getEvalModels(env);
         try {
             for (String key : evalModels.keySet()) {
                 interpreter.set(key, evalModels.get(key));
+            }
+            List<String> sortedSrc = new ArrayList<>(getReplaceTargets(evalModels));
+            sortedSrc.sort((o1, o2) -> o1.length() > o2.length() ? -1 : 1);
+            for (String s : sortedSrc) {
+                eval = eval.replace("." + s, ".get(\"" + s + "\")");
             }
             return (boolean) interpreter.eval(eval);
         } catch (EvalError evalError) {
@@ -233,31 +231,23 @@ public class BuiltInFunctions {
      *
      * @param env the map.
      */
-    private static Map<String, EvalModel> getEvalModels(Map<String, Object> env) {
-        Map<String, EvalModel> evalModels = new HashMap<>();
+    private static Map<String, Map<String, Object>> getEvalModels(Map<String, Object> env) {
+        Map<String, Map<String, Object>> evalModels = new HashMap<>();
         for (String key : env.keySet()) {
             String[] names = key.split("_");
             if (!evalModels.containsKey(names[0])) {
-                evalModels.put(names[0], new EvalModel());
+                evalModels.put(names[0], new HashMap<>());
             }
-            switch (names[1]) {
-                case "sub":
-                    evalModels.get(names[0]).sub = env.get(key);
-                    break;
-                case "obj":
-                    evalModels.get(names[0]).obj = env.get(key);
-                    break;
-                case "act":
-                    evalModels.get(names[0]).act = env.get(key);
-                    break;
-            }
+            evalModels.get(names[0]).put(names[1], env.get(key));
         }
         return evalModels;
     }
 
-    public static class EvalModel { //This class must be public and static.
-        public Object sub;
-        public Object obj;
-        public Object act;
+    private static Set<String> getReplaceTargets(Map<String, Map<String, Object>> evalModels) {
+        Set<String> ret = new HashSet<>();
+        for (String key1 : evalModels.keySet()) {
+            ret.addAll(evalModels.get(key1).keySet());
+        }
+        return ret;
     }
 }

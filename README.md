@@ -108,7 +108,7 @@ What jCasbin does:
 What jCasbin does NOT do:
 
 1. authentication (aka verify ``username`` and ``password`` when a user logs in)
-2. manage the list of users or roles. I believe it's more convenient for the project itself to manage these entities. Users usually have their passwords, and jCasbin is not designed as a password container. However, jCasbin stores the user-role mapping for the RBAC scenario. 
+2. manage the list of users or roles. I believe it's more convenient for the project itself to manage these entities. Users usually have their passwords, and jCasbin is not designed as a password container. However, jCasbin stores the user-role mapping for the RBAC scenario.
 
 ## Installation
 
@@ -217,19 +217,20 @@ https://casbin.org/docs/en/adopters
 
 We provide Spring Boot support, you can use [casbin-spring-boot-starter](https://github.com/jcasbin/casbin-spring-boot-starter) to quickly develop in SpringBoot
 
-In casbin-spring-boot-starter, we made the following adjustments.
-1. Rewrite JDBCAdapter to support a variety of commonly used JDBC databases 
-2. Implement RedisWatcher 
-4. IDEA Editor Configuration Tips 
-5. Provide default configuration, automatic assembly
-6. SpringSecurity integration (future) 
-7. Shiro integration (future) 
+In casbin-spring-boot-starter, we made the following adjustments:
+
+1. Rewrite JDBCAdapter to support a variety of commonly used JDBC databases
+2. Implement RedisWatcher
+3. IDEA Editor Configuration Tips
+4. Provide default configuration, automatic assembly
+5. SpringSecurity integration (future)
+6. Shiro integration (future)
 
 https://github.com/jcasbin/casbin-spring-boot-starter
 
 ## Contributors
 
-This project exists thanks to all the people who contribute. 
+This project exists thanks to all the people who contribute.
 <a href="https://github.com/casbin/jcasbin/graphs/contributors"><img src="https://opencollective.com/jcasbin/contributors.svg?width=890&button=false" /></a>
 
 ## Backers

@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 
 public class Util {
     public static boolean enableLog = true;
+    private static Pattern evalReg = Pattern.compile("\\beval\\(([^),]*)\\)");
 
     private static Logger LOGGER = LoggerFactory.getLogger("org.casbin.jcasbin");
 
@@ -239,5 +240,13 @@ public class Util {
             }
         }
         return true;
+    }
+
+    public static boolean hasEval(String exp) {
+        return evalReg.matcher(exp).matches();
+    }
+
+    public static String replaceEval(String s, String replacement) {
+        return evalReg.matcher(s).replaceAll("(" + replacement + ")");
     }
 }

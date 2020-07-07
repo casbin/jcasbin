@@ -15,10 +15,7 @@
 package org.casbin.jcasbin.model;
 
 import com.googlecode.aviator.runtime.type.AviatorFunction;
-import org.casbin.jcasbin.util.function.KeyMatchFunc;
-import org.casbin.jcasbin.util.function.KeyMatch2Func;
-import org.casbin.jcasbin.util.function.RegexMatchFunc;
-import org.casbin.jcasbin.util.function.IPMatchFunc;
+import org.casbin.jcasbin.util.function.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,6 +52,7 @@ public class FunctionMap {
         fm.addFunction("keyMatch2", new KeyMatch2Func());
         fm.addFunction("regexMatch", new RegexMatchFunc());
         fm.addFunction("ipMatch", new IPMatchFunc());
+        fm.addFunction("eval", new EvalFunc());
 
         return fm;
     }

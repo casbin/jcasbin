@@ -1,0 +1,2 @@
+p, r.sub.age > 18 && r.sub.age < 25, /data1, read
+p, r.sub.age < 60, /data2, write

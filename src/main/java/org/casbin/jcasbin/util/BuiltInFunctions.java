@@ -14,6 +14,8 @@
 
 package org.casbin.jcasbin.util;
 
+import bsh.EvalError;
+import bsh.Interpreter;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
@@ -24,13 +26,18 @@ import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
 import org.casbin.jcasbin.rbac.RoleManager;
 
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class BuiltInFunctions {
 
     private static Pattern keyMatch2Pattern = Pattern.compile("(.*):[^/]+(.*)");
     private static Pattern keyMatch3Pattern = Pattern.compile("(.*)\\{[^/]+\\}(.*)");
+    private static final Interpreter interpreter;
+
+    static {
+        interpreter = new Interpreter();
+    }
 
     /**
      * keyMatch determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
@@ -188,5 +195,59 @@ public class BuiltInFunctions {
                 return name;
             }
         };
+    }
+
+    /**
+     * eval calculates the stringified boolean expression and return its result.
+     * The syntax of expressions is exactly the same as Java.
+     * Flaw: dynamically generated classes or non-static inner class cannot be used.
+     * @author tldyl
+     * @since 2020-07-02
+     *
+     * @param eval Boolean expression.
+     * @param env Parameters.
+     * @return The result of the eval.
+     */
+    public static boolean eval(String eval, Map<String, Object> env) {
+        Map<String, Map<String, Object>> evalModels = getEvalModels(env);
+        try {
+            for (String key : evalModels.keySet()) {
+                interpreter.set(key, evalModels.get(key));
+            }
+            List<String> sortedSrc = new ArrayList<>(getReplaceTargets(evalModels));
+            sortedSrc.sort((o1, o2) -> o1.length() > o2.length() ? -1 : 1);
+            for (String s : sortedSrc) {
+                eval = eval.replace("." + s, ".get(\"" + s + "\")");
+            }
+            return (boolean) interpreter.eval(eval);
+        } catch (EvalError evalError) {
+            evalError.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * getEvalModels extracts the value from env and assemble it into a EvalModel object.
+     *
+     * @param env the map.
+     */
+    private static Map<String, Map<String, Object>> getEvalModels(Map<String, Object> env) {
+        Map<String, Map<String, Object>> evalModels = new HashMap<>();
+        for (String key : env.keySet()) {
+            String[] names = key.split("_");
+            if (!evalModels.containsKey(names[0])) {
+                evalModels.put(names[0], new HashMap<>());
+            }
+            evalModels.get(names[0]).put(names[1], env.get(key));
+        }
+        return evalModels;
+    }
+
+    private static Set<String> getReplaceTargets(Map<String, Map<String, Object>> evalModels) {
+        Set<String> ret = new HashSet<>();
+        for (String key1 : evalModels.keySet()) {
+            ret.addAll(evalModels.get(key1).keySet());
+        }
+        return ret;
     }
 }

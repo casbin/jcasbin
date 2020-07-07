@@ -89,7 +89,7 @@ public class Util {
         if (s.startsWith("r") || s.startsWith("p")) {
             s = s.replaceFirst("\\.", "_");
         }
-        String regex = "(\\|| |=|\\)|\\(|&|<|>|,|\\+|-|!|\\*|\\/)(r|p)\\.";
+        String regex = "(\\|| |=|\\)|\\(|&|<|>|,|\\+|-|!|\\*|\\/)(r|p)[0-9]*\\.";
         Pattern p = Pattern.compile(regex);
         Matcher m = p.matcher(s);
         StringBuffer sb = new StringBuffer();

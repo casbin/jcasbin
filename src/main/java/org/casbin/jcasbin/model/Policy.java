@@ -184,6 +184,23 @@ public class Policy {
     }
 
     /**
+     * addPolicies adds policy rules to the model.
+     * @param sec the section, "p" or "g".
+     * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param rules the policy rules.
+     * @return succeeds or not.
+     */
+    public boolean addPolicies(String sec, String ptype, List<List<String>> rules) {
+        int size = model.get(sec).get(ptype).policy.size();
+        for (List<String> rule : rules) {
+            if (!hasPolicy(sec, ptype, rule)) {
+                model.get(sec).get(ptype).policy.add(rule);
+            }
+        }
+        return size < model.get(sec).get(ptype).policy.size();
+    }
+
+    /**
      * removePolicy removes a policy rule from the model.
      *
      * @param sec the section, "p" or "g".
@@ -204,18 +221,39 @@ public class Policy {
     }
 
     /**
-     * removeFilteredPolicy removes policy rules based on field filters from the model.
+     * removePolicies removes rules from the current policy.
+     * @param sec the section, "p" or "g".
+     * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param rules the policy rules.
+     * @return succeeds or not.
+     */
+    public boolean removePolicies(String sec, String ptype, List<List<String>> rules) {
+        int size = model.get(sec).get(ptype).policy.size();
+        for (List<String> rule : rules) {
+            for (int i = 0; i < model.get(sec).get(ptype).policy.size(); i ++) {
+                List<String> r = model.get(sec).get(ptype).policy.get(i);
+                if (Util.arrayEquals(rule, r)) {
+                    model.get(sec).get(ptype).policy.remove(i);
+                }
+            }
+        }
+        return size > model.get(sec).get(ptype).policy.size();
+    }
+
+    /**
+     * removeFilteredPolicyReturnsEffects removes policy rules based on field filters from the model.
      *
      * @param sec the section, "p" or "g".
      * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
      * @param fieldIndex the policy rule's start index to be matched.
      * @param fieldValues the field values to be matched, value ""
      *                    means not to match this field.
-     * @return succeeds or not.
+     * @return succeeds(effects.size() > 0) or not.
      */
-    public boolean removeFilteredPolicy(String sec, String ptype, int fieldIndex, String... fieldValues) {
+    public List<List<String>> removeFilteredPolicyReturnsEffects(String sec, String ptype, int fieldIndex, String... fieldValues) {
         List<List<String>> tmp = new ArrayList<>();
-        boolean res = false;
+        List<List<String>> effects = new ArrayList<>();
+        int firstIndex = -1;
 
         for (List<String> rule : model.get(sec).get(ptype).policy) {
             boolean matched = true;
@@ -228,14 +266,34 @@ public class Policy {
             }
 
             if (matched) {
-                res = true;
+                if (firstIndex == -1) {
+                    firstIndex = model.get(sec).get(ptype).policy.indexOf(rule);
+                }
+                effects.add(rule);
             } else {
                 tmp.add(rule);
             }
         }
 
-        model.get(sec).get(ptype).policy = tmp;
-        return res;
+        if (firstIndex != -1) {
+            model.get(sec).get(ptype).policy = tmp;
+        }
+
+        return effects;
+    }
+
+    /**
+     * removeFilteredPolicy removes policy rules based on field filters from the model.
+     *
+     * @param sec the section, "p" or "g".
+     * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param fieldIndex the policy rule's start index to be matched.
+     * @param fieldValues the field values to be matched, value ""
+     *                    means not to match this field.
+     * @return succeeds or not.
+     */
+    public boolean removeFilteredPolicy(String sec, String ptype, int fieldIndex, String... fieldValues) {
+        return removeFilteredPolicyReturnsEffects(sec, ptype, fieldIndex, fieldValues).size() > 0;
     }
 
     /**
@@ -256,5 +314,20 @@ public class Policy {
         Util.arrayRemoveDuplicates(values);
 
         return values;
+    }
+
+    public void buildIncrementalRoleLinks(RoleManager rm, Model.PolicyOperations op, String sec, String ptype, List<List<String>> rules) {
+        if (sec.equals("g")) {
+            model.get(sec).get(ptype).buildIncrementalRoleLinks(rm, op, rules);
+        }
+    }
+
+    public boolean hasPolicies(String sec, String ptype, List<List<String>> rules) {
+        for (List<String> rule : rules) {
+            if (this.hasPolicy(sec, ptype, rule)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

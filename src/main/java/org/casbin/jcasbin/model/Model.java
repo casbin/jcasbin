@@ -197,4 +197,9 @@ public class Model extends Policy {
             }
         }
     }
+
+    public enum PolicyOperations {
+        POLICY_ADD,
+        POLICY_REMOVE
+    }
 }

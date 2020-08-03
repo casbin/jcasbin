@@ -27,6 +27,7 @@ import org.casbin.jcasbin.model.Assertion;
 import org.casbin.jcasbin.model.FunctionMap;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
+import org.casbin.jcasbin.persist.WatcherEx;
 import org.casbin.jcasbin.persist.file_adapter.FilteredAdapter;
 import org.casbin.jcasbin.persist.Watcher;
 import org.casbin.jcasbin.rbac.DefaultRoleManager;
@@ -54,6 +55,7 @@ public class CoreEnforcer {
     private boolean enabled;
     boolean autoSave;
     boolean autoBuildRoleLinks;
+    boolean autoNotifyWatcher = true;
 
     // cached instance of AviatorEvaluatorInstance
     AviatorEvaluatorInstance aviatorEval;
@@ -260,8 +262,12 @@ public class CoreEnforcer {
         }
 
         adapter.savePolicy(model);
-        if (watcher != null) {
-            watcher.update();
+        if (watcher != null && autoNotifyWatcher) {
+            if (watcher instanceof WatcherEx) {
+                ((WatcherEx) watcher).updateForSavePolicy(model);
+            } else {
+                watcher.update();
+            }
         }
     }
 
@@ -481,5 +487,13 @@ public class CoreEnforcer {
      */
     public void resetExpressionEvaluator() {
         aviatorEval = null;
+    }
+
+    public boolean isAutoNotifyWatcher() {
+        return autoNotifyWatcher;
+    }
+
+    public void setAutoNotifyWatcher(boolean autoNotifyWatcher) {
+        this.autoNotifyWatcher = autoNotifyWatcher;
     }
 }

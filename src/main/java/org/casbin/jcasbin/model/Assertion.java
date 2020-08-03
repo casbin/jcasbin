@@ -63,4 +63,35 @@ public class Assertion {
         Util.logPrint("Role links for: " + key);
         rm.printRoles();
     }
+
+    public void buildIncrementalRoleLinks(RoleManager rm, Model.PolicyOperations op, List<List<String>> rules) {
+        this.rm = rm;
+        int count = 0;
+        for (int i = 0; i < value.length(); i ++) {
+            if (value.charAt(i) == '_') {
+                count ++;
+            }
+        }
+        for (List<String> rule : rules) {
+            if (count < 2) {
+                throw new IllegalArgumentException("the number of \"_\" in role definition should be at least 2");
+            }
+            if (rule.size() < count) {
+                throw new IllegalArgumentException("grouping policy elements do not meet role definition");
+            }
+            if (rule.size() > count) {
+                rule = rule.subList(0, count);
+            }
+            switch (op) {
+                case POLICY_ADD:
+                    rm.addLink(rule.get(0), rule.get(1), rule.subList(2, rule.size()).toArray(new String[0]));
+                    break;
+                case POLICY_REMOVE:
+                    rm.deleteLink(rule.get(0), rule.get(1), rule.subList(2, rule.size()).toArray(new String[0]));
+                    break;
+                default:
+                    throw new IllegalArgumentException("invalid operation:" + op.toString());
+            }
+        }
+    }
 }

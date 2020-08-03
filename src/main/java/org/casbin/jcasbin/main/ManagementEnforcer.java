@@ -450,9 +450,6 @@ public class ManagementEnforcer extends InternalEnforcer {
     public boolean addNamedGroupingPolicy(String ptype, List<String> params) {
         boolean ruleAdded = addPolicy("g", ptype, params);
 
-        if (autoBuildRoleLinks) {
-            buildRoleLinks();
-        }
         aviatorEval = null;
         return ruleAdded;
     }
@@ -512,9 +509,6 @@ public class ManagementEnforcer extends InternalEnforcer {
     public boolean removeNamedGroupingPolicy(String ptype, List<String> params) {
         boolean ruleRemoved = removePolicy("g", ptype, params);
 
-        if (autoBuildRoleLinks) {
-            buildRoleLinks();
-        }
         aviatorEval = null;
         return ruleRemoved;
     }
@@ -542,9 +536,6 @@ public class ManagementEnforcer extends InternalEnforcer {
     public boolean removeFilteredNamedGroupingPolicy(String ptype, int fieldIndex, String... fieldValues) {
         boolean ruleRemoved = removeFilteredPolicy("g", ptype, fieldIndex, fieldValues);
 
-        if (autoBuildRoleLinks) {
-            buildRoleLinks();
-        }
         aviatorEval = null;
         return ruleRemoved;
     }

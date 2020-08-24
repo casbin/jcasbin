@@ -27,12 +27,14 @@ import inet.ipaddr.IPAddressString;
 import org.casbin.jcasbin.rbac.RoleManager;
 
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class BuiltInFunctions {
 
     private static Pattern keyMatch2Pattern = Pattern.compile("(.*):[^/]+(.*)");
-    private static Pattern keyMatch3Pattern = Pattern.compile("(.*)\\{[^/]+\\}(.*)");
+    private static Pattern keyMatch3Pattern = Pattern.compile("(.*)\\{[^/]+}(.*)");
+
     private static final Interpreter interpreter;
 
     static {
@@ -69,11 +71,7 @@ public class BuiltInFunctions {
      */
     public static boolean keyMatch2(String key1, String key2) {
         key2 = key2.replace("/*", "/.*");
-        while (true) {
-            if (!key2.contains("/:")) {
-                break;
-            }
-
+        while (key2.contains("/:")) {
             key2 = "^" + keyMatch2Pattern.matcher(key2).replaceAll("$1[^/]+$2") + "$";
         }
 
@@ -91,15 +89,66 @@ public class BuiltInFunctions {
     public static boolean keyMatch3(String key1, String key2) {
         key2 = key2.replace("/*", "/.*");
 
-        while (true) {
-            if (!key2.contains("/{")) {
-                break;
-            }
-
+        while (key2.contains("/{")) {
             key2 = keyMatch3Pattern.matcher(key2).replaceAll("$1[^/]+$2");
         }
 
         return regexMatch(key1, key2);
+    }
+
+    /**
+     * KeyMatch4 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
+     * Besides what KeyMatch3 does, KeyMatch4 can also match repeated patterns:
+     * "/parent/123/child/123" matches "/parent/{id}/child/{id}"
+     * "/parent/123/child/456" does not match "/parent/{id}/child/{id}"
+     * But KeyMatch3 will match both.
+     *
+     * Attention: key1 cannot contain English commas.
+     */
+    public static boolean keyMatch4(String key1, String key2) {
+        String regEx="\\{[^/]+}";
+        Pattern p =Pattern.compile(regEx);
+        Matcher m = p.matcher(key2);
+
+        String[] tmp = p.split(key2);
+        List<String> tokens = new ArrayList<>();
+        if(tmp.length > 0) {
+            int count = 0;
+            while(count < tmp.length) {
+                tokens.add(tmp[count]);
+                if(m.find()) {
+                    tokens.add(m.group());
+                }
+                count++;
+            }
+        }
+        int off = 0;
+        for (String token : tokens) {
+            if (!p.matcher(token).matches()) {
+                while (off < key1.length() && key1.charAt(off) != token.charAt(0)) {
+                    off++;
+                }
+                if (key1.length() - (off + 1) < token.length()) return false;
+                if (!key1.substring(off, off + token.length()).equals(token)) return false;
+                key1 = key1.replaceFirst(token, ",");
+            }
+        }
+        String[] values = key1.split(",");
+        int i = 0;
+        Map<String, String> params = new HashMap<>();
+        for (String token : tokens) {
+            if (p.matcher(token).matches()) {
+                while (i < values.length && values[i].equals("")) i++;
+                if (i == values.length) return false;
+                if (params.containsKey(token)) {
+                    if (!values[i].equals(params.get(token))) return false;
+                } else {
+                    params.put(token, values[i]);
+                }
+                i++;
+            }
+        }
+        return true;
     }
 
     /**

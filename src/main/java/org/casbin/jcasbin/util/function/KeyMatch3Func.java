@@ -23,7 +23,7 @@ import org.casbin.jcasbin.util.BuiltInFunctions;
 import java.util.Map;
 
 /**
- * KeyMatch3Func is the wrapper for keyMatch2.
+ * KeyMatch3Func is the wrapper for keyMatch3.
  */
 public class KeyMatch3Func extends AbstractFunction {
     public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {

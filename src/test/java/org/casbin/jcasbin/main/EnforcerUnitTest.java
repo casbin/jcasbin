@@ -411,6 +411,24 @@ public class EnforcerUnitTest {
     }
 
     @Test
+    public void testKeyMatch4Func() {
+        Enforcer e = new Enforcer("examples/keymatch4_model.conf", "examples/keymatch4_policy.csv");
+
+        testEnforce(e, "alice", "/alice_data/resource/1/child/1", "GET", true);
+        testEnforce(e, "alice", "/alice_data/resource/1/child/2", "GET", false);
+
+        testEnforce(e, "alice", "/alice_data2/1/using/2", "GET", true);
+        testEnforce(e, "alice", "/alice_data2/1/using/1", "GET", true);
+        testEnforce(e, "alice", "/alice_data3/1/using/2", "GET", false);
+
+        testEnforce(e, "alice", "/alice_data/resource/1/child/1/child2/1", "GET", true);
+        testEnforce(e, "alice", "/alice_data/resource/1/child2/1/child/1/child2/1", "GET", false);
+
+        testEnforce(e, "alice", "/alice_data/resource/1/child1", "GET", true);
+        testEnforce(e, "alice", "/alice_data/resource/1/child2", "GET", false);
+    }
+
+    @Test
     public void testInitEmptyByInputStream() {
         Enforcer e = new Enforcer();
 

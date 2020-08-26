@@ -1,0 +1,4 @@
+p, alice, /alice_data/resource/{id}/child/{id}, GET
+p, alice, /alice_data/resource/{id}/child{id}, GET
+p, alice, /alice_data/resource/{id}/child/{id}/child2/{id}, GET
+p, alice, /alice_data2/{id}/using/{resId}, GET

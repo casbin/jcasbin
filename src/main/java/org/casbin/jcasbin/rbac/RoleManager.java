@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 package org.casbin.jcasbin.rbac;
 
 import java.util.List;
@@ -24,8 +23,8 @@ public interface RoleManager {
     void clear();
 
     /**
-     * addLink adds the inheritance link between two roles. role: name1 and role: name2.
-     * domain is a prefix to the roles.
+     * addLink adds the inheritance link between two roles. role: name1 and role: name2. domain is a
+     * prefix to the roles.
      *
      * @param name1 the first role (or user).
      * @param name2 the second role.
@@ -55,8 +54,7 @@ public interface RoleManager {
     boolean hasLink(String name1, String name2, String... domain);
 
     /**
-     * getRoles gets the roles that a user inherits.
-     * domain is a prefix to the roles.
+     * getRoles gets the roles that a user inherits. domain is a prefix to the roles.
      *
      * @param name the user (or a role).
      * @param domain the domain the roles belong to.
@@ -66,10 +64,12 @@ public interface RoleManager {
 
     /**
      * getUsers gets the users that inherits a role.
+     * 
      * @param name the role.
+     * @param domain is a prefix to the users (can be used for other purposes).
      * @return the users.
      */
-    List<String> getUsers(String name);
+    List<String> getUsers(String name, String... domain);
 
     /**
      * printRoles prints all the roles to log.

@@ -14,14 +14,14 @@
 
 package org.casbin.jcasbin.main;
 
-import org.casbin.jcasbin.rbac.RoleManager;
-import org.junit.Test;
-
-import java.util.List;
-
 import static org.casbin.jcasbin.main.TestUtil.testDomainEnforce;
 import static org.casbin.jcasbin.main.TestUtil.testEnforce;
 import static org.casbin.jcasbin.main.TestUtil.testEnforceWithoutUsers;
+
+import java.util.List;
+
+import org.casbin.jcasbin.rbac.RoleManager;
+import org.junit.Test;
 
 public class ModelUnitTest {
     @Test
@@ -221,8 +221,10 @@ public class ModelUnitTest {
     public void testRBACModelWithCustomData() {
         Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
 
-        // You can add custom data to a grouping policy, Casbin will ignore it. It is only meaningful to the caller.
-        // This feature can be used to store information like whether "bob" is an end user (so no subject will inherit "bob")
+        // You can add custom data to a grouping policy, Casbin will ignore it. It is only
+        // meaningful to the caller.
+        // This feature can be used to store information like whether "bob" is an end user (so no
+        // subject will inherit "bob")
         // For Casbin, it is equivalent to: e.addGroupingPolicy("bob", "data2_admin")
         e.addGroupingPolicy("bob", "data2_admin", "custom_data");
 
@@ -251,9 +253,14 @@ public class ModelUnitTest {
     }
 
     class CustomRoleManager implements RoleManager {
-        public void clear() {}
-        public void addLink(String name1, String name2, String... domain) {}
-        public void deleteLink(String name1, String name2, String... domain) {}
+        public void clear() {
+        }
+
+        public void addLink(String name1, String name2, String... domain) {
+        }
+
+        public void deleteLink(String name1, String name2, String... domain) {
+        }
 
         public boolean hasLink(String name1, String name2, String... domain) {
             if (name1.equals("alice") && name2.equals("alice")) {
@@ -266,9 +273,16 @@ public class ModelUnitTest {
             return false;
         }
 
-        public List<String> getRoles(String name, String... domain) { return null; }
-        public List<String> getUsers(String name) { return null; }
-        public void printRoles() {}
+        public List<String> getRoles(String name, String... domain) {
+            return null;
+        }
+
+        public List<String> getUsers(String name, String... domain) {
+            return null;
+        }
+
+        public void printRoles() {
+        }
     }
 
     @Test

@@ -1,0 +1,113 @@
+// Copyright 2018 The casbin Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package org.casbin.jcasbin.main;
+
+import static java.util.Arrays.asList;
+import static org.casbin.jcasbin.main.TestUtil.testDomainEnforce;
+import static org.casbin.jcasbin.main.TestUtil.testEnforce;
+import static org.casbin.jcasbin.main.TestUtil.testGetImplicitPermissionsInDomain;
+import static org.casbin.jcasbin.main.TestUtil.testGetRolesInDomain;
+
+import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
+import org.casbin.jcasbin.rbac.DefaultRoleManager;
+import org.casbin.jcasbin.util.BuiltInFunctions;
+import org.junit.Test;
+
+public class RbacAPIWithPatternMatchUnitTest {
+
+    @Test
+    public void testEnforceAPIWithKeyMatch3Pattern() {
+        final Enforcer e = new Enforcer("examples/rbac_with_pattern_model.conf");
+        e.setAdapter(new FileAdapter("examples/rbac_with_pattern_policy.csv"));
+        e.setRoleManager(new DefaultRoleManager(10, BuiltInFunctions::keyMatch3, null));
+        e.loadPolicy();
+
+        testEnforce(e, "alice", "/book/1", "GET", true);
+        testEnforce(e, "alice", "/book/2", "GET", true);
+        testEnforce(e, "alice", "/pen/1", "GET", true);
+        testEnforce(e, "alice", "/pen/2", "GET", false);
+        testEnforce(e, "bob", "/book/1", "GET", false);
+        testEnforce(e, "bob", "/book/2", "GET", false);
+        testEnforce(e, "bob", "/pen/1", "GET", false);
+        testEnforce(e, "bob", "/pen/2", "GET", false);
+
+        testEnforce(e, "alice", "/book2/1", "GET", true);
+        testEnforce(e, "alice", "/book2/2", "GET", true);
+        testEnforce(e, "alice", "/pen2/1", "GET", true);
+        testEnforce(e, "alice", "/pen2/2", "GET", false);
+        testEnforce(e, "bob", "/book2/1", "GET", false);
+        testEnforce(e, "bob", "/book2/2", "GET", false);
+        testEnforce(e, "bob", "/pen2/1", "GET", true);
+        testEnforce(e, "bob", "/pen2/2", "GET", true);
+    }
+
+    @Test
+    public void testEnforceAPIWithDomainMatch() {
+        final Enforcer e = new Enforcer("examples/rbac_with_domain_pattern_model.conf");
+        e.setAdapter(new FileAdapter("examples/rbac_with_domain_pattern_policy.csv"));
+        e.setRoleManager(new DefaultRoleManager(10, null, BuiltInFunctions::allMatch));
+        e.loadPolicy();
+
+        testDomainEnforce(e, "alice", "domain1", "data1", "read", true);
+        testDomainEnforce(e, "alice", "domain1", "data1", "write", true);
+
+        testDomainEnforce(e, "alice", "domain1", "data2", "read", false);
+        testDomainEnforce(e, "alice", "domain1", "data2", "write", false);
+        testDomainEnforce(e, "alice", "domain2", "data2", "read", true);
+        testDomainEnforce(e, "alice", "domain2", "data2", "write", true);
+        testDomainEnforce(e, "bob", "domain2", "data1", "read", false);
+        testDomainEnforce(e, "bob", "domain2", "data1", "write", false);
+        testDomainEnforce(e, "bob", "domain2", "data2", "read", true);
+        testDomainEnforce(e, "bob", "domain2", "data2", "write", true);
+    }
+
+    @Test
+    public void testRoleAPIWithDomainMatch() {
+        final Enforcer e = new Enforcer("examples/rbac_with_domain_pattern_model.conf");
+        e.setAdapter(new FileAdapter("examples/rbac_with_domain_pattern_policy.csv"));
+        e.setRoleManager(new DefaultRoleManager(10, null, BuiltInFunctions::allMatch));
+        e.loadPolicy();
+
+        testGetRolesInDomain(e, "alice", "domain1", asList("admin"));
+        testGetRolesInDomain(e, "alice", "domain2", asList("admin"));
+
+        testGetRolesInDomain(e, "bob", "domain1", asList());
+        testGetRolesInDomain(e, "bob", "domain2", asList("admin"));
+    }
+
+    @Test
+    public void testImplicitPermissionAPIWithDomainMatch() {
+        final Enforcer e = new Enforcer("examples/rbac_with_domain_pattern_model.conf");
+        e.setAdapter(new FileAdapter("examples/rbac_with_domain_pattern_policy.csv"));
+        e.setRoleManager(new DefaultRoleManager(10, null, BuiltInFunctions::allMatch));
+        e.loadPolicy();
+
+        testGetImplicitPermissionsInDomain(e, "alice", "domain1",
+                asList(asList("admin", "domain1", "data1", "read"), asList("admin", "domain1", "data1", "write")));
+    }
+
+    @Test
+    public void testEnforceAPIWithAllMatchPatterns() {
+        final Enforcer e = new Enforcer("examples/rbac_with_all_pattern_model.conf");
+        e.setAdapter(new FileAdapter("examples/rbac_with_all_pattern_policy.csv"));
+        e.setRoleManager(new DefaultRoleManager(10, BuiltInFunctions::keyMatch2, BuiltInFunctions::allMatch));
+        e.loadPolicy();
+
+        testDomainEnforce(e, "alice", "domain1", "/book/1", "read", true);
+        testDomainEnforce(e, "alice", "domain1", "/book/1", "write", false);
+        testDomainEnforce(e, "alice", "domain2", "/book/1", "read", false);
+        testDomainEnforce(e, "alice", "domain2", "/book/1", "write", true);
+    }
+}

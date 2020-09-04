@@ -45,18 +45,18 @@ public class DefaultRoleManager implements RoleManager {
     /**
      * In order to use a specific role name matching function, set explicitly the role manager on
      * the Enforcer and rebuild role links (you can optimize by using minimal enforcer constructor).
-     * 
+     *
      * <pre>
      * final Enforcer e = new Enforcer("model.conf");
      * e.setAdapter(new FileAdapter("policies.csv"));
      * e.setRoleManager(new DefaultRoleManager(10, BuiltInFunctions::domainMatch));
      * e.loadPolicy();
      * </pre>
-     * 
-     * 
+     *
+     *
      * @param maxHierarchyLevel the maximized allowed RBAC hierarchy level.
      * @param matchingFunc a matcher for supporting pattern in g
-     * @param domainMatchingPredicate a matcher for supporting domain pattern in g
+     * @param domainMatchingFunc a matcher for supporting domain pattern in g
      */
     public DefaultRoleManager(int maxHierarchyLevel, final BiPredicate<String, String> matchingFunc,
             final BiPredicate<String, String> domainMatchingFunc) {
@@ -74,7 +74,7 @@ public class DefaultRoleManager implements RoleManager {
     /**
      * Build temporary roles when a domain matching function is defined, else the domain or default
      * roles.
-     * 
+     *
      * @param domain eventual domain
      * @return matched domain roles or domain roles
      */

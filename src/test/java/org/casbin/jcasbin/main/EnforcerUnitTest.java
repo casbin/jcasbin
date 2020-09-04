@@ -22,6 +22,7 @@ import org.junit.Test;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
@@ -491,5 +492,17 @@ public class EnforcerUnitTest {
             // the owner of a resource has any permission to the resource it owns.
             Util.logPrint(action);
         }
+    }
+
+    @Test
+    public void testGetPolicyWithModelEmpty() {
+        Enforcer enforcer = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv");
+        List<List<String>> result = null;
+        try {
+            result = enforcer.getPolicy();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+        assert result != null;
     }
 }

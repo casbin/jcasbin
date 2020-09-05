@@ -496,7 +496,7 @@ public class EnforcerUnitTest {
 
     @Test
     public void testGetPolicyWithModelEmpty() {
-        Enforcer enforcer = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv");
+        Enforcer enforcer = new Enforcer("examples/basic_model.conf", "examples/empty_policy.csv");
         List<List<String>> result = null;
         try {
             result = enforcer.getPolicy();

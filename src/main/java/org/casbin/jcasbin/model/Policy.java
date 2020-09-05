@@ -115,7 +115,13 @@ public class Policy {
      * @return the policy rules of section sec and policy type ptype.
      */
     public List<List<String>> getPolicy(String sec, String ptype) {
-        List<List<String>> ret = model.get(sec).get(ptype).policy;
+        List<List<String>> ret;
+        try {
+            ret = model.get(sec).get(ptype).policy;
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
         return ret == null ? new ArrayList<>() : ret;
     }
 

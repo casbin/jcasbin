@@ -1,0 +1,5 @@
+p, alice, domain1, data1, read, allow
+p, bob, domain1, data2, write, allow
+p, data2_admin, domain1, data2, read, allow
+p, data2_admin, domain1, data2, write, allow
+p, alice, domain1, data2, write, deny

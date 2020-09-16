@@ -126,6 +126,22 @@ public class Config {
                 }
                 String option = optionVal[0].trim();
                 String value = optionVal[1].trim();
+                if (value.endsWith("\\")) {
+                    value = value.substring(0, value.length() - 1);
+                    while ((line = buf.readLine()) != null && line.endsWith("\\")) {
+                        lineNum++;
+                        line = line.trim();
+                        value = value.concat(line.substring(0, line.length() - 1));
+                    }
+                    if (line != null) {
+                        lineNum++;
+                        if (line.endsWith("\\")) {
+                            line = line.substring(0, line.length() - 1);
+                        }
+                        line = line.trim();
+                        value = value.concat(line);
+                    }
+                }
                 addConfig(section, option, value);
             }
         }

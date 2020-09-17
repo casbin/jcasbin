@@ -26,6 +26,7 @@ import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static org.casbin.jcasbin.main.CoreEnforcer.newModel;
+import static org.casbin.jcasbin.main.TestUtil.testDomainEnforce;
 import static org.casbin.jcasbin.main.TestUtil.testEnforce;
 import static org.casbin.jcasbin.main.TestUtil.testGetPolicy;
 import static org.junit.Assert.assertFalse;
@@ -491,5 +492,12 @@ public class EnforcerUnitTest {
             // the owner of a resource has any permission to the resource it owns.
             Util.logPrint(action);
         }
+    }
+
+    @Test
+    public void testMultilineModel() {
+        Enforcer enforcer = new Enforcer("examples/multiline_model.conf", "examples/multiline_policy.csv");
+        testDomainEnforce(enforcer, "alice", "domain1", "data1", "read", true);
+        testDomainEnforce(enforcer, "alice", "domain1", "data2", "write", false);
     }
 }

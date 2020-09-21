@@ -180,10 +180,10 @@ public class SyncedEnforcer extends Enforcer {
      */
     public boolean enforce(Object... rvals) {
         try {
-            READ_WRITE_LOCK.writeLock().lock();
+            READ_WRITE_LOCK.readLock().lock();
             return super.enforce(rvals);
         } finally {
-            READ_WRITE_LOCK.writeLock().unlock();
+            READ_WRITE_LOCK.readLock().unlock();
         }
     }
 
@@ -529,7 +529,7 @@ public class SyncedEnforcer extends Enforcer {
             READ_WRITE_LOCK.writeLock().unlock();
         }
     }
-    
+
     /**
      * addPolicy adds an authorization rule to the current policy.
      * If the rule already exists, the function returns false and the rule will not be added.
@@ -903,7 +903,7 @@ public class SyncedEnforcer extends Enforcer {
     public boolean removeFilteredNamedGroupingPolicy(String ptype, int fieldIndex, String... fieldValues) {
         try {
             READ_WRITE_LOCK.writeLock().lock();
-            return super.removeFilteredNamedGroupingPolicy(ptype, fieldIndex, fieldValues); 
+            return super.removeFilteredNamedGroupingPolicy(ptype, fieldIndex, fieldValues);
         } finally {
             READ_WRITE_LOCK.writeLock().unlock();
         }

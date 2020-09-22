@@ -331,36 +331,36 @@ public class CoreEnforcer {
         if (!enabled) {
             return true;
         }
-
-        synchronized (this) {
-            if (aviatorEval == null || modelModCount != model.getModCount()) {
-                // AviatorEvaluator instance must be rebuild
-                Map<String, AviatorFunction> functions = new HashMap<>();
-                for (Map.Entry<String, AviatorFunction> entry : fm.fm.entrySet()) {
-                    String key = entry.getKey();
-                    AviatorFunction function = entry.getValue();
-
-                    functions.put(key, function);
-                }
-                if (model.model.containsKey("g")) {
-                    for (Map.Entry<String, Assertion> entry : model.model.get("g").entrySet()) {
+        if (aviatorEval == null || modelModCount != model.getModCount()) {
+            synchronized (this) {
+                if (aviatorEval == null || modelModCount != model.getModCount()) {
+                    // AviatorEvaluator instance must be rebuild
+                    Map<String, AviatorFunction> functions = new HashMap<>();
+                    for (Map.Entry<String, AviatorFunction> entry : fm.fm.entrySet()) {
                         String key = entry.getKey();
-                        Assertion ast = entry.getValue();
+                        AviatorFunction function = entry.getValue();
 
-                        RoleManager rm = ast.rm;
-                        functions.put(key, BuiltInFunctions.generateGFunction(key, rm));
+                        functions.put(key, function);
                     }
-                }
+                    if (model.model.containsKey("g")) {
+                        for (Map.Entry<String, Assertion> entry : model.model.get("g").entrySet()) {
+                            String key = entry.getKey();
+                            Assertion ast = entry.getValue();
 
-                aviatorEval = AviatorEvaluator.newInstance();
-                for (AviatorFunction f : functions.values()) {
-                    aviatorEval.addFunction(f);
-                }
+                            RoleManager rm = ast.rm;
+                            functions.put(key, BuiltInFunctions.generateGFunction(key, rm));
+                        }
+                    }
 
-                modelModCount = model.getModCount();
+                    aviatorEval = AviatorEvaluator.newInstance();
+                    for (AviatorFunction f : functions.values()) {
+                        aviatorEval.addFunction(f);
+                    }
+
+                    modelModCount = model.getModCount();
+                }
             }
         }
-
         String expString = model.model.get("m").get("m").value;
         Expression expression = aviatorEval.compile(expString, true);
 

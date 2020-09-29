@@ -52,7 +52,7 @@ public class BuiltInFunctions {
     /**
      * keyMatch determines whether key1 matches the pattern of key2 (similar to RESTful path), key2
      * can contain a *.
-     * 
+     *
      * <pre>
      * For example, "/foo/bar" matches "/foo/*"
      * </pre>
@@ -76,7 +76,7 @@ public class BuiltInFunctions {
     /**
      * keyMatch2 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2
      * can contain a *.
-     * 
+     *
      * <pre>
      * For example, "/foo/bar" matches "/foo/*", "/resource1" matches "/:resource"
      * </pre>
@@ -97,7 +97,7 @@ public class BuiltInFunctions {
     /**
      * keyMatch3 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2
      * can contain a *.
-     * 
+     *
      * <pre>
      * For example, "/foo/bar" matches "/foo/*", "/resource1" matches "/{resource}"
      * </pre>
@@ -119,7 +119,7 @@ public class BuiltInFunctions {
     /**
      * KeyMatch4 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2
      * can contain a *. Besides what KeyMatch3 does, KeyMatch4 can also match repeated patterns:
-     * 
+     *
      * <pre>
      * "/parent/123/child/123" matches "/parent/{id}/child/{id}"
      * "/parent/123/child/456" does not match "/parent/{id}/child/{id}"
@@ -127,6 +127,10 @@ public class BuiltInFunctions {
      * </pre>
      *
      * Attention: key1 cannot contain English commas.
+     *
+     * @param key1 the first argument.
+     * @param key2 the second argument.
+     * @return whether key1 matches key2.
      */
     public static boolean keyMatch4(String key1, String key2) {
         String regEx = "\\{[^/]+}";
@@ -241,11 +245,11 @@ public class BuiltInFunctions {
 
     /**
      * allMatch determines whether key1 matches the pattern of key2 , key2 can contain a *.
-     * 
+     *
      * <pre>
      * For example, "*" matches everything
      * </pre>
-     * 
+     *
      * @param key1 the first argument.
      * @param key2 the second argument.
      * @return whether key1 matches key2.
@@ -304,7 +308,7 @@ public class BuiltInFunctions {
      * eval calculates the stringified boolean expression and return its result. The syntax of
      * expressions is exactly the same as Java. Flaw: dynamically generated classes or non-static
      * inner class cannot be used.
-     * 
+     *
      * @author tldyl
      * @since 2020-07-02
      *

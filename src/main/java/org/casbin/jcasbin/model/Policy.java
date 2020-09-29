@@ -248,7 +248,7 @@ public class Policy {
      * @param fieldIndex the policy rule's start index to be matched.
      * @param fieldValues the field values to be matched, value ""
      *                    means not to match this field.
-     * @return succeeds(effects.size() > 0) or not.
+     * @return succeeds(effects.size() &gt; 0) or not.
      */
     public List<List<String>> removeFilteredPolicyReturnsEffects(String sec, String ptype, int fieldIndex, String... fieldValues) {
         List<List<String>> tmp = new ArrayList<>();

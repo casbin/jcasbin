@@ -100,6 +100,9 @@ class InternalEnforcer extends CoreEnforcer {
 
     /**
      * buildIncrementalRoleLinks provides incremental build the role inheritance relations.
+     * @param op Policy operations.
+     * @param ptype policy type.
+     * @param rules the rules.
      */
     public void buildIncrementalRoleLinks(Model.PolicyOperations op, String ptype, List<List<String>> rules) {
         model.buildIncrementalRoleLinks(rm, op, "g", ptype, rules);

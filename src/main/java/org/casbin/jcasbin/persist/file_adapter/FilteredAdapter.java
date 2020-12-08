@@ -63,7 +63,9 @@ public class FilteredAdapter implements Adapter {
             List<String> lines = IOUtils.readLines(fis, Charset.forName("UTF-8"));
             for (String line : lines) {
                 line = line.trim();
-                if (filterLine(line, filter)) continue;
+                if (filterLine(line, filter)) {
+                    continue;
+                }
                 handler.accept(line, model);
             }
         } catch (IOException e) {
@@ -75,9 +77,13 @@ public class FilteredAdapter implements Adapter {
      * match the line.
      */
     private boolean filterLine(String line, Filter filter) {
-        if (filter == null) return false;
+        if (filter == null) {
+            return false;
+        }
         String[] p = line.split(",");
-        if (p.length == 0) return true;
+        if (p.length == 0) {
+            return true;
+        }
         String[] filterSlice = null;
         switch (p[0].trim()) {
             case "p":
@@ -87,7 +93,9 @@ public class FilteredAdapter implements Adapter {
                 filterSlice = filter.g;
                 break;
         }
-        if (filterSlice == null) filterSlice = new String[]{};
+        if (filterSlice == null) {
+            filterSlice = new String[]{};
+        }
         return filterWords(p, filterSlice);
     }
 
@@ -95,7 +103,9 @@ public class FilteredAdapter implements Adapter {
      * match the words in the specific line.
      */
     private boolean filterWords(String[] line, String[] filter) {
-        if (line.length < filter.length + 1) return true;
+        if (line.length < filter.length + 1) {
+            return true;
+        }
         boolean skipLine = false;
         int i = 0;
         for (String s : filter) {

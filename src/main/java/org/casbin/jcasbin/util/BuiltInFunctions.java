@@ -298,6 +298,7 @@ public class BuiltInFunctions {
                 }
             }
 
+            @Override
             public String getName() {
                 return name;
             }

@@ -33,6 +33,7 @@ public class RegexMatchFunc extends AbstractFunction {
         return AviatorBoolean.valueOf(BuiltInFunctions.regexMatch(key1, key2));
     }
 
+    @Override
     public String getName() {
         return "regexMatch";
     }

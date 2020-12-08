@@ -101,6 +101,7 @@ public class SyncedEnforcer extends Enforcer {
      *
      * @param watcher the watcher.
      */
+    @Override
     public void setWatcher(Watcher watcher) {
         this.watcher = watcher;
         watcher.setUpdateCallback(this::loadPolicy);
@@ -109,6 +110,7 @@ public class SyncedEnforcer extends Enforcer {
     /**
      * clearPolicy clears all policy.
      */
+    @Override
     public void clearPolicy() {
         try {
             READ_WRITE_LOCK.writeLock().lock();
@@ -121,6 +123,7 @@ public class SyncedEnforcer extends Enforcer {
     /**
      * loadPolicy reloads the policy from file/database.
      */
+    @Override
     public void loadPolicy() {
         try {
             READ_WRITE_LOCK.writeLock().lock();
@@ -135,6 +138,7 @@ public class SyncedEnforcer extends Enforcer {
      *
      * @param filter the filter used to specify which type of policy should be loaded.
      */
+    @Override
     public void loadFilteredPolicy(Object filter) {
         try {
             READ_WRITE_LOCK.writeLock().lock();
@@ -148,6 +152,7 @@ public class SyncedEnforcer extends Enforcer {
      * savePolicy saves the current policy (usually after changed with
      * Casbin API) back to file/database.
      */
+    @Override
     public void savePolicy() {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -161,6 +166,7 @@ public class SyncedEnforcer extends Enforcer {
      * buildRoleLinks manually rebuild the
      * role inheritance relations.
      */
+    @Override
     public void buildRoleLinks() {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -178,6 +184,7 @@ public class SyncedEnforcer extends Enforcer {
      *              of strings, can be class instances if ABAC is used.
      * @return whether to allow the request.
      */
+    @Override
     public boolean enforce(Object... rvals) {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -194,6 +201,7 @@ public class SyncedEnforcer extends Enforcer {
      *         0-index elements of "p" policy rules. So make sure your subject
      *         is the 0-index element, like (sub, obj, act). Duplicates are removed.
      */
+    @Override
     public List<String> getAllSubjects() {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -211,6 +219,7 @@ public class SyncedEnforcer extends Enforcer {
      *         is the 1-index element, like (sub, obj, act).
      *         Duplicates are removed.
      */
+    @Override
     public List<String> getAllObjects() {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -229,6 +238,7 @@ public class SyncedEnforcer extends Enforcer {
      *         your object is the 1-index element, like (sub, obj, act).
      *         Duplicates are removed.
      */
+    @Override
     public List<String> getAllNamedObjects(String ptype) {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -246,6 +256,7 @@ public class SyncedEnforcer extends Enforcer {
      *         is the 2-index element, like (sub, obj, act).
      *         Duplicates are removed.
      */
+    @Override
     public List<String> getAllActions() {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -264,6 +275,7 @@ public class SyncedEnforcer extends Enforcer {
      *         your action is the 2-index element, like (sub, obj, act).
      *         Duplicates are removed.
      */
+    @Override
     public List<String> getAllNamedActions(String ptype) {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -281,6 +293,7 @@ public class SyncedEnforcer extends Enforcer {
      *         role is the 1-index element, like (sub, role).
      *         Duplicates are removed.
      */
+    @Override
     public List<String> getAllRoles() {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -299,6 +312,7 @@ public class SyncedEnforcer extends Enforcer {
      *         sure your subject is the 0-index element, like (sub, obj, act).
      *         Duplicates are removed.
      */
+    @Override
     public List<String> getAllNamedRoles(String ptype) {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -313,6 +327,7 @@ public class SyncedEnforcer extends Enforcer {
      *
      * @return all the "p" policy rules.
      */
+    @Override
     public List<List<String>> getPolicy() {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -330,6 +345,7 @@ public class SyncedEnforcer extends Enforcer {
      *                    means not to match this field.
      * @return the filtered "p" policy rules.
      */
+    @Override
     public List<List<String>> getFilteredPolicy(int fieldIndex, String... fieldValues) {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -345,6 +361,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param ptype the policy type, can be "p", "p2", "p3", ..
      * @return the "p" policy rules of the specified ptype.
      */
+    @Override
     public List<List<String>> getNamedPolicy(String ptype) {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -363,6 +380,7 @@ public class SyncedEnforcer extends Enforcer {
      *                    means not to match this field.
      * @return the filtered "p" policy rules of the specified ptype.
      */
+    @Override
     public List<List<String>> getFilteredNamedPolicy(String ptype, int fieldIndex, String... fieldValues) {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -377,6 +395,7 @@ public class SyncedEnforcer extends Enforcer {
      *
      * @return all the "g" policy rules.
      */
+    @Override
     public List<List<String>> getGroupingPolicy() {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -410,6 +429,7 @@ public class SyncedEnforcer extends Enforcer {
                           means not to match this field.
      * @return the filtered "g" policy rules.
      */
+    @Override
     public List<List<String>> getFilteredGroupingPolicy(int fieldIndex, String... fieldValues) {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -425,6 +445,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param ptype the policy type, can be "g", "g2", "g3", ..
      * @return the "g" policy rules of the specified ptype.
      */
+    @Override
     public List<List<String>> getNamedGroupingPolicy(String ptype) {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -443,6 +464,7 @@ public class SyncedEnforcer extends Enforcer {
      *                    means not to match this field.
      * @return the filtered "g" policy rules of the specified ptype.
      */
+    @Override
     public List<List<String>> getFilteredNamedGroupingPolicy(String ptype, int fieldIndex, String... fieldValues) {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -458,6 +480,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "p" policy rule, ptype "p" is implicitly used.
      * @return whether the rule exists.
      */
+    @Override
     public boolean hasPolicy(List<String> params) {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -473,6 +496,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "p" policy rule, ptype "p" is implicitly used.
      * @return whether the rule exists.
      */
+    @Override
     public boolean hasPolicy(String... params) {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -489,6 +513,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "p" policy rule.
      * @return whether the rule exists.
      */
+    @Override
     public boolean hasNamedPolicy(String ptype, List<String> params) {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -504,6 +529,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "p" policy rule.
      * @return whether the rule exists.
      */
+    @Override
     public boolean hasNamedPolicy(String ptype, String... params) {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -521,7 +547,9 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "p" policy rule, ptype "p" is implicitly used.
      * @return succeeds or not.
      */
+    @Override
     public boolean addPolicy(List<String> params) {
+
         try {
             READ_WRITE_LOCK.writeLock().lock();
             return super.addPolicy(params);
@@ -538,6 +566,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "p" policy rule, ptype "p" is implicitly used.
      * @return succeeds or not.
      */
+    @Override
     public boolean addPolicy(String... params) {
         try {
             READ_WRITE_LOCK.writeLock().lock();
@@ -556,6 +585,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "p" policy rule.
      * @return succeeds or not.
      */
+    @Override
     public boolean addNamedPolicy(String ptype, List<String> params) {
         try {
             READ_WRITE_LOCK.writeLock().lock();
@@ -574,6 +604,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "p" policy rule.
      * @return succeeds or not.
      */
+    @Override
     public boolean addNamedPolicy(String ptype, String... params) {
         try {
             READ_WRITE_LOCK.writeLock().lock();
@@ -589,6 +620,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "p" policy rule, ptype "p" is implicitly used.
      * @return succeeds or not.
      */
+    @Override
     public boolean removePolicy(List<String> params) {
         try {
             READ_WRITE_LOCK.writeLock().lock();
@@ -604,6 +636,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "p" policy rule, ptype "p" is implicitly used.
      * @return succeeds or not.
      */
+    @Override
     public boolean removePolicy(String... params) {
         try {
             READ_WRITE_LOCK.writeLock().lock();
@@ -621,6 +654,7 @@ public class SyncedEnforcer extends Enforcer {
      *                    means not to match this field.
      * @return succeeds or not.
      */
+    @Override
     public boolean removeFilteredPolicy(int fieldIndex, String... fieldValues) {
         try {
             READ_WRITE_LOCK.writeLock().lock();
@@ -637,6 +671,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "p" policy rule.
      * @return succeeds or not.
      */
+    @Override
     public boolean removeNamedPolicy(String ptype, List<String> params) {
         try {
             READ_WRITE_LOCK.writeLock().lock();
@@ -653,6 +688,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "p" policy rule.
      * @return succeeds or not.
      */
+    @Override
     public boolean removeNamedPolicy(String ptype, String... params) {
         try {
             READ_WRITE_LOCK.writeLock().lock();
@@ -671,6 +707,7 @@ public class SyncedEnforcer extends Enforcer {
      *                    means not to match this field.
      * @return succeeds or not.
      */
+    @Override
     public boolean removeFilteredNamedPolicy(String ptype, int fieldIndex, String... fieldValues) {
         try {
             READ_WRITE_LOCK.writeLock().lock();
@@ -686,6 +723,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "g" policy rule, ptype "g" is implicitly used.
      * @return whether the rule exists.
      */
+    @Override
     public boolean hasGroupingPolicy(List<String> params) {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -701,6 +739,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "g" policy rule, ptype "g" is implicitly used.
      * @return whether the rule exists.
      */
+    @Override
     public boolean hasGroupingPolicy(String... params) {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -717,6 +756,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "g" policy rule.
      * @return whether the rule exists.
      */
+    @Override
     public boolean hasNamedGroupingPolicy(String ptype, List<String> params) {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -733,6 +773,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "g" policy rule.
      * @return whether the rule exists.
      */
+    @Override
     public boolean hasNamedGroupingPolicy(String ptype, String... params) {
         try {
             READ_WRITE_LOCK.readLock().lock();
@@ -750,6 +791,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "g" policy rule, ptype "g" is implicitly used.
      * @return succeeds or not.
      */
+    @Override
     public boolean addGroupingPolicy(List<String> params) {
         try {
             READ_WRITE_LOCK.writeLock().lock();
@@ -767,6 +809,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "g" policy rule, ptype "g" is implicitly used.
      * @return succeeds or not.
      */
+    @Override
     public boolean addGroupingPolicy(String... params) {
         try {
             READ_WRITE_LOCK.writeLock().lock();
@@ -785,6 +828,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "g" policy rule.
      * @return succeeds or not.
      */
+    @Override
     public boolean addNamedGroupingPolicy(String ptype, List<String> params) {
         try {
             READ_WRITE_LOCK.writeLock().lock();
@@ -803,6 +847,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "g" policy rule.
      * @return succeeds or not.
      */
+    @Override
     public boolean addNamedGroupingPolicy(String ptype, String... params) {
         try {
             READ_WRITE_LOCK.writeLock().lock();
@@ -818,6 +863,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "g" policy rule, ptype "g" is implicitly used.
      * @return succeeds or not.
      */
+    @Override
     public boolean removeGroupingPolicy(List<String> params) {
         try {
             READ_WRITE_LOCK.writeLock().lock();
@@ -833,6 +879,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "g" policy rule, ptype "g" is implicitly used.
      * @return succeeds or not.
      */
+    @Override
     public boolean removeGroupingPolicy(String... params) {
         try {
             READ_WRITE_LOCK.writeLock().lock();
@@ -850,6 +897,7 @@ public class SyncedEnforcer extends Enforcer {
      *                    means not to match this field.
      * @return succeeds or not.
      */
+    @Override
     public boolean removeFilteredGroupingPolicy(int fieldIndex, String... fieldValues) {
         try {
             READ_WRITE_LOCK.writeLock().lock();
@@ -866,6 +914,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "g" policy rule.
      * @return succeeds or not.
      */
+    @Override
     public boolean removeNamedGroupingPolicy(String ptype, List<String> params) {
         try {
             READ_WRITE_LOCK.writeLock().lock();
@@ -882,6 +931,7 @@ public class SyncedEnforcer extends Enforcer {
      * @param params the "g" policy rule.
      * @return succeeds or not.
      */
+    @Override
     public boolean removeNamedGroupingPolicy(String ptype, String... params) {
         try {
             READ_WRITE_LOCK.writeLock().lock();
@@ -900,6 +950,7 @@ public class SyncedEnforcer extends Enforcer {
      *                    means not to match this field.
      * @return succeeds or not.
      */
+    @Override
     public boolean removeFilteredNamedGroupingPolicy(String ptype, int fieldIndex, String... fieldValues) {
         try {
             READ_WRITE_LOCK.writeLock().lock();

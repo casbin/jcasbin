@@ -253,15 +253,19 @@ public class ModelUnitTest {
     }
 
     class CustomRoleManager implements RoleManager {
+        @Override
         public void clear() {
         }
 
+        @Override
         public void addLink(String name1, String name2, String... domain) {
         }
 
+        @Override
         public void deleteLink(String name1, String name2, String... domain) {
         }
 
+        @Override
         public boolean hasLink(String name1, String name2, String... domain) {
             if (name1.equals("alice") && name2.equals("alice")) {
                 return true;
@@ -273,14 +277,17 @@ public class ModelUnitTest {
             return false;
         }
 
+        @Override
         public List<String> getRoles(String name, String... domain) {
             return null;
         }
 
+        @Override
         public List<String> getUsers(String name, String... domain) {
             return null;
         }
 
+        @Override
         public void printRoles() {
         }
     }

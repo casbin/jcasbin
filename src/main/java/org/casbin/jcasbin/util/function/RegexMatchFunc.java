@@ -26,6 +26,7 @@ import java.util.Map;
  * RegexMatchFunc is the wrapper for regexMatch.
  */
 public class RegexMatchFunc extends AbstractFunction {
+    @Override
     public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
         String key1 = FunctionUtils.getStringValue(arg1, env);
         String key2 = FunctionUtils.getStringValue(arg2, env);

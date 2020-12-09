@@ -19,6 +19,7 @@ import org.casbin.jcasbin.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Assertion represents an expression in a section of the model.
@@ -29,6 +30,7 @@ public class Assertion {
     public String value;
     public String[] tokens;
     public List<List<String>> policy;
+    public Map<String, Integer> policyMap;
     public RoleManager rm;
 
     public Assertion() {

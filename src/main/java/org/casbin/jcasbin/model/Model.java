@@ -65,7 +65,7 @@ public class Model extends Policy {
         Assertion ast = new Assertion();
         ast.key = key;
         ast.value = value;
-
+        ast.policyMap = new HashMap<>();
         if (ast.value.equals("")) {
             return false;
         }

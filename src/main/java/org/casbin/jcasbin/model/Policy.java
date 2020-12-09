@@ -14,10 +14,13 @@
 
 package org.casbin.jcasbin.model;
 
+import com.sun.deploy.util.StringUtils;
 import org.casbin.jcasbin.rbac.RoleManager;
+import org.casbin.jcasbin.util.StringPool;
 import org.casbin.jcasbin.util.Util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -97,12 +100,14 @@ public class Policy {
         if (model.containsKey("p")) {
             for (Assertion ast : model.get("p").values()) {
                 ast.policy = new ArrayList<>();
+                ast.policyMap = new HashMap<>();
             }
         }
 
         if (model.containsKey("g")) {
             for (Assertion ast : model.get("g").values()) {
                 ast.policy = new ArrayList<>();
+                ast.policyMap = new HashMap<>();
             }
         }
     }
@@ -158,13 +163,7 @@ public class Policy {
      * @return whether the rule exists.
      */
     public boolean hasPolicy(String sec, String ptype, List<String> rule) {
-        for (List<String> r : model.get(sec).get(ptype).policy) {
-            if (Util.arrayEquals(rule, r)) {
-                return true;
-            }
-        }
-
-        return false;
+        return model.get(sec).get(ptype).policyMap.containsKey(StringUtils.join(rule, StringPool.COMMA));
     }
 
     /**
@@ -178,6 +177,7 @@ public class Policy {
     public boolean addPolicy(String sec, String ptype, List<String> rule) {
         if (!hasPolicy(sec, ptype, rule)) {
             model.get(sec).get(ptype).policy.add(rule);
+            model.get(sec).get(ptype).policyMap.put(StringUtils.join(rule, StringPool.COMMA), model.get(sec).get(ptype).policy.size() - 1);
             return true;
         }
         return false;
@@ -193,9 +193,12 @@ public class Policy {
     public boolean addPolicies(String sec, String ptype, List<List<String>> rules) {
         int size = model.get(sec).get(ptype).policy.size();
         for (List<String> rule : rules) {
-            if (!hasPolicy(sec, ptype, rule)) {
-                model.get(sec).get(ptype).policy.add(rule);
+            String hashKey = StringUtils.join(rule, StringPool.COMMA);
+            if (model.get(sec).get(ptype).policyMap.containsKey(hashKey)) {
+                continue;
             }
+            model.get(sec).get(ptype).policy.add(rule);
+            model.get(sec).get(ptype).policyMap.put(hashKey, model.get(sec).get(ptype).policy.size() - 1);
         }
         return size < model.get(sec).get(ptype).policy.size();
     }
@@ -209,15 +212,40 @@ public class Policy {
      * @return succeeds or not.
      */
     public boolean removePolicy(String sec, String ptype, List<String> rule) {
-        for (int i = 0; i < model.get(sec).get(ptype).policy.size(); i ++) {
-            List<String> r = model.get(sec).get(ptype).policy.get(i);
-            if (Util.arrayEquals(rule, r)) {
-                model.get(sec).get(ptype).policy.remove(i);
-                return true;
-            }
+        String hashKey = StringUtils.join(rule, StringPool.COMMA);
+        Integer index = model.get(sec).get(ptype).policyMap.get(hashKey);
+        if (index == null) {
+            return false;
         }
 
-        return false;
+        model.get(sec).get(ptype).policy.remove(index);
+        model.get(sec).get(ptype).policyMap.remove(hashKey);
+
+        for (int i = 0; i < model.get(sec).get(ptype).policy.size(); i ++) {
+            List<String> policy = model.get(sec).get(ptype).policy.get(i);
+            model.get(sec).get(ptype).policyMap.put(StringUtils.join(policy, StringPool.COMMA), i);
+        }
+        return true;
+    }
+
+    /**
+     * UpdatePolicy updates a policy rule from the model.
+     * @param sec
+     * @param ptype
+     * @param oldRule
+     * @param newRule
+     * @return
+     */
+    public boolean updatePolicy(String sec, String ptype, List<String> oldRule, List<String> newRule) {
+        String oldPolicy = StringUtils.join(oldRule, StringPool.COMMA);
+        Integer index = model.get(sec).get(ptype).policyMap.get(oldPolicy);
+        if (index == null) {
+            return false;
+        }
+        model.get(sec).get(ptype).policy.set(index, newRule);
+        model.get(sec).get(ptype).policyMap.remove(oldPolicy);
+        model.get(sec).get(ptype).policyMap.put(StringUtils.join(newRule, StringPool.COMMA), index);
+        return true;
     }
 
     /**
@@ -229,12 +257,19 @@ public class Policy {
      */
     public boolean removePolicies(String sec, String ptype, List<List<String>> rules) {
         int size = model.get(sec).get(ptype).policy.size();
+
         for (List<String> rule : rules) {
+            String hashKey = StringUtils.join(rule, StringPool.COMMA);
+            Integer index = model.get(sec).get(ptype).policyMap.get(hashKey);
+            if (index != null) {
+                continue;
+            }
+            model.get(sec).get(ptype).policy.remove(index);
+            model.get(sec).get(ptype).policyMap.remove(hashKey);
+
             for (int i = 0; i < model.get(sec).get(ptype).policy.size(); i ++) {
-                List<String> r = model.get(sec).get(ptype).policy.get(i);
-                if (Util.arrayEquals(rule, r)) {
-                    model.get(sec).get(ptype).policy.remove(i);
-                }
+                List<String> policy = model.get(sec).get(ptype).policy.get(i);
+                model.get(sec).get(ptype).policyMap.put(StringUtils.join(policy, StringPool.COMMA), i);
             }
         }
         return size > model.get(sec).get(ptype).policy.size();
@@ -255,11 +290,16 @@ public class Policy {
         List<List<String>> effects = new ArrayList<>();
         int firstIndex = -1;
 
-        for (List<String> rule : model.get(sec).get(ptype).policy) {
+        if (fieldValues.length == 0) {
+            return effects;
+        }
+
+        for (int index = 0; index < model.get(sec).get(ptype).policy.size(); index++) {
+            List<String> rule = model.get(sec).get(ptype).policy.get(index);
             boolean matched = true;
             for (int i = 0; i < fieldValues.length; i ++) {
                 String fieldValue = fieldValues[i];
-                if (!fieldValue.equals("") && !rule.get(fieldIndex + i).equals(fieldValue)) {
+                if (!fieldValue.equals(StringPool.EMPTY) && !rule.get(fieldIndex + i).equals(fieldValue)) {
                     matched = false;
                     break;
                 }
@@ -267,8 +307,9 @@ public class Policy {
 
             if (matched) {
                 if (firstIndex == -1) {
-                    firstIndex = model.get(sec).get(ptype).policy.indexOf(rule);
+                    firstIndex = index;
                 }
+                model.get(sec).get(ptype).policyMap.remove(StringUtils.join(rule, StringPool.COMMA));
                 effects.add(rule);
             } else {
                 tmp.add(rule);
@@ -277,6 +318,10 @@ public class Policy {
 
         if (firstIndex != -1) {
             model.get(sec).get(ptype).policy = tmp;
+            for (int i = firstIndex; i < model.get(sec).get(ptype).policy.size(); i ++) {
+                List<String> policy = model.get(sec).get(ptype).policy.get(i);
+                model.get(sec).get(ptype).policyMap.put(StringUtils.join(policy, StringPool.COMMA), i);
+            }
         }
 
         return effects;

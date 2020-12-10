@@ -16,7 +16,9 @@ package org.casbin.jcasbin.main;
 
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.BatchAdapter;
+import org.casbin.jcasbin.persist.UpdatableAdapter;
 import org.casbin.jcasbin.persist.WatcherEx;
+import org.casbin.jcasbin.persist.WatcherUpdatable;
 import org.casbin.jcasbin.util.Util;
 
 import java.util.ArrayList;
@@ -30,6 +32,13 @@ class InternalEnforcer extends CoreEnforcer {
      * addPolicy adds a rule to the current policy.
      */
     boolean addPolicy(String sec, String ptype, List<String> rule) {
+        if (dispatcher != null && autoNotifyDispatcher) {
+            List<List<String>> policy = new ArrayList<>();
+            policy.add(rule);
+            dispatcher.addPolicies(sec, ptype, policy);
+            return true;
+        }
+
         if (model.hasPolicy(sec, ptype, rule)) {
             return false;
         }
@@ -68,6 +77,11 @@ class InternalEnforcer extends CoreEnforcer {
      * addPolicies adds rules to the current policy.
      */
     boolean addPolicies(String sec, String ptype, List<List<String>> rules) {
+        if (dispatcher != null && autoNotifyDispatcher) {
+            dispatcher.addPolicies(sec, ptype, rules);
+            return true;
+        }
+
         if (model.hasPolicies(sec, ptype, rules)) {
             return false;
         }
@@ -112,6 +126,13 @@ class InternalEnforcer extends CoreEnforcer {
      * removePolicy removes a rule from the current policy.
      */
     boolean removePolicy(String sec, String ptype, List<String> rule) {
+        if (dispatcher != null && autoNotifyDispatcher) {
+            List<List<String>> policy = new ArrayList<>();
+            policy.add(rule);
+            dispatcher.removePolicies(sec, ptype, policy);
+            return true;
+        }
+
         if (adapter != null && autoSave) {
             try {
                 adapter.removePolicy(sec, ptype, rule);
@@ -129,10 +150,15 @@ class InternalEnforcer extends CoreEnforcer {
             return false;
         }
 
-        if (sec.equals("g")) {
-            List<List<String>> rules = new ArrayList<>();
-            rules.add(rule);
-            buildIncrementalRoleLinks(Model.PolicyOperations.POLICY_REMOVE, ptype, rules);
+        if ("g".equals(sec)) {
+            try {
+                List<List<String>> rules = new ArrayList<>();
+                rules.add(rule);
+                buildIncrementalRoleLinks(Model.PolicyOperations.POLICY_REMOVE, ptype, rules);
+            } catch (Exception e) {
+                Util.logPrint("An exception occurred:" + e.getMessage());
+                return false;
+            }
         }
 
         if (watcher != null && autoNotifyWatcher) {
@@ -147,11 +173,87 @@ class InternalEnforcer extends CoreEnforcer {
     }
 
     /**
+     * updatePolicy updates an authorization rule from the current policy.
+     * @param sec
+     * @param ptype
+     * @param oldRule
+     * @param newRule
+     * @return
+     */
+    boolean updatePolicy(String sec, String ptype, List<String> oldRule, List<String> newRule) {
+        if (dispatcher != null && autoNotifyDispatcher) {
+            dispatcher.updatePolicy(sec, ptype, oldRule, newRule);
+            return true;
+        }
+
+        if (adapter != null && autoSave) {
+            if (adapter instanceof UpdatableAdapter) {
+                try {
+                    ((UpdatableAdapter) adapter).updatePolicy(sec, ptype, oldRule, newRule);
+                } catch (UnsupportedOperationException ignored) {
+                    Util.logPrintf("Method not implemented");
+                } catch (Exception e) {
+                    Util.logPrint("An exception occurred:" + e.getMessage());
+                    return false;
+                }
+            }
+        }
+
+        boolean ruleUpdated = model.updatePolicy(sec, ptype, oldRule, newRule);
+
+        if (!ruleUpdated) {
+            return false;
+        }
+
+        if ("g".equals(sec)) {
+            try {
+                // remove the old rule
+                List<List<String>> oldRules = new ArrayList<>();
+                oldRules.add(oldRule);
+                buildIncrementalRoleLinks(Model.PolicyOperations.POLICY_REMOVE, ptype, oldRules);
+            } catch (Exception e) {
+                Util.logPrint("An exception occurred:" + e.getMessage());
+                return false;
+            }
+
+            try {
+                // add the new rule
+                List<List<String>> newRules = new ArrayList<>();
+                newRules.add(newRule);
+                buildIncrementalRoleLinks(Model.PolicyOperations.POLICY_ADD, ptype, newRules);
+            } catch (Exception e) {
+                Util.logPrint("An exception occurred:" + e.getMessage());
+                return false;
+            }
+        }
+
+        if (watcher != null && autoNotifyWatcher) {
+            try {
+                if (watcher instanceof WatcherUpdatable) {
+                    ((WatcherUpdatable) watcher).updateForUpdatePolicy(oldRule, newRule);
+                } else {
+                    watcher.update();
+                }
+            } catch (Exception e) {
+                Util.logPrint("An exception occurred:" + e.getMessage());
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * removePolicies removes rules from the current policy.
      */
     boolean removePolicies(String sec, String ptype, List<List<String>> rules) {
-        if (model.hasPolicies(sec, ptype, rules)) {
+        if (!model.hasPolicies(sec, ptype, rules)) {
             return false;
+        }
+
+        if (dispatcher != null && autoNotifyDispatcher) {
+            dispatcher.removePolicies(sec, ptype, rules);
+            return true;
         }
 
         if (adapter != null && autoSave) {
@@ -192,6 +294,11 @@ class InternalEnforcer extends CoreEnforcer {
         if (fieldValues == null || fieldValues.length == 0) {
             Util.logPrint("Invaild fieldValues parameter");
             return false;
+        }
+
+        if (dispatcher != null && autoNotifyDispatcher) {
+            dispatcher.removeFilteredPolicy(sec, ptype, fieldIndex, fieldValues);
+            return true;
         }
 
         if (adapter != null && autoSave) {

@@ -217,10 +217,8 @@ public class Policy {
         if (index == null) {
             return false;
         }
-
-        model.get(sec).get(ptype).policy.remove(index);
+        model.get(sec).get(ptype).policy.remove(index.intValue());
         model.get(sec).get(ptype).policyMap.remove(hashKey);
-
         for (int i = 0; i < model.get(sec).get(ptype).policy.size(); i ++) {
             List<String> policy = model.get(sec).get(ptype).policy.get(i);
             model.get(sec).get(ptype).policyMap.put(StringUtils.join(policy, StringPool.COMMA), i);
@@ -261,10 +259,10 @@ public class Policy {
         for (List<String> rule : rules) {
             String hashKey = StringUtils.join(rule, StringPool.COMMA);
             Integer index = model.get(sec).get(ptype).policyMap.get(hashKey);
-            if (index != null) {
+            if (index == null) {
                 continue;
             }
-            model.get(sec).get(ptype).policy.remove(index);
+            model.get(sec).get(ptype).policy.remove(index.intValue());
             model.get(sec).get(ptype).policyMap.remove(hashKey);
 
             for (int i = 0; i < model.get(sec).get(ptype).policy.size(); i ++) {

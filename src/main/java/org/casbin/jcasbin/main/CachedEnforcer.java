@@ -16,7 +16,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class CachedEnforcer extends Enforcer {
     private final static ReadWriteLock READ_WRITE_LOCK = new ReentrantReadWriteLock();
-    private final static Map<String, Boolean> cacheMap = new HashMap();
+    private Map<String, Boolean> cacheMap;
     private boolean enableCathe = true;
 
     /**
@@ -25,6 +25,7 @@ public class CachedEnforcer extends Enforcer {
      */
     public CachedEnforcer() {
         super();
+        cacheMap = new HashMap<>();
     }
 
     /**
@@ -35,6 +36,7 @@ public class CachedEnforcer extends Enforcer {
      */
     public CachedEnforcer(String modelPath, String policyFile) {
         super(modelPath, policyFile);
+        cacheMap = new HashMap<>();
     }
 
     /**
@@ -45,6 +47,7 @@ public class CachedEnforcer extends Enforcer {
      */
     public CachedEnforcer(String modelPath, Adapter adapter) {
         super(modelPath, adapter);
+        cacheMap = new HashMap<>();
     }
 
     /**
@@ -55,6 +58,7 @@ public class CachedEnforcer extends Enforcer {
      */
     public CachedEnforcer(Model m, Adapter adapter) {
         super(m, adapter);
+        cacheMap = new HashMap<>();
     }
 
     /**
@@ -64,6 +68,7 @@ public class CachedEnforcer extends Enforcer {
      */
     public CachedEnforcer(Model m) {
         super(m);
+        cacheMap = new HashMap<>();
     }
 
     /**
@@ -73,6 +78,7 @@ public class CachedEnforcer extends Enforcer {
      */
     public CachedEnforcer(String modelPath) {
         super(modelPath);
+        cacheMap = new HashMap<>();
     }
 
     /**
@@ -84,6 +90,7 @@ public class CachedEnforcer extends Enforcer {
      */
     public CachedEnforcer(String modelPath, String policyFile, boolean enableLog) {
         super(modelPath, policyFile, enableLog);
+        cacheMap = new HashMap<>();
     }
 
     public void enableCache(boolean enableCathe) {
@@ -96,6 +103,9 @@ public class CachedEnforcer extends Enforcer {
 
     @Override
     public boolean enforce(Object... rvals) {
+        if (!enabled) {
+            return true;
+        }
         if (!isEnableCathe()) {
             return super.enforce(rvals);
         }
@@ -120,7 +130,7 @@ public class CachedEnforcer extends Enforcer {
         return res;
     }
 
-    public boolean getCachedResult(String key) {
+    public Boolean getCachedResult(String key) {
         try {
             READ_WRITE_LOCK.readLock().lock();
             return cacheMap.getOrDefault(key, null);

@@ -61,7 +61,7 @@ public class CoreEnforcer {
     // detect changes in Model so that we can invalidate AviatorEvaluatorInstance cache
     int modelModCount;
     private Effector eft;
-    private boolean enabled;
+    protected boolean enabled;
 
     /**
      * newModel creates a model.

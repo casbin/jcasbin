@@ -33,7 +33,7 @@ class DomainRoles {
 
         if (matchingFunc != null) {
             roles.entrySet().stream().filter(roleEntry -> isRoleEntryMatchExists(roleEntry, name, matchingFunc))
-                    .forEach(roleEntry -> role.addRole(roleEntry.getValue()));
+                .forEach(roleEntry -> role.addRole(roleEntry.getValue()));
         }
 
         return role;

@@ -14,13 +14,13 @@
 
 package org.casbin.jcasbin.model;
 
-import static org.casbin.jcasbin.util.Util.splitCommaDelimited;
-
 import org.casbin.jcasbin.config.Config;
 import org.casbin.jcasbin.util.Util;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.casbin.jcasbin.util.Util.splitCommaDelimited;
 
 /**
  * Model represents the whole access control model.
@@ -30,11 +30,11 @@ public class Model extends Policy {
 
     static {
         sectionNameMap = new HashMap<>();
-        sectionNameMap.put("r", "request_definition");
-        sectionNameMap.put("p", "policy_definition");
-        sectionNameMap.put("g", "role_definition");
-        sectionNameMap.put("e", "policy_effect");
-        sectionNameMap.put("m", "matchers");
+        sectionNameMap.put(Primitive.REQUEST, "request_definition");
+        sectionNameMap.put(Primitive.POLICY, "policy_definition");
+        sectionNameMap.put(Primitive.GROUP, "role_definition");
+        sectionNameMap.put(Primitive.EFFECT, "policy_effect");
+        sectionNameMap.put(Primitive.MATCHERS, "matchers");
     }
 
     // used by CoreEnforcer to detect changes to Model
@@ -56,8 +56,8 @@ public class Model extends Policy {
     /**
      * addDef adds an assertion to the model.
      *
-     * @param sec the section, "p" or "g".
-     * @param key the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param sec   the section, "p" or "g".
+     * @param key   the policy type, "p", "p2", .. or "g", "g2", ..
      * @param value the policy rule, separated by ", ".
      * @return succeeds or not.
      */
@@ -70,9 +70,9 @@ public class Model extends Policy {
             return false;
         }
 
-        if (sec.equals("r") || sec.equals("p")) {
+        if (sec.equals(Primitive.REQUEST) || sec.equals(Primitive.POLICY)) {
             ast.tokens = splitCommaDelimited(ast.value);
-            for (int i = 0; i < ast.tokens.length; i ++) {
+            for (int i = 0; i < ast.tokens.length; i++) {
                 ast.tokens[i] = key + "_" + ast.tokens[i];
             }
         } else {
@@ -102,7 +102,7 @@ public class Model extends Policy {
             if (!loadAssertion(model, cfg, sec, sec + getKeySuffix(i))) {
                 break;
             } else {
-                i ++;
+                i++;
             }
         }
     }
@@ -115,12 +115,12 @@ public class Model extends Policy {
     public void loadModel(String path) {
         Config cfg = Config.newConfig(path);
 
-        loadSection(this, cfg, "r");
-        loadSection(this, cfg, "p");
-        loadSection(this, cfg, "e");
-        loadSection(this, cfg, "m");
+        loadSection(this, cfg, Primitive.REQUEST);
+        loadSection(this, cfg, Primitive.POLICY);
+        loadSection(this, cfg, Primitive.EFFECT);
+        loadSection(this, cfg, Primitive.MATCHERS);
 
-        loadSection(this, cfg, "g");
+        loadSection(this, cfg, Primitive.GROUP);
     }
 
     /**
@@ -131,12 +131,12 @@ public class Model extends Policy {
     public void loadModelFromText(String text) {
         Config cfg = Config.newConfigFromText(text);
 
-        loadSection(this, cfg, "r");
-        loadSection(this, cfg, "p");
-        loadSection(this, cfg, "e");
-        loadSection(this, cfg, "m");
+        loadSection(this, cfg, Primitive.REQUEST);
+        loadSection(this, cfg, Primitive.POLICY);
+        loadSection(this, cfg, Primitive.EFFECT);
+        loadSection(this, cfg, Primitive.MATCHERS);
 
-        loadSection(this, cfg, "g");
+        loadSection(this, cfg, Primitive.GROUP);
     }
 
     /**
@@ -167,21 +167,21 @@ public class Model extends Policy {
     public String saveModelToText() {
         StringBuilder res = new StringBuilder();
 
-        res.append(saveSectionToText("r"));
+        res.append(saveSectionToText(Primitive.REQUEST));
         res.append("\n");
-        res.append(saveSectionToText("p"));
+        res.append(saveSectionToText(Primitive.POLICY));
         res.append("\n");
 
-        String g = saveSectionToText("g");
+        String g = saveSectionToText(Primitive.GROUP);
         g = g.replace(".", "_");
         res.append(g);
         if (!g.equals("")) {
             res.append("\n");
         }
 
-        res.append(saveSectionToText("e"));
+        res.append(saveSectionToText(Primitive.EFFECT));
         res.append("\n");
-        res.append(saveSectionToText("m"));
+        res.append(saveSectionToText(Primitive.MATCHERS));
 
         return res.toString();
     }

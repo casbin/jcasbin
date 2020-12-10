@@ -10,6 +10,7 @@ import java.util.Map;
 
 /**
  * EvalFunc is the wrapper for eval.
+ *
  * @author tldyl
  * @since 2020-07-02
  */

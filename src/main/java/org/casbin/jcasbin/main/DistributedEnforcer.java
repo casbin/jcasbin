@@ -1,6 +1,7 @@
 package org.casbin.jcasbin.main;
 
 import org.casbin.jcasbin.model.Model;
+import org.casbin.jcasbin.model.Primitive;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.BatchAdapter;
 import org.casbin.jcasbin.persist.UpdatableAdapter;
@@ -12,6 +13,7 @@ import java.util.function.BooleanSupplier;
 
 /**
  * DistributedEnforcer wraps DistributedEnforcer for dispatcher.
+ *
  * @author canxer314
  */
 public class DistributedEnforcer extends SyncedEnforcer {
@@ -86,6 +88,7 @@ public class DistributedEnforcer extends SyncedEnforcer {
     /**
      * AddPolicySelf provides a method for dispatcher to add authorization rules to the current policy.
      * The function returns the rules affected and error.
+     *
      * @param shouldPersist
      * @param sec
      * @param ptype
@@ -115,7 +118,7 @@ public class DistributedEnforcer extends SyncedEnforcer {
 
         this.model.addPolicies(sec, ptype, noExistsPolicy);
 
-        if (sec.equals("g")) {
+        if (sec.equals(Primitive.GROUP)) {
             try {
                 this.buildIncrementalRoleLinks(Model.PolicyOperations.POLICY_ADD, ptype, noExistsPolicy);
             } catch (Exception e) {
@@ -129,6 +132,7 @@ public class DistributedEnforcer extends SyncedEnforcer {
     /**
      * RemovePolicySelf provides a method for dispatcher to remove policies from current policy.
      * The function returns the rules affected and error.
+     *
      * @param shouldPersist
      * @param sec
      * @param ptype
@@ -151,7 +155,7 @@ public class DistributedEnforcer extends SyncedEnforcer {
 
         this.model.removePolicies(sec, ptype, rules);
 
-        if (sec.equals("g")) {
+        if (sec.equals(Primitive.GROUP)) {
             try {
                 this.buildIncrementalRoleLinks(Model.PolicyOperations.POLICY_REMOVE, ptype, rules);
             } catch (Exception e) {
@@ -166,6 +170,7 @@ public class DistributedEnforcer extends SyncedEnforcer {
      * RemoveFilteredPolicySelf provides a method for dispatcher to remove an authorization rule from the current policy,
      * field filters can be specified.
      * The function returns the rules affected and error.
+     *
      * @param shouldPersist
      * @param sec
      * @param ptype
@@ -187,7 +192,7 @@ public class DistributedEnforcer extends SyncedEnforcer {
 
         List<List<String>> effects = this.model.removeFilteredPolicyReturnsEffects(sec, ptype, fieldIndex, fieldValues);
 
-        if (sec.equals("g")) {
+        if (sec.equals(Primitive.GROUP)) {
             try {
                 this.buildIncrementalRoleLinks(Model.PolicyOperations.POLICY_REMOVE, ptype, effects);
             } catch (Exception e) {
@@ -200,6 +205,7 @@ public class DistributedEnforcer extends SyncedEnforcer {
 
     /**
      * ClearPolicySelf provides a method for dispatcher to clear all rules from the current policy.
+     *
      * @param shouldPersist
      */
     public void clearPolicySelf(BooleanSupplier shouldPersist) {
@@ -219,6 +225,7 @@ public class DistributedEnforcer extends SyncedEnforcer {
 
     /**
      * UpdatePolicySelf provides a method for dispatcher to update an authorization rule from the current policy.
+     *
      * @param shouldPersist
      * @param sec
      * @param ptype
@@ -244,7 +251,7 @@ public class DistributedEnforcer extends SyncedEnforcer {
             return false;
         }
         List<List<String>> rules = new ArrayList<>();
-        if (sec.equals("g")) {
+        if (sec.equals(Primitive.GROUP)) {
             try {
                 // remove the old rule
                 rules.add(oldRule);

@@ -15,6 +15,7 @@
 package org.casbin.jcasbin.main;
 
 import org.casbin.jcasbin.model.Model;
+import org.casbin.jcasbin.model.Primitive;
 import org.casbin.jcasbin.persist.BatchAdapter;
 import org.casbin.jcasbin.persist.UpdatableAdapter;
 import org.casbin.jcasbin.persist.WatcherEx;
@@ -56,7 +57,7 @@ class InternalEnforcer extends CoreEnforcer {
 
         model.addPolicy(sec, ptype, rule);
 
-        if (sec.equals("g")) {
+        if (sec.equals(Primitive.GROUP)) {
             List<List<String>> rules = new ArrayList<>();
             rules.add(rule);
             buildIncrementalRoleLinks(Model.PolicyOperations.POLICY_ADD, ptype, rules);
@@ -101,7 +102,7 @@ class InternalEnforcer extends CoreEnforcer {
 
         model.addPolicies(sec, ptype, rules);
 
-        if (sec.equals("g")) {
+        if (sec.equals(Primitive.GROUP)) {
             buildIncrementalRoleLinks(Model.PolicyOperations.POLICY_ADD, ptype, rules);
         }
 
@@ -114,12 +115,13 @@ class InternalEnforcer extends CoreEnforcer {
 
     /**
      * buildIncrementalRoleLinks provides incremental build the role inheritance relations.
-     * @param op Policy operations.
+     *
+     * @param op    Policy operations.
      * @param ptype policy type.
      * @param rules the rules.
      */
     public void buildIncrementalRoleLinks(Model.PolicyOperations op, String ptype, List<List<String>> rules) {
-        model.buildIncrementalRoleLinks(rm, op, "g", ptype, rules);
+        model.buildIncrementalRoleLinks(rm, op, Primitive.GROUP, ptype, rules);
     }
 
     /**
@@ -150,7 +152,7 @@ class InternalEnforcer extends CoreEnforcer {
             return false;
         }
 
-        if ("g".equals(sec)) {
+        if (Primitive.GROUP.equals(sec)) {
             try {
                 List<List<String>> rules = new ArrayList<>();
                 rules.add(rule);
@@ -174,6 +176,7 @@ class InternalEnforcer extends CoreEnforcer {
 
     /**
      * updatePolicy updates an authorization rule from the current policy.
+     *
      * @param sec
      * @param ptype
      * @param oldRule
@@ -205,7 +208,7 @@ class InternalEnforcer extends CoreEnforcer {
             return false;
         }
 
-        if ("g".equals(sec)) {
+        if (Primitive.GROUP.equals(sec)) {
             try {
                 // remove the old rule
                 List<List<String>> oldRules = new ArrayList<>();
@@ -275,7 +278,7 @@ class InternalEnforcer extends CoreEnforcer {
             return false;
         }
 
-        if (sec.equals("g")) {
+        if (sec.equals(Primitive.GROUP)) {
             buildIncrementalRoleLinks(Model.PolicyOperations.POLICY_REMOVE, ptype, rules);
         }
 
@@ -319,7 +322,7 @@ class InternalEnforcer extends CoreEnforcer {
             return false;
         }
 
-        if (sec.equals("g")) {
+        if (sec.equals(Primitive.GROUP)) {
             buildIncrementalRoleLinks(Model.PolicyOperations.POLICY_REMOVE, ptype, effects);
         }
 

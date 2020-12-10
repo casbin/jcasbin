@@ -30,16 +30,6 @@ public class FunctionMap {
     public Map<String, AviatorFunction> fm;
 
     /**
-     * addFunction adds an expression function.
-     *
-     * @param name the name of the new function.
-     * @param function the function.
-     */
-    public void addFunction(String name, AviatorFunction function) {
-        fm.put(name, function);
-    }
-
-    /**
      * loadFunctionMap loads an initial function map.
      *
      * @return the constructor of FunctionMap.
@@ -57,5 +47,15 @@ public class FunctionMap {
         fm.addFunction("eval", new EvalFunc());
 
         return fm;
+    }
+
+    /**
+     * addFunction adds an expression function.
+     *
+     * @param name     the name of the new function.
+     * @param function the function.
+     */
+    public void addFunction(String name, AviatorFunction function) {
+        fm.put(name, function);
     }
 }

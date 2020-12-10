@@ -40,9 +40,9 @@ public class Assertion {
     protected void buildRoleLinks(RoleManager rm) {
         this.rm = rm;
         int count = 0;
-        for (int i = 0; i < value.length(); i ++) {
+        for (int i = 0; i < value.length(); i++) {
             if (value.charAt(i) == '_') {
-                count ++;
+                count++;
             }
         }
         for (List<String> rule : policy) {
@@ -69,9 +69,9 @@ public class Assertion {
     public void buildIncrementalRoleLinks(RoleManager rm, Model.PolicyOperations op, List<List<String>> rules) {
         this.rm = rm;
         int count = 0;
-        for (int i = 0; i < value.length(); i ++) {
+        for (int i = 0; i < value.length(); i++) {
             if (value.charAt(i) == '_') {
-                count ++;
+                count++;
             }
         }
         for (List<String> rule : rules) {

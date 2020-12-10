@@ -26,11 +26,12 @@ import org.casbin.jcasbin.exception.CasbinMatcherException;
 import org.casbin.jcasbin.model.Assertion;
 import org.casbin.jcasbin.model.FunctionMap;
 import org.casbin.jcasbin.model.Model;
+import org.casbin.jcasbin.model.Primitive;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.Dispatcher;
+import org.casbin.jcasbin.persist.Watcher;
 import org.casbin.jcasbin.persist.WatcherEx;
 import org.casbin.jcasbin.persist.file_adapter.FilteredAdapter;
-import org.casbin.jcasbin.persist.Watcher;
 import org.casbin.jcasbin.rbac.DefaultRoleManager;
 import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.BuiltInFunctions;
@@ -47,34 +48,20 @@ public class CoreEnforcer {
     String modelPath;
     Model model;
     FunctionMap fm;
-    private Effector eft;
-
     Adapter adapter;
     Watcher watcher;
     Dispatcher dispatcher;
     RoleManager rm;
-
-    private boolean enabled;
     boolean autoSave;
     boolean autoBuildRoleLinks;
     boolean autoNotifyWatcher = true;
     boolean autoNotifyDispatcher = true;
-
     // cached instance of AviatorEvaluatorInstance
     AviatorEvaluatorInstance aviatorEval;
-
     // detect changes in Model so that we can invalidate AviatorEvaluatorInstance cache
     int modelModCount;
-
-    void initialize() {
-        rm = new DefaultRoleManager(10);
-        eft = new DefaultEffector();
-        watcher = null;
-        dispatcher = null;
-        enabled = true;
-        autoSave = true;
-        autoBuildRoleLinks = true;
-    }
+    private Effector eft;
+    private boolean enabled;
 
     /**
      * newModel creates a model.
@@ -105,8 +92,8 @@ public class CoreEnforcer {
      * newModel creates a model.
      *
      * @param modelPath the path of the model file.
-     * @param unused unused parameter, just for differentiating with
-     *               newModel(String text).
+     * @param unused    unused parameter, just for differentiating with
+     *                  newModel(String text).
      * @return the model.
      */
     public static Model newModel(String modelPath, String unused) {
@@ -119,6 +106,15 @@ public class CoreEnforcer {
         return m;
     }
 
+    void initialize() {
+        rm = new DefaultRoleManager(10);
+        eft = new DefaultEffector();
+        watcher = null;
+        dispatcher = null;
+        enabled = true;
+        autoSave = true;
+        autoBuildRoleLinks = true;
+    }
 
     /**
      * loadModel reloads the model from the model CONF file.
@@ -354,8 +350,8 @@ public class CoreEnforcer {
 
                         functions.put(key, function);
                     }
-                    if (model.model.containsKey("g")) {
-                        for (Map.Entry<String, Assertion> entry : model.model.get("g").entrySet()) {
+                    if (model.model.containsKey(Primitive.GROUP)) {
+                        for (Map.Entry<String, Assertion> entry : model.model.get(Primitive.GROUP).entrySet()) {
                             String key = entry.getKey();
                             Assertion ast = entry.getValue();
 
@@ -373,29 +369,29 @@ public class CoreEnforcer {
                 }
             }
         }
-        String expString = model.model.get("m").get("m").value;
+        String expString = model.model.get(Primitive.MATCHERS).get(Primitive.MATCHERS).value;
         Expression expression = aviatorEval.compile(expString, true);
 
         Effect policyEffects[];
         float matcherResults[];
         int policyLen;
-        if ((policyLen = model.model.get("p").get("p").policy.size()) != 0) {
+        if ((policyLen = model.model.get(Primitive.POLICY).get(Primitive.POLICY).policy.size()) != 0) {
             policyEffects = new Effect[policyLen];
             matcherResults = new float[policyLen];
 
-            for (int i = 0; i < model.model.get("p").get("p").policy.size(); i ++) {
-                List<String> pvals = model.model.get("p").get("p").policy.get(i);
+            for (int i = 0; i < model.model.get(Primitive.POLICY).get(Primitive.POLICY).policy.size(); i++) {
+                List<String> pvals = model.model.get(Primitive.POLICY).get(Primitive.POLICY).policy.get(i);
 
                 // Util.logPrint("Policy Rule: " + pvals);
                 // Select the rule based on request size
                 Map<String, Object> parameters = new HashMap<>();
                 getRTokens(parameters, rvals);
-                for (int j = 0; j < model.model.get("p").get("p").tokens.length; j ++) {
-                    String token = model.model.get("p").get("p").tokens[j];
+                for (int j = 0; j < model.model.get(Primitive.POLICY).get(Primitive.POLICY).tokens.length; j++) {
+                    String token = model.model.get(Primitive.POLICY).get(Primitive.POLICY).tokens[j];
                     parameters.put(token, pvals.get(j));
                 }
 
-                Object result =  expression.execute(parameters);
+                Object result = expression.execute(parameters);
                 // Util.logPrint("Result: " + result);
 
                 if (result instanceof Boolean) {
@@ -426,7 +422,7 @@ public class CoreEnforcer {
                     policyEffects[i] = Effect.Allow;
                 }
 
-                if (model.model.get("e").get("e").value.equals("priority(p_eft) || deny")) {
+                if (model.model.get(Primitive.EFFECT).get(Primitive.EFFECT).value.equals("priority(p_eft) || deny")) {
                     break;
                 }
             }
@@ -435,12 +431,12 @@ public class CoreEnforcer {
             matcherResults = new float[1];
 
             Map<String, Object> parameters = new HashMap<>();
-            for (int j = 0; j < model.model.get("r").get("r").tokens.length; j ++) {
-                String token = model.model.get("r").get("r").tokens[j];
+            for (int j = 0; j < model.model.get(Primitive.REQUEST).get(Primitive.REQUEST).tokens.length; j++) {
+                String token = model.model.get(Primitive.REQUEST).get(Primitive.REQUEST).tokens[j];
                 parameters.put(token, rvals[j]);
             }
-            for (int j = 0; j < model.model.get("p").get("p").tokens.length; j ++) {
-                String token = model.model.get("p").get("p").tokens[j];
+            for (int j = 0; j < model.model.get(Primitive.POLICY).get(Primitive.POLICY).tokens.length; j++) {
+                String token = model.model.get(Primitive.POLICY).get(Primitive.POLICY).tokens[j];
                 parameters.put(token, "");
             }
 
@@ -454,10 +450,10 @@ public class CoreEnforcer {
             }
         }
 
-        boolean result = eft.mergeEffects(model.model.get("e").get("e").value, policyEffects, matcherResults);
+        boolean result = eft.mergeEffects(model.model.get(Primitive.EFFECT).get(Primitive.EFFECT).value, policyEffects, matcherResults);
 
         StringBuilder reqStr = new StringBuilder("Request: ");
-        for (int i = 0; i < rvals.length; i ++) {
+        for (int i = 0; i < rvals.length; i++) {
             String rval = rvals[i].toString();
 
             if (i != rvals.length - 1) {
@@ -472,33 +468,35 @@ public class CoreEnforcer {
         return result;
     }
 
-    private void getRTokens(Map<String, Object> parameters, Object ...rvals) {
-      for(String rKey : model.model.get("r").keySet()) {
-        if(!(rvals.length == model.model.get("r").get(rKey).tokens.length)) { continue; }
-        for (int j = 0; j < model.model.get("r").get(rKey).tokens.length; j ++) {
-          String token = model.model.get("r").get(rKey).tokens[j];
-          parameters.put(token, rvals[j]);
-        }
+    private void getRTokens(Map<String, Object> parameters, Object... rvals) {
+        for (String rKey : model.model.get(Primitive.REQUEST).keySet()) {
+            if (!(rvals.length == model.model.get(Primitive.REQUEST).get(rKey).tokens.length)) {
+                continue;
+            }
+            for (int j = 0; j < model.model.get(Primitive.REQUEST).get(rKey).tokens.length; j++) {
+                String token = model.model.get(Primitive.REQUEST).get(rKey).tokens[j];
+                parameters.put(token, rvals[j]);
+            }
 
-      }
+        }
     }
 
-    public boolean validateEnforce(Object... rvals){
-        return  validateEnforceSection("r",rvals);
+    public boolean validateEnforce(Object... rvals) {
+        return validateEnforceSection(Primitive.REQUEST, rvals);
     }
 
     private boolean validateEnforceSection(String section, Object... rvals) {
         int expectedParamSize = getModel().model.entrySet().stream()
-                .filter(stringMapEntry -> stringMapEntry.getKey().equals(section))
-                .flatMap(stringMapEntry -> stringMapEntry.getValue().entrySet().stream())
-                .filter(stringAssertionEntry -> stringAssertionEntry.getKey().equals(section))
-                .findFirst().orElseThrow(
-                        () -> new CasbinMatcherException("Could not find " + section + " definition in model"))
-                .getValue().tokens.length;
+            .filter(stringMapEntry -> stringMapEntry.getKey().equals(section))
+            .flatMap(stringMapEntry -> stringMapEntry.getValue().entrySet().stream())
+            .filter(stringAssertionEntry -> stringAssertionEntry.getKey().equals(section))
+            .findFirst().orElseThrow(
+                () -> new CasbinMatcherException("Could not find " + section + " definition in model"))
+            .getValue().tokens.length;
 
         if (rvals.length != expectedParamSize) {
             Util.logPrintfWarn("Incorrect number of attributes to check for policy (expected {} but got {})",
-                    expectedParamSize, rvals.length);
+                expectedParamSize, rvals.length);
             return rvals.length >= expectedParamSize;
         }
         return true;

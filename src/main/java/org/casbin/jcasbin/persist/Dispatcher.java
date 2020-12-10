@@ -4,11 +4,13 @@ import java.util.List;
 
 /**
  * Dispatcher is the interface for jCasbin dispatcher
+ *
  * @author canxer314
  */
 public interface Dispatcher {
     /**
      * // AddPolicies adds policies rule to all instance.
+     *
      * @param sec
      * @param ptype
      * @param rules
@@ -17,6 +19,7 @@ public interface Dispatcher {
 
     /**
      * RemovePolicies removes policies rule from all instance.
+     *
      * @param sec
      * @param ptype
      * @param rules
@@ -25,6 +28,7 @@ public interface Dispatcher {
 
     /**
      * RemoveFilteredPolicy removes policy rules that match the filter from all instance.
+     *
      * @param sec
      * @param ptype
      * @param fieldIndex
@@ -39,6 +43,7 @@ public interface Dispatcher {
 
     /**
      * UpdatePolicy updates policy rule from all instance.
+     *
      * @param sec
      * @param ptype
      * @param oldRule

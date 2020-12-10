@@ -18,6 +18,7 @@ import org.apache.commons.io.IOUtils;
 import org.casbin.jcasbin.exception.CasbinAdapterException;
 import org.casbin.jcasbin.exception.CasbinPolicyFileNotFoundException;
 import org.casbin.jcasbin.model.Model;
+import org.casbin.jcasbin.model.Primitive;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.Helper;
 import org.casbin.jcasbin.util.Util;
@@ -91,8 +92,8 @@ public class FileAdapter implements Adapter {
         }
 
         List<String> policy = new ArrayList<>();
-        policy.addAll(getModelPolicy(model, "p"));
-        policy.addAll(getModelPolicy(model, "g"));
+        policy.addAll(getModelPolicy(model, Primitive.POLICY));
+        policy.addAll(getModelPolicy(model, Primitive.GROUP));
 
         savePolicyFile(String.join("\n", policy));
     }

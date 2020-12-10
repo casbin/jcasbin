@@ -14,36 +14,28 @@
 
 package org.casbin.jcasbin.util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.casbin.jcasbin.rbac.RoleManager;
-
+import bsh.EvalError;
+import bsh.Interpreter;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
-
-import bsh.EvalError;
-import bsh.Interpreter;
 import inet.ipaddr.AddressStringException;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
+import org.casbin.jcasbin.rbac.RoleManager;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class BuiltInFunctions {
 
+    private static final Interpreter interpreter;
     private static Pattern keyMatch2Pattern = Pattern.compile("(.*):[^/]+(.*)");
     private static Pattern keyMatch3Pattern = Pattern.compile("(.*)\\{[^/]+}(.*)");
-
-    private static final Interpreter interpreter;
 
     static {
         interpreter = new Interpreter();
@@ -125,7 +117,7 @@ public class BuiltInFunctions {
      * "/parent/123/child/456" does not match "/parent/{id}/child/{id}"
      * But KeyMatch3 will match both.
      * </pre>
-     *
+     * <p>
      * Attention: key1 cannot contain English commas.
      *
      * @param key1 the first argument.
@@ -266,7 +258,7 @@ public class BuiltInFunctions {
      * generateGFunction is the factory method of the g(_, _) function.
      *
      * @param name the name of the g(_, _) function, can be "g", "g2", ..
-     * @param rm the role manager used by the function.
+     * @param rm   the role manager used by the function.
      * @return the function.
      */
     public static AviatorFunction generateGFunction(String name, RoleManager rm) {
@@ -310,12 +302,11 @@ public class BuiltInFunctions {
      * expressions is exactly the same as Java. Flaw: dynamically generated classes or non-static
      * inner class cannot be used.
      *
+     * @param eval Boolean expression.
+     * @param env  Parameters.
+     * @return The result of the eval.
      * @author tldyl
      * @since 2020-07-02
-     *
-     * @param eval Boolean expression.
-     * @param env Parameters.
-     * @return The result of the eval.
      */
     public static boolean eval(String eval, Map<String, Object> env) {
         Map<String, Map<String, Object>> evalModels = getEvalModels(env);

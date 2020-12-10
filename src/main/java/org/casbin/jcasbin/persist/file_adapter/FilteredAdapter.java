@@ -3,6 +3,7 @@ package org.casbin.jcasbin.persist.file_adapter;
 import org.apache.commons.io.IOUtils;
 import org.casbin.jcasbin.exception.CasbinAdapterException;
 import org.casbin.jcasbin.model.Model;
+import org.casbin.jcasbin.model.Primitive;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.Helper;
 
@@ -31,7 +32,8 @@ public class FilteredAdapter implements Adapter {
 
     /**
      * loadFilteredPolicy loads only policy rules that match the filter.
-     * @param model the model.
+     *
+     * @param model  the model.
      * @param filter the filter used to specify which type of policy should be loaded.
      * @throws CasbinAdapterException if the file path or the type of the filter is incorrect.
      */
@@ -86,10 +88,10 @@ public class FilteredAdapter implements Adapter {
         }
         String[] filterSlice = null;
         switch (p[0].trim()) {
-            case "p":
+            case Primitive.POLICY:
                 filterSlice = filter.p;
                 break;
-            case "g":
+            case Primitive.GROUP:
                 filterSlice = filter.g;
                 break;
         }
@@ -121,7 +123,7 @@ public class FilteredAdapter implements Adapter {
     /**
      * @return true if have any filter roles.
      */
-    public boolean isFiltered(){
+    public boolean isFiltered() {
         return isFiltered;
     }
 

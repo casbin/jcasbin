@@ -26,7 +26,7 @@ import java.util.Optional;
  * p, admin, domain1, data1, read
  * g, alice, group1
  * g2, group1, admin, domain1
- *
+ * <p>
  * As for the previous example, alice should have the permission to read data1, but if we use the
  * DefaultRoleManager, it will return false.
  * GroupRoleManager is to handle this situation.
@@ -48,15 +48,15 @@ public class GroupRoleManager extends DefaultRoleManager {
      */
     @Override
     public boolean hasLink(String name1, String name2, String... domain) {
-        if(super.hasLink(name1, name2, domain)) {
+        if (super.hasLink(name1, name2, domain)) {
             return true;
         }
         // check name1's groups
         if (domain.length == 1) {
             try {
                 List<String> groups = Optional.ofNullable(super.getRoles(name1)).orElse(new ArrayList<>());
-                for(String group : groups) {
-                    if(hasLink(group, name2, domain)) {
+                for (String group : groups) {
+                    if (hasLink(group, name2, domain)) {
                         return true;
                     }
                 }

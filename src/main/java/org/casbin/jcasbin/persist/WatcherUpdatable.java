@@ -4,9 +4,10 @@ import java.util.List;
 
 /**
  * WatcherUpdatable is the strengthen for jCasbin watchers.
+ *
  * @author canxer314
  */
-public interface WatcherUpdatable extends Watcher{
+public interface WatcherUpdatable extends Watcher {
 
     /**
      * updateForUpdatePolicy calls the update callback of other instances to synchronize their policy.

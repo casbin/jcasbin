@@ -14,8 +14,6 @@
 
 package org.casbin.jcasbin.persist;
 
-import static org.casbin.jcasbin.util.Util.splitCommaDelimited;
-
 import com.sun.deploy.util.StringUtils;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.util.StringPool;
@@ -23,11 +21,9 @@ import org.casbin.jcasbin.util.StringPool;
 import java.util.Arrays;
 import java.util.List;
 
-public class Helper {
-    public interface loadPolicyLineHandler<T, U> {
-        void accept(T t, U u);
-    }
+import static org.casbin.jcasbin.util.Util.splitCommaDelimited;
 
+public class Helper {
     public static void loadPolicyLine(String line, Model model) {
         if (line.equals("")) {
             return;
@@ -43,5 +39,9 @@ public class Helper {
         String sec = key.substring(0, 1);
         model.model.get(sec).get(key).policy.add(policy);
         model.model.get(sec).get(key).policyMap.put(StringUtils.join(policy, StringPool.COMMA), model.model.get(sec).get(key).policy.size() - 1);
+    }
+
+    public interface loadPolicyLineHandler<T, U> {
+        void accept(T t, U u);
     }
 }

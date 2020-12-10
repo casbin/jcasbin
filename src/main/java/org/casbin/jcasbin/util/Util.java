@@ -14,6 +14,7 @@
 
 package org.casbin.jcasbin.util;
 
+import org.casbin.jcasbin.model.Primitive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +45,7 @@ public class Util {
      * logPrintf prints the log with the format.
      *
      * @param format the format of the log.
-     * @param v the log.
+     * @param v      the log.
      */
     public static void logPrintf(String format, String... v) {
         if (enableLog) {
@@ -57,7 +58,7 @@ public class Util {
      * logPrintf prints the log with the format as a warning.
      *
      * @param format the format of the log.
-     * @param v the log.
+     * @param v      the log.
      */
     public static void logPrintfWarn(String format, Object... v) {
         if (enableLog) {
@@ -69,7 +70,7 @@ public class Util {
      * logPrintf prints the log with the format as an error.
      *
      * @param format the format of the log.
-     * @param v the log.
+     * @param v      the log.
      */
     public static void logPrintfError(String format, Object... v) {
         if (enableLog) {
@@ -86,7 +87,7 @@ public class Util {
     public static String escapeAssertion(String s) {
         //Replace the first dot, because the string doesn't start with "m="
         // and is not covered by the regex.
-        if (s.startsWith("r") || s.startsWith("p")) {
+        if (s.startsWith(Primitive.REQUEST) || s.startsWith(Primitive.POLICY)) {
             s = s.replaceFirst("\\.", "_");
         }
         String regex = "(\\|| |=|\\)|\\(|&|<|>|,|\\+|-|!|\\*|\\/)(r|p)[0-9]*\\.";
@@ -95,7 +96,7 @@ public class Util {
         StringBuffer sb = new StringBuffer();
 
         while (m.find()) {
-            m.appendReplacement(sb, m.group().replace(".", "_") );
+            m.appendReplacement(sb, m.group().replace(".", "_"));
         }
 
         m.appendTail(sb);
@@ -113,7 +114,7 @@ public class Util {
         if (pos == -1) {
             return s;
         }
-        return s.substring(0,pos).trim();
+        return s.substring(0, pos).trim();
     }
 
     /**
@@ -134,7 +135,7 @@ public class Util {
             return false;
         }
 
-        for (int i = 0; i < a.size(); i ++) {
+        for (int i = 0; i < a.size(); i++) {
             if (!a.get(i).equals(b.get(i))) {
                 return false;
             }
@@ -160,7 +161,7 @@ public class Util {
             return false;
         }
 
-        for (int i = 0; i < a.size(); i ++) {
+        for (int i = 0; i < a.size(); i++) {
             if (!arrayEquals(a.get(i), b.get(i))) {
                 return false;
             }
@@ -234,7 +235,7 @@ public class Util {
         Collections.sort(a);
         Collections.sort(b);
 
-        for (int i = 0; i < a.size(); i ++) {
+        for (int i = 0; i < a.size(); i++) {
             if (!a.get(i).equals(b.get(i))) {
                 return false;
             }

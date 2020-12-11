@@ -14,7 +14,7 @@
 
 package org.casbin.jcasbin.model;
 
-import com.sun.deploy.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.StringPool;
 import org.casbin.jcasbin.util.Util;
@@ -140,7 +140,7 @@ public class Policy {
             boolean matched = true;
             for (int i = 0; i < fieldValues.length; i++) {
                 String fieldValue = fieldValues[i];
-                if (!fieldValue.equals("") && !rule.get(fieldIndex + i).equals(fieldValue)) {
+                if (!fieldValue.equals(StringPool.EMPTY) && !rule.get(fieldIndex + i).equals(fieldValue)) {
                     matched = false;
                     break;
                 }

@@ -2,7 +2,6 @@ package org.casbin.jcasbin.main;
 
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
-import org.casbin.jcasbin.util.Util;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -139,7 +138,7 @@ public class CachedEnforcer extends Enforcer {
         }
     }
 
-    public void setCachedResult(String key, boolean bool) {
+    public void setCachedResult(String key, Boolean bool) {
         try {
             READ_WRITE_LOCK.writeLock().lock();
             cacheMap.put(key, bool);
@@ -149,7 +148,12 @@ public class CachedEnforcer extends Enforcer {
     }
 
     public void invalidateCache() {
-        cacheMap.clear();
+        try {
+            READ_WRITE_LOCK.writeLock().lock();
+            cacheMap.clear();
+        } finally {
+            READ_WRITE_LOCK.writeLock().unlock();
+        }
     }
 
 }

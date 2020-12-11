@@ -35,6 +35,7 @@ import org.casbin.jcasbin.persist.file_adapter.FilteredAdapter;
 import org.casbin.jcasbin.rbac.DefaultRoleManager;
 import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.BuiltInFunctions;
+import org.casbin.jcasbin.util.StringPool;
 import org.casbin.jcasbin.util.Util;
 
 import java.util.HashMap;
@@ -99,7 +100,7 @@ public class CoreEnforcer {
     public static Model newModel(String modelPath, String unused) {
         Model m = new Model();
 
-        if (!modelPath.equals("")) {
+        if (!modelPath.equals(StringPool.EMPTY)) {
             m.loadModel(modelPath);
         }
 

@@ -15,6 +15,7 @@
 package org.casbin.jcasbin.config;
 
 import org.casbin.jcasbin.exception.CasbinConfigException;
+import org.casbin.jcasbin.util.StringPool;
 
 import java.io.*;
 import java.util.HashMap;
@@ -70,7 +71,7 @@ public class Config {
      * addConfig adds a new section->key:value to the configuration.
      */
     private boolean addConfig(String section, String option, String value) {
-        if (section.equals("")) {
+        if (section.equals(StringPool.EMPTY)) {
             section = DEFAULT_SECTION;
         }
 
@@ -165,7 +166,7 @@ public class Config {
 
     public String[] getStrings(String key) {
         String v = get(key);
-        if (v.equals("")) {
+        if (v.equals(StringPool.EMPTY)) {
             return null;
         }
         return v.split(",");

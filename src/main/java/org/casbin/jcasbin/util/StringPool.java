@@ -41,6 +41,7 @@ public interface StringPool {
     String EQUALS = "=";
     String FALSE = "false";
     String HASH = "#";
+    char HASH_CHAR = '#';
     String HAT = "^";
     String LEFT_BRACE = "{";
     String LEFT_BRACKET = "(";

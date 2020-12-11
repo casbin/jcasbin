@@ -14,7 +14,7 @@
 
 package org.casbin.jcasbin.persist;
 
-import com.sun.deploy.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.util.StringPool;
 
@@ -25,11 +25,11 @@ import static org.casbin.jcasbin.util.Util.splitCommaDelimited;
 
 public class Helper {
     public static void loadPolicyLine(String line, Model model) {
-        if (line.equals("")) {
+        if (line.equals(StringPool.EMPTY)) {
             return;
         }
 
-        if (line.charAt(0) == '#') {
+        if (line.charAt(0) == StringPool.HASH_CHAR) {
             return;
         }
 

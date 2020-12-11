@@ -161,7 +161,7 @@ public class BuiltInFunctions {
         Map<String, String> params = new HashMap<>();
         for (String token : tokens) {
             if (p.matcher(token).matches()) {
-                while (i < values.length && values[i].equals("")) {
+                while (i < values.length && values[i].equals(StringPool.EMPTY)) {
                     i++;
                 }
                 if (i == values.length) {

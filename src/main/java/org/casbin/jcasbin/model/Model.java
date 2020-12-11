@@ -15,6 +15,7 @@
 package org.casbin.jcasbin.model;
 
 import org.casbin.jcasbin.config.Config;
+import org.casbin.jcasbin.util.StringPool;
 import org.casbin.jcasbin.util.Util;
 
 import java.util.HashMap;
@@ -66,7 +67,7 @@ public class Model extends Policy {
         ast.key = key;
         ast.value = value;
         ast.policyMap = new HashMap<>();
-        if (ast.value.equals("")) {
+        if (ast.value.equals(StringPool.EMPTY)) {
             return false;
         }
 
@@ -175,7 +176,7 @@ public class Model extends Policy {
         String g = saveSectionToText(Primitive.GROUP);
         g = g.replace(".", "_");
         res.append(g);
-        if (!g.equals("")) {
+        if (!g.equals(StringPool.EMPTY)) {
             res.append("\n");
         }
 

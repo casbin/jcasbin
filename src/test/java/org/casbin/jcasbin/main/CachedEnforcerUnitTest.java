@@ -55,6 +55,19 @@ public class CachedEnforcerUnitTest {
         testEnforce(e, "alice", "data1", "write", false);
         testEnforce(e, "alice", "data2", "read", false);
         testEnforce(e, "alice", "data2", "write", false);
+
+        e.addPermissionForUser("alice", "data1", "read");
+        testEnforce(e, "alice", "data1", "read", false);
+        StringBuilder key = new StringBuilder();
+        key.append("alice");
+        key.append("$$");
+        key.append("data1");
+        key.append("$$");
+        key.append("read");
+        key.append("$$");
+        e.setCachedResult(key.toString(), null);
+        testEnforce(e, "alice", "data1", "read", true);
+
     }
 
     @Test
@@ -63,7 +76,7 @@ public class CachedEnforcerUnitTest {
         m.addDef("r", "r", "sub, obj, act");
         m.addDef("p", "p", "sub, obj, act");
         m.addDef("e", "e", "some(where (p.eft == allow))");
-        m.addDef("m", "m", "r.sub == p.sub && keyMatch(r.obj, p.obj) && regexMatch(r.acp.act)");
+        m.addDef("m", "m", "r.sub == p.sub && keyMatch(r.obj, p.obj) && regexMatch(r.act, p.act)");
 
         Adapter a = new FileAdapter("examples/keymatch_policy.csv");
 
@@ -123,7 +136,7 @@ public class CachedEnforcerUnitTest {
         m.addDef("r", "r", "sub, obj, act");
         m.addDef("p", "p", "sub, obj, act");
         m.addDef("e", "e", "!some(where (p.eft == deny))");
-        m.addDef("m", "m", "r.sub == p.sub && keyMatch(r.obj, p.obj) && regexMatch(r.acp.act)");
+        m.addDef("m", "m", "r.sub == p.sub && keyMatch(r.obj, p.obj) && regexMatch(r.act, p.act)");
 
         Adapter a = new FileAdapter("examples/keymatch_policy.csv");
 
@@ -426,7 +439,7 @@ public class CachedEnforcerUnitTest {
         m.addDef("r", "r", "sub, obj, act");
         m.addDef("p", "p", "sub, obj, act");
         m.addDef("e", "e", "some(where (p.eft == allow))");
-        m.addDef("m", "m", "r.sub == p.sub && keyMatch(r.obj, p.obj) && regexMatch(r.acp.act)");
+        m.addDef("m", "m", "r.sub == p.sub && keyMatch(r.obj, p.obj) && regexMatch(r.act, p.act)");
 
         Adapter a = new FileAdapter("examples/keymatch_policy.csv");
 
@@ -445,7 +458,7 @@ public class CachedEnforcerUnitTest {
         m.addDef("r", "r", "sub, obj, act");
         m.addDef("p", "p", "sub, obj, act");
         m.addDef("e", "e", "some(where (p.eft == allow))");
-        m.addDef("m", "m", "r.sub == p.sub && keyMatch(r.obj, p.obj) && regexMatch(r.acp.act)");
+        m.addDef("m", "m", "r.sub == p.sub && keyMatch(r.obj, p.obj) && regexMatch(r.act, p.act)");
 
         try (FileInputStream fis = new FileInputStream("examples/keymatch_policy.csv")) {
             Adapter a = new FileAdapter(fis);

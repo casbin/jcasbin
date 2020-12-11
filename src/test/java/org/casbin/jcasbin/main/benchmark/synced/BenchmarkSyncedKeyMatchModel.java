@@ -1,6 +1,6 @@
-package org.casbin.jcasbin.main.benchmark;
+package org.casbin.jcasbin.main.benchmark.synced;
 
-import org.casbin.jcasbin.main.Enforcer;
+import org.casbin.jcasbin.main.SyncedEnforcer;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.profile.GCProfiler;
 import org.openjdk.jmh.runner.Runner;
@@ -12,12 +12,12 @@ import java.util.concurrent.TimeUnit;
 
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Mode.AverageTime)
-public class BenchmarkRBACModelWithResourceRoles {
-    private static Enforcer e = new Enforcer("examples/rbac_with_resource_roles_model.conf", "examples/rbac_with_resource_roles_policy.csv", false);
+public class BenchmarkSyncedKeyMatchModel {
+    private static SyncedEnforcer e = new SyncedEnforcer("examples/keymatch_model.conf", "examples/keymatch_policy.csv", false);
 
     public static void main(String args[]) throws RunnerException {
         Options opt = new OptionsBuilder()
-            .include(BenchmarkRBACModelWithResourceRoles.class.getName())
+            .include(BenchmarkSyncedKeyMatchModel.class.getName())
             .exclude("Pref")
             .warmupIterations(3)
             .measurementIterations(3)
@@ -27,11 +27,11 @@ public class BenchmarkRBACModelWithResourceRoles {
         new Runner(opt).run();
     }
 
-    @Threads(1)
+    @Threads(Threads.MAX)
     @Benchmark
-    public static void benchmarkRBACModelWithResourceRoles() {
+    public static void benchmarkKeyMatchModel() {
         for (int i = 0; i < 1000; i++) {
-            e.enforce("alice", "data1", "read");
+            e.enforce("alice", "/alice_data/resource1", "GET");
         }
     }
 }

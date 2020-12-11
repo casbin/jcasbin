@@ -1,4 +1,4 @@
-package org.casbin.jcasbin.main.benchmark;
+package org.casbin.jcasbin.main.benchmark.raw;
 
 import org.casbin.jcasbin.main.Enforcer;
 import org.openjdk.jmh.annotations.*;
@@ -12,12 +12,12 @@ import java.util.concurrent.TimeUnit;
 
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Mode.AverageTime)
-public class BenchmarkKeyMatchModel {
-    private static Enforcer e = new Enforcer("examples/keymatch_model.conf", "examples/keymatch_policy.csv", false);
+public class BenchmarkBasicModel {
+    private static Enforcer e = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv", false);
 
     public static void main(String args[]) throws RunnerException {
         Options opt = new OptionsBuilder()
-            .include(BenchmarkKeyMatchModel.class.getName())
+            .include(BenchmarkBasicModel.class.getName())
             .exclude("Pref")
             .warmupIterations(3)
             .measurementIterations(3)
@@ -29,9 +29,9 @@ public class BenchmarkKeyMatchModel {
 
     @Threads(1)
     @Benchmark
-    public static void benchmarkKeyMatchModel() {
+    public static void benchmarkBasicModel() {
         for (int i = 0; i < 1000; i++) {
-            e.enforce("alice", "/alice_data/resource1", "GET");
+            e.enforce("alice", "data1", "read");
         }
     }
 }

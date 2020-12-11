@@ -1,6 +1,6 @@
-package org.casbin.jcasbin.main.benchmark;
+package org.casbin.jcasbin.main.benchmark.synced;
 
-import org.casbin.jcasbin.main.Enforcer;
+import org.casbin.jcasbin.main.SyncedEnforcer;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.profile.GCProfiler;
 import org.openjdk.jmh.runner.Runner;
@@ -12,12 +12,12 @@ import java.util.concurrent.TimeUnit;
 
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Mode.AverageTime)
-public class BenchmarkRBACModelSingle {
-    private static Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv", false);
+public class BenchmarkSyncedPriorityModel {
+    private static SyncedEnforcer e = new SyncedEnforcer("examples/priority_model.conf", "examples/priority_policy.csv", false);
 
     public static void main(String args[]) throws RunnerException {
         Options opt = new OptionsBuilder()
-            .include(BenchmarkRBACModelSingle.class.getName())
+            .include(BenchmarkSyncedPriorityModel.class.getName())
             .exclude("Pref")
             .warmupIterations(3)
             .measurementIterations(3)
@@ -27,11 +27,11 @@ public class BenchmarkRBACModelSingle {
         new Runner(opt).run();
     }
 
-    @Threads(1)
+    @Threads(Threads.MAX)
     @Benchmark
-    public static void benchmarkRBACModel() {
+    public static void benchmarkPriorityModel() {
         for (int i = 0; i < 1000; i++) {
-            e.enforce("alice", "data2", "read");
+            e.enforce("alice", "data1", "read");
         }
     }
 }

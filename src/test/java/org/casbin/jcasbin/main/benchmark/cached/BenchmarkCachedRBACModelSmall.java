@@ -1,6 +1,6 @@
-package org.casbin.jcasbin.main.benchmark;
+package org.casbin.jcasbin.main.benchmark.cached;
 
-import org.casbin.jcasbin.main.Enforcer;
+import org.casbin.jcasbin.main.CachedEnforcer;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.profile.GCProfiler;
 import org.openjdk.jmh.runner.Runner;
@@ -12,12 +12,12 @@ import java.util.concurrent.TimeUnit;
 
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Mode.AverageTime)
-public class BenchmarkRBACModelSmall {
-    private static Enforcer e = new Enforcer("examples/rbac_model.conf", "", false);
+public class BenchmarkCachedRBACModelSmall {
+    private static CachedEnforcer e = new CachedEnforcer("examples/rbac_model.conf", "", false);
 
     public static void main(String args[]) throws RunnerException {
         Options opt = new OptionsBuilder()
-            .include(BenchmarkRBACModelSmall.class.getName())
+            .include(BenchmarkCachedRBACModelSmall.class.getName())
             .exclude("Pref")
             .warmupIterations(3)
             .measurementIterations(1)
@@ -29,7 +29,7 @@ public class BenchmarkRBACModelSmall {
 
     @Threads(1)
     @Benchmark
-    public static void benchmarkRBACModelSmall() {
+    public static void benchmarkCachedRBACModelSmall() {
         for (int i = 0; i < 1000; i++) {
             e.enforce("user501", "data9", "read");
         }

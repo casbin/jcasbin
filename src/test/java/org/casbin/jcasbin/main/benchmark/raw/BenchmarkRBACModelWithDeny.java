@@ -1,4 +1,4 @@
-package org.casbin.jcasbin.main.benchmark;
+package org.casbin.jcasbin.main.benchmark.raw;
 
 import org.casbin.jcasbin.main.Enforcer;
 import org.openjdk.jmh.annotations.*;

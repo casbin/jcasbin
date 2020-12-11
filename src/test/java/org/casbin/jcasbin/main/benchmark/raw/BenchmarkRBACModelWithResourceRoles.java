@@ -1,4 +1,4 @@
-package org.casbin.jcasbin.main.benchmark;
+package org.casbin.jcasbin.main.benchmark.raw;
 
 import org.casbin.jcasbin.main.Enforcer;
 import org.openjdk.jmh.annotations.*;
@@ -12,12 +12,12 @@ import java.util.concurrent.TimeUnit;
 
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Mode.AverageTime)
-public class BenchmarkPriorityModel {
-    private static Enforcer e = new Enforcer("examples/priority_model.conf", "examples/priority_policy.csv", false);
+public class BenchmarkRBACModelWithResourceRoles {
+    private static Enforcer e = new Enforcer("examples/rbac_with_resource_roles_model.conf", "examples/rbac_with_resource_roles_policy.csv", false);
 
     public static void main(String args[]) throws RunnerException {
         Options opt = new OptionsBuilder()
-            .include(BenchmarkPriorityModel.class.getName())
+            .include(BenchmarkRBACModelWithResourceRoles.class.getName())
             .exclude("Pref")
             .warmupIterations(3)
             .measurementIterations(3)
@@ -29,7 +29,7 @@ public class BenchmarkPriorityModel {
 
     @Threads(1)
     @Benchmark
-    public static void benchmarkPriorityModel() {
+    public static void benchmarkRBACModelWithResourceRoles() {
         for (int i = 0; i < 1000; i++) {
             e.enforce("alice", "data1", "read");
         }

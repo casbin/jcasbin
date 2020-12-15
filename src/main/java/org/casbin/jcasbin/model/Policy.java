@@ -14,7 +14,7 @@
 
 package org.casbin.jcasbin.model;
 
-import com.sun.deploy.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.StringPool;
 import org.casbin.jcasbin.util.Util;

@@ -14,9 +14,9 @@
 
 package org.casbin.jcasbin.persist;
 
+import org.apache.commons.lang3.StringUtils;
 import static org.casbin.jcasbin.util.Util.splitCommaDelimited;
 
-import com.sun.deploy.util.StringUtils;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.util.StringPool;
 

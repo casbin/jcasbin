@@ -20,6 +20,7 @@ import org.casbin.jcasbin.util.Util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class Policy {
     public Map<String, Map<String, Assertion>> model;
@@ -115,7 +116,7 @@ public class Policy {
      * @return the policy rules of section sec and policy type ptype.
      */
     public List<List<String>> getPolicy(String sec, String ptype) {
-        return model.get(sec).get(ptype).policy;
+        return Optional.ofNullable(model).map(m -> m.get(sec)).map(s -> s.get(ptype)).map(p -> p.policy).orElseGet(() -> new ArrayList<>());
     }
 
     /**

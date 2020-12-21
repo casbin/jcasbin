@@ -19,7 +19,7 @@ import java.util.List;
  * @author tldyl
  * @since 2020/6/8
  */
-public class FilteredAdapter implements Adapter {
+public class FilteredAdapter implements org.casbin.jcasbin.persist.FilteredAdapter {
     private Adapter adapter;
     private boolean isFiltered = true;
     private String filepath;
@@ -35,6 +35,7 @@ public class FilteredAdapter implements Adapter {
      * @param filter the filter used to specify which type of policy should be loaded.
      * @throws CasbinAdapterException if the file path or the type of the filter is incorrect.
      */
+    @Override
     public void loadFilteredPolicy(Model model, Object filter) throws CasbinAdapterException {
         if ("".equals(filepath)) {
             throw new CasbinAdapterException("Invalid file path, file path cannot be empty.");
@@ -121,6 +122,7 @@ public class FilteredAdapter implements Adapter {
     /**
      * @return true if have any filter roles.
      */
+    @Override
     public boolean isFiltered(){
         return isFiltered;
     }

@@ -27,10 +27,10 @@ public class ManagementAPIUnitTest {
         Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
 
         testGetPolicy(e, asList(
-                asList("alice", "data1", "read"),
-                asList("bob", "data2", "write"),
-                asList("data2_admin", "data2", "read"),
-                asList("data2_admin", "data2", "write")));
+            asList("alice", "data1", "read"),
+            asList("bob", "data2", "write"),
+            asList("data2_admin", "data2", "read"),
+            asList("data2_admin", "data2", "write")));
 
         testGetFilteredPolicy(e, 0, asList(asList("alice", "data1", "read")), "alice");
         testGetFilteredPolicy(e, 0, asList(asList("bob", "data2", "write")), "bob");
@@ -68,10 +68,10 @@ public class ManagementAPIUnitTest {
         Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
 
         testGetPolicy(e, asList(
-                asList("alice", "data1", "read"),
-                asList("bob", "data2", "write"),
-                asList("data2_admin", "data2", "read"),
-                asList("data2_admin", "data2", "write")));
+            asList("alice", "data1", "read"),
+            asList("bob", "data2", "write"),
+            asList("data2_admin", "data2", "read"),
+            asList("data2_admin", "data2", "write")));
 
         e.removePolicy("alice", "data1", "read");
         e.removePolicy("bob", "data2", "write");
@@ -84,9 +84,9 @@ public class ManagementAPIUnitTest {
         e.addNamedPolicy("p", namedPolicy);
 
         testGetPolicy(e, asList(
-                asList("data2_admin", "data2", "read"),
-                asList("data2_admin", "data2", "write"),
-                asList("eve", "data3", "read")));
+            asList("data2_admin", "data2", "read"),
+            asList("data2_admin", "data2", "write"),
+            asList("eve", "data3", "read")));
 
         e.removeFilteredPolicy(1, "data2");
 

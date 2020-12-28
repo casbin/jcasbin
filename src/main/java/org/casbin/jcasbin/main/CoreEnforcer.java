@@ -27,6 +27,7 @@ import org.casbin.jcasbin.model.Assertion;
 import org.casbin.jcasbin.model.FunctionMap;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
+import org.casbin.jcasbin.persist.Dispatcher;
 import org.casbin.jcasbin.persist.WatcherEx;
 import org.casbin.jcasbin.persist.file_adapter.FilteredAdapter;
 import org.casbin.jcasbin.persist.Watcher;
@@ -51,11 +52,13 @@ public class CoreEnforcer {
     Adapter adapter;
     Watcher watcher;
     RoleManager rm;
+    Dispatcher dispatcher;
 
     private boolean enabled;
     boolean autoSave;
     boolean autoBuildRoleLinks;
     boolean autoNotifyWatcher = true;
+    boolean autoNotifyDispatcher = true;
 
     // cached instance of AviatorEvaluatorInstance
     AviatorEvaluatorInstance aviatorEval;
@@ -71,6 +74,7 @@ public class CoreEnforcer {
         enabled = true;
         autoSave = true;
         autoBuildRoleLinks = true;
+        dispatcher = null;
     }
 
     /**
@@ -176,6 +180,15 @@ public class CoreEnforcer {
     public void setWatcher(Watcher watcher) {
         this.watcher = watcher;
         watcher.setUpdateCallback(this::loadPolicy);
+    }
+
+    /**
+     * setDispatcher sets the current dispatcher.
+     *
+     * @param dispatcher jCasbin dispatcher
+     */
+    public void setDispatcher(Dispatcher dispatcher) {
+        this.dispatcher = dispatcher;
     }
 
     /**
@@ -461,14 +474,14 @@ public class CoreEnforcer {
     }
 
     private void getRTokens(Map<String, Object> parameters, Object ...rvals) {
-      for(String rKey : model.model.get("r").keySet()) {
-        if(!(rvals.length == model.model.get("r").get(rKey).tokens.length)) { continue; }
-        for (int j = 0; j < model.model.get("r").get(rKey).tokens.length; j ++) {
-          String token = model.model.get("r").get(rKey).tokens[j];
-          parameters.put(token, rvals[j]);
-        }
+        for(String rKey : model.model.get("r").keySet()) {
+            if(!(rvals.length == model.model.get("r").get(rKey).tokens.length)) { continue; }
+            for (int j = 0; j < model.model.get("r").get(rKey).tokens.length; j ++) {
+                String token = model.model.get("r").get(rKey).tokens[j];
+                parameters.put(token, rvals[j]);
+            }
 
-      }
+        }
     }
 
     public boolean validateEnforce(Object... rvals){
@@ -477,16 +490,16 @@ public class CoreEnforcer {
 
     private boolean validateEnforceSection(String section, Object... rvals) {
         int expectedParamSize = getModel().model.entrySet().stream()
-                .filter(stringMapEntry -> stringMapEntry.getKey().equals(section))
-                .flatMap(stringMapEntry -> stringMapEntry.getValue().entrySet().stream())
-                .filter(stringAssertionEntry -> stringAssertionEntry.getKey().equals(section))
-                .findFirst().orElseThrow(
-                        () -> new CasbinMatcherException("Could not find " + section + " definition in model"))
-                .getValue().tokens.length;
+            .filter(stringMapEntry -> stringMapEntry.getKey().equals(section))
+            .flatMap(stringMapEntry -> stringMapEntry.getValue().entrySet().stream())
+            .filter(stringAssertionEntry -> stringAssertionEntry.getKey().equals(section))
+            .findFirst().orElseThrow(
+                () -> new CasbinMatcherException("Could not find " + section + " definition in model"))
+            .getValue().tokens.length;
 
         if (rvals.length != expectedParamSize) {
             Util.logPrintfWarn("Incorrect number of attributes to check for policy (expected {} but got {})",
-                    expectedParamSize, rvals.length);
+                expectedParamSize, rvals.length);
             return rvals.length >= expectedParamSize;
         }
         return true;
@@ -506,5 +519,13 @@ public class CoreEnforcer {
 
     public void setAutoNotifyWatcher(boolean autoNotifyWatcher) {
         this.autoNotifyWatcher = autoNotifyWatcher;
+    }
+
+    public boolean isAutoNotifyDispatcher() {
+        return autoNotifyDispatcher;
+    }
+
+    public void setAutoNotifyDispatcher(boolean autoNotifyDispatcher) {
+        this.autoNotifyDispatcher = autoNotifyDispatcher;
     }
 }

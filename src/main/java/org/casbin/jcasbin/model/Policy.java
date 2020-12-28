@@ -201,6 +201,24 @@ public class Policy {
     }
 
     /**
+     * UpdatePolicy updates a policy rule from the model.
+     *
+     * @param sec the section, "p" or "g".
+     * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param oldRule the old rule.
+     * @param newRule the new rule.
+     * @return succeeds or not.
+     */
+    public boolean updatePolicy(String sec, String ptype, List<String> oldRule, List<String> newRule) {
+        if (!hasPolicy(sec, ptype, oldRule)) {
+            return false;
+        }
+        model.get(sec).get(ptype).policy.remove(oldRule);
+        model.get(sec).get(ptype).policy.add(newRule);
+        return true;
+    }
+
+    /**
      * removePolicy removes a policy rule from the model.
      *
      * @param sec the section, "p" or "g".

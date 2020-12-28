@@ -16,7 +16,9 @@ package org.casbin.jcasbin.main;
 
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.BatchAdapter;
+import org.casbin.jcasbin.persist.UpdatableAdapter;
 import org.casbin.jcasbin.persist.WatcherEx;
+import org.casbin.jcasbin.persist.WatcherUpdatable;
 import org.casbin.jcasbin.util.Util;
 
 import java.util.ArrayList;
@@ -140,6 +142,78 @@ class InternalEnforcer extends CoreEnforcer {
                 ((WatcherEx) watcher).updateForRemovePolicy(rule.toArray(new String[0]));
             } else {
                 watcher.update();
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * updatePolicy updates an authorization rule from the current policy.
+     *
+     * @param sec     the section, "p" or "g".
+     * @param ptype   the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param oldRule the old rule.
+     * @param newRule the new rule.
+     * @return succeeds or not.
+     */
+    boolean updatePolicy(String sec, String ptype, List<String> oldRule, List<String> newRule) {
+        if (dispatcher != null && autoNotifyDispatcher) {
+            dispatcher.updatePolicy(sec, ptype, oldRule, newRule);
+            return true;
+        }
+
+        if (adapter != null && autoSave) {
+            if (adapter instanceof UpdatableAdapter) {
+                try {
+                    ((UpdatableAdapter) adapter).updatePolicy(sec, ptype, oldRule, newRule);
+                } catch (UnsupportedOperationException ignored) {
+                    Util.logPrintf("Method not implemented");
+                } catch (Exception e) {
+                    Util.logPrint("An exception occurred:" + e.getMessage());
+                    return false;
+                }
+            }
+        }
+
+        boolean ruleUpdated = model.updatePolicy(sec, ptype, oldRule, newRule);
+
+        if (!ruleUpdated) {
+            return false;
+        }
+
+        if ("g".equals(sec)) {
+            try {
+                // remove the old rule
+                List<List<String>> oldRules = new ArrayList<>();
+                oldRules.add(oldRule);
+                buildIncrementalRoleLinks(Model.PolicyOperations.POLICY_REMOVE, ptype, oldRules);
+            } catch (Exception e) {
+                Util.logPrint("An exception occurred:" + e.getMessage());
+                return false;
+            }
+
+            try {
+                // add the new rule
+                List<List<String>> newRules = new ArrayList<>();
+                newRules.add(newRule);
+                buildIncrementalRoleLinks(Model.PolicyOperations.POLICY_ADD, ptype, newRules);
+            } catch (Exception e) {
+                Util.logPrint("An exception occurred:" + e.getMessage());
+                return false;
+            }
+        }
+
+        if (watcher != null && autoNotifyWatcher) {
+            try {
+                if (watcher instanceof WatcherUpdatable) {
+                    ((WatcherUpdatable) watcher).updateForUpdatePolicy(oldRule, newRule);
+                } else {
+                    watcher.update();
+                }
+            } catch (Exception e) {
+                Util.logPrint("An exception occurred:" + e.getMessage());
+                return false;
             }
         }
 

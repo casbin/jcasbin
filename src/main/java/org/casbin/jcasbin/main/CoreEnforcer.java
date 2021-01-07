@@ -474,14 +474,14 @@ public class CoreEnforcer {
     }
 
     private void getRTokens(Map<String, Object> parameters, Object ...rvals) {
-      for(String rKey : model.model.get("r").keySet()) {
-        if(!(rvals.length == model.model.get("r").get(rKey).tokens.length)) { continue; }
-        for (int j = 0; j < model.model.get("r").get(rKey).tokens.length; j ++) {
-          String token = model.model.get("r").get(rKey).tokens[j];
-          parameters.put(token, rvals[j]);
-        }
+        for(String rKey : model.model.get("r").keySet()) {
+            if(!(rvals.length == model.model.get("r").get(rKey).tokens.length)) { continue; }
+            for (int j = 0; j < model.model.get("r").get(rKey).tokens.length; j ++) {
+                String token = model.model.get("r").get(rKey).tokens[j];
+                parameters.put(token, rvals[j]);
+            }
 
-      }
+        }
     }
 
     public boolean validateEnforce(Object... rvals){
@@ -490,16 +490,16 @@ public class CoreEnforcer {
 
     private boolean validateEnforceSection(String section, Object... rvals) {
         int expectedParamSize = getModel().model.entrySet().stream()
-                .filter(stringMapEntry -> stringMapEntry.getKey().equals(section))
-                .flatMap(stringMapEntry -> stringMapEntry.getValue().entrySet().stream())
-                .filter(stringAssertionEntry -> stringAssertionEntry.getKey().equals(section))
-                .findFirst().orElseThrow(
-                        () -> new CasbinMatcherException("Could not find " + section + " definition in model"))
-                .getValue().tokens.length;
+            .filter(stringMapEntry -> stringMapEntry.getKey().equals(section))
+            .flatMap(stringMapEntry -> stringMapEntry.getValue().entrySet().stream())
+            .filter(stringAssertionEntry -> stringAssertionEntry.getKey().equals(section))
+            .findFirst().orElseThrow(
+                () -> new CasbinMatcherException("Could not find " + section + " definition in model"))
+            .getValue().tokens.length;
 
         if (rvals.length != expectedParamSize) {
             Util.logPrintfWarn("Incorrect number of attributes to check for policy (expected {} but got {})",
-                    expectedParamSize, rvals.length);
+                expectedParamSize, rvals.length);
             return rvals.length >= expectedParamSize;
         }
         return true;

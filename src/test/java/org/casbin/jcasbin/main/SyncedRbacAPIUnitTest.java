@@ -112,6 +112,11 @@ public class SyncedRbacAPIUnitTest {
         testEnforceWithoutUsers(e, "bob", "read", true);
         testEnforceWithoutUsers(e, "bob", "write", true);
 
+        e.updatePermissionForUser("bob", asList("read"), asList("discuss"));
+
+        testEnforceWithoutUsers(e, "bob", "read", false);
+        testEnforceWithoutUsers(e, "bob", "discuss", true);
+
         e.deletePermissionForUser("bob", "read");
 
         testEnforceWithoutUsers(e, "alice", "read", false);

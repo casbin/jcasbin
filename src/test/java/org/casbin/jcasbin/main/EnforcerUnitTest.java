@@ -154,20 +154,20 @@ public class EnforcerUnitTest {
     @Test
     public void testRBACModelInMemory2() {
         String text =
-		    "[request_definition]\n"
-            + "r = sub, obj, act\n"
-            + "\n"
-            + "[policy_definition]\n"
-            + "p = sub, obj, act\n"
-            + "\n"
-            + "[role_definition]\n"
-            + "g = _, _\n"
-            + "\n"
-            + "[policy_effect]\n"
-            + "e = some(where (p.eft == allow))\n"
-            + "\n"
-            + "[matchers]\n"
-            + "m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act\n";
+            "[request_definition]\n"
+                + "r = sub, obj, act\n"
+                + "\n"
+                + "[policy_definition]\n"
+                + "p = sub, obj, act\n"
+                + "\n"
+                + "[role_definition]\n"
+                + "g = _, _\n"
+                + "\n"
+                + "[policy_effect]\n"
+                + "e = some(where (p.eft == allow))\n"
+                + "\n"
+                + "[matchers]\n"
+                + "m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act\n";
 
         Model m = newModel(text);
         // The above is the same as:

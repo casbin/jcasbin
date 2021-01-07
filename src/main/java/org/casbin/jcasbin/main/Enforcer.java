@@ -258,6 +258,28 @@ public class Enforcer extends ManagementEnforcer {
     }
 
     /**
+     * updatePermissionForUser updates a permission for a user or role.
+     * Returns false if the user or role already has the permission (aka not affected).
+     *
+     * @param user the user.
+     * @param oldPermission the old permission.
+     * @param newPermission the new permission.
+     * @return succeeds or not.
+     */
+    public boolean updatePermissionForUser(String user, List<String> oldPermission, List<String> newPermission) {
+        List<String> params1 = new ArrayList<>();
+        List<String> params2 = new ArrayList<>();
+
+        params1.add(user);
+        params2.add(user);
+
+        Collections.addAll(params1, oldPermission.toArray(new String[0]));
+        Collections.addAll(params2, newPermission.toArray(new String[0]));
+
+        return updatePolicy(params1, params2);
+    }
+
+    /**
      * addPermissionForUser adds a permission for a user or role.
      * Returns false if the user or role already has the permission (aka not affected).
      *

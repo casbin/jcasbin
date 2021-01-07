@@ -268,6 +268,17 @@ public class ManagementEnforcer extends InternalEnforcer {
     }
 
     /**
+     * updatePolicy update an authorization rule to the current policy.
+     *
+     * @param params1  the old rule.
+     * @param params2 the new rule.
+     * @return succeeds or not.
+     */
+    public boolean updatePolicy(List<String> params1, List<String> params2) {
+        return updateNamedPolicy("p", params1, params2);
+    }
+
+    /**
      * addPolicy adds an authorization rule to the current policy.
      * If the rule already exists, the function returns false and the rule will not be added.
      * Otherwise the function returns true by adding the new rule.
@@ -290,6 +301,18 @@ public class ManagementEnforcer extends InternalEnforcer {
      */
     public boolean addNamedPolicy(String ptype, List<String> params) {
         return addPolicy("p", ptype, params);
+    }
+
+    /**
+     * updateNamedPolicy updates an authorization rule to the current named policy.
+     *
+     * @param ptype the policy type, can be "p", "p2", "p3", ..
+     * @param params1  the old rule.
+     * @param params2 the new rule.
+     * @return succeeds or not.
+     */
+    public boolean updateNamedPolicy(String ptype, List<String> params1, List<String> params2) {
+        return updatePolicy("p", ptype, params1, params2);
     }
 
     /**
@@ -347,6 +370,7 @@ public class ManagementEnforcer extends InternalEnforcer {
     public boolean removeNamedPolicy(String ptype, List<String> params) {
         return removePolicy("p", ptype, params);
     }
+
 
     /**
      * removeNamedPolicy removes an authorization rule from the current named policy.

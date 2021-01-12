@@ -14,29 +14,22 @@
 
 package org.casbin.jcasbin.util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.casbin.jcasbin.rbac.RoleManager;
-
+import bsh.EvalError;
+import bsh.Interpreter;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
-
-import bsh.EvalError;
-import bsh.Interpreter;
 import inet.ipaddr.AddressStringException;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
+import org.casbin.jcasbin.rbac.RoleManager;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class BuiltInFunctions {
 
@@ -241,6 +234,17 @@ public class BuiltInFunctions {
         Integer prefix = ipa2.getNetworkPrefixLength();
         IPAddress mask = ipa2.getNetwork().getNetworkMask(prefix, false);
         return ipa1.mask(mask).equals(ipas2.getHostAddress());
+    }
+
+    /**
+     * globMatch determines whether key1 matches the pattern of key2 in glob expression.
+     *
+     * @param key1 the first argument.
+     * @param key2 the second argument.
+     * @return whether key1 matches key2.
+     */
+    public static boolean globMatch(String key1, String key2) {
+        return Pattern.matches(Glob.toRegexPattern(key2), key1);
     }
 
     /**

@@ -426,4 +426,25 @@ public class ModelUnitTest {
 
         testEnforce(e, "alice", "data1", "read", false);
     }
+
+    @Test
+    public void testGlobMatchModel() {
+        Enforcer e = new Enforcer("examples/glob_model.conf", "examples/glob_policy.csv");
+
+        testEnforce(e, "u1", "/foo/", "read", true);
+        testEnforce(e, "u1", "/foo", "read", false);
+        testEnforce(e, "u1", "/foo/subprefix", "read", true);
+        testEnforce(e, "u1", "foo", "read", false);
+
+        testEnforce(e, "u2", "/foosubprefix", "read", true);
+        testEnforce(e, "u2", "/foo/subprefix", "read", false);
+        testEnforce(e, "u2", "foo", "read", false);
+
+        testEnforce(e, "u3", "/prefix/foo/subprefix", "read", true);
+        testEnforce(e, "u3", "/prefix/foo/", "read", true);
+        testEnforce(e, "u3", "/prefix/foo", "read", false);
+
+        testEnforce(e, "u4", "/foo", "read", false);
+        testEnforce(e, "u4", "foo", "read", true);
+    }
 }

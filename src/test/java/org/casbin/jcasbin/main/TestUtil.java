@@ -14,6 +14,7 @@
 
 package org.casbin.jcasbin.main;
 
+import org.casbin.jcasbin.util.BuiltInFunctions;
 import org.casbin.jcasbin.util.Util;
 
 import java.util.List;
@@ -158,5 +159,9 @@ public class TestUtil {
         if (!Util.array2DEquals(res, myRes)) {
             fail("Permissions for " + name + " under " + domain + ": " + myRes + ", supposed to be " + res);
         }
+    }
+
+    static void testGlobMatch(String key1, String key2, boolean res) {
+        assertEquals(res, BuiltInFunctions.globMatch(key1, key2));
     }
 }

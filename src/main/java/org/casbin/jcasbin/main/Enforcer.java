@@ -52,7 +52,6 @@ public class Enforcer extends ManagementEnforcer {
      */
     public Enforcer(String modelPath, Adapter adapter) {
         this(newModel(modelPath, ""), adapter);
-
         this.modelPath = modelPath;
     }
 

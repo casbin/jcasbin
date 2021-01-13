@@ -55,6 +55,7 @@ public class FunctionMap {
         fm.addFunction("regexMatch", new RegexMatchFunc());
         fm.addFunction("ipMatch", new IPMatchFunc());
         fm.addFunction("eval", new EvalFunc());
+        fm.addFunction("globMatch", new GlobMatchFunc());
 
         return fm;
     }

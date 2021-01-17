@@ -4,7 +4,7 @@
 
     <groupId>org.casbin</groupId>
     <artifactId>jcasbin</artifactId>
-    <version>1.6.2</version>
+    <version>1.6.3</version>
 
     <name>JCasbin Authorization Library</name>
     <description>An authorization library that supports access control models like ACL, RBAC, ABAC in Java</description>
@@ -65,24 +65,6 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-gpg-plugin</artifactId>
-                    <version>1.5</version>
-                    <executions>
-                        <execution>
-                            <id>sign-artifacts</id>
-                            <!-- We sign in the verify phase, which means it will happen before install and deploy (the last two phases)
-                                 but not before earlier phases like test or package. -->
-                            <phase>verify</phase>
-                            <goals>
-                                <goal>sign</goal>
-                            </goals>
-                            <!-- If using gpg > 2.1 it is necessary for gpg to not try to use the pinentry programs
-                              however, it looks like Travis does not need this entry -->
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
                     <!-- Allow attaching Javadoc during releases -->
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
@@ -116,32 +98,6 @@
                     </executions>
                 </plugin>
                 <plugin>
-                    <!-- Include zipped source code in releases -->
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>attach-sources</id>
-                            <goals>
-                                <goal>jar-no-fork</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <!-- Automatically close and deploy from OSSRH -->
-                    <groupId>org.sonatype.plugins</groupId>
-                    <artifactId>nexus-staging-maven-plugin</artifactId>
-                    <version>1.6.7</version>
-                    <extensions>true</extensions>
-                    <configuration>
-                        <serverId>ossrh</serverId>
-                        <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                        <!-- Release versions will be synced to Maven Central automatically. -->
-                        <autoReleaseAfterClose>false</autoReleaseAfterClose>
-                    </configuration>
-                </plugin>
-                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <configuration>
@@ -171,6 +127,69 @@
         </pluginManagement>
     </build>
 
+    <profiles>
+        <profile>
+            <id>release</id>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+                </snapshotRepository>
+                <repository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+            </distributionManagement>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <!-- We sign in the verify phase, which means it will happen before install and deploy (the last two phases)
+                                     but not before earlier phases like test or package. -->
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <!-- If using gpg > 2.1 it is necessary for gpg to not try to use the pinentry programs
+                                  however, it looks like Travis does not need this entry -->
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <!-- Include zipped source code in releases -->
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <!-- Automatically close and deploy from OSSRH -->
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.7</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <!-- Release versions will be synced to Maven Central automatically. -->
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>

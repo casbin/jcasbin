@@ -10,3 +10,40 @@ jdk:
 
 after_success:
   - mvn clean test jacoco:report coveralls:report
+  - semantic-release --prepare @conveyal/maven-semantic-release --publish @semantic-release/github,@conveyal/maven-semantic-release --verify-conditions @semantic-release/github,@conveyal/maven-semantic-release --verify-release @conveyal/maven-semantic-release --use-conveyal-workflow --dev-branch=dev
+  # The following line is optional in maven-semantic-release projects.
+  # It is included here to test the uploading of jar files to s3 which is part of conveyal workflow.
+  - aws s3 cp --recursive --exclude "*" --include "v*.jar" /home/travis/build/evansiroky/maven-semantic-release-example/target s3://maven-semantic-release-example-builds
+  # The following line is optional in maven-semantic-release projects.
+  # It is included here to test running code coverage reports as part of conveyal workflow.
+  # run codecov after semantic-release because maven-semantic-release creates extra commits that
+  # codecov will need a report on to reference in future PRs to the release branch
+  - bash <(curl -s https://codecov.io/bash)
+
+before_install: |
+  # only install signing keys under the same circumstances we do a mvn deploy later
+  if [[ "$TRAVIS_PULL_REQUEST" = false ]] && [[ "$TRAVIS_BRANCH" = master ]]; then
+    openssl aes-256-cbc -K $encrypted_d81b39e7ac43_key -iv $encrypted_d81b39e7ac43_iv -in maven-artifact-signing-key.asc.enc -out maven-artifact-signing-key.asc -d
+    gpg --import --batch maven-artifact-signing-key.asc
+  fi
+
+before_script:
+  # install node 12
+  - nvm install '12'
+  - yarn global add https://github.com/conveyal/maven-semantic-release.git#8eb976c8ec57b2fd1cee86f119f80ab1f8a38948 semantic-release
+  # The following line is optional in maven-semantic-release projects.
+  # It is included here to install the aws command line tool.
+  - pip install --user awscli && export PATH=$PATH:~/.local/bin/
+
+cache:
+  directories:
+    - $HOME/.m2
+    - $HOME/.yarn-cache
+    # The following line is optional in maven-semantic-release projects.
+    # It is included here to cache libraries used to install the aws command line tool.
+    - $HOME/.cache/pip
+
+script:
+  - mvn package
+
+install: true

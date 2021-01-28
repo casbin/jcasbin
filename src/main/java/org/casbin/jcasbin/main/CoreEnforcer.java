@@ -237,7 +237,7 @@ public class CoreEnforcer {
     public void loadFilteredPolicy(Object filter) {
         model.clearPolicy();
         FilteredAdapter filteredAdapter;
-        if (adapter instanceof FilteredAdapter) {
+        if (adapter instanceof org.casbin.jcasbin.persist.FilteredAdapter) {
             filteredAdapter = (FilteredAdapter) adapter;
         } else {
             throw new CasbinAdapterException("Filtered policies are not supported by this adapter.");

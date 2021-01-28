@@ -18,7 +18,7 @@
 
     <ciManagement>
         <system>Travis CI</system>
-        <url>https://travis-ci.org/casbin/jcasbin</url>
+        <url>https://travis-ci.com/casbin/jcasbin</url>
     </ciManagement>
 
     <parent>

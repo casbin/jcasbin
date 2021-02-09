@@ -164,4 +164,12 @@ public class TestUtil {
     static void testGlobMatch(String key1, String key2, boolean res) {
         assertEquals(res, BuiltInFunctions.globMatch(key1, key2));
     }
+
+    static void testKeyGet(String key1, String key2, String res) {
+        assertEquals(res, BuiltInFunctions.keyGetFunc(key1, key2));
+    }
+
+    static void testKeyGet2(String key1, String key2, String pathVar, String res) {
+        assertEquals(res, BuiltInFunctions.keyGet2Func(key1, key2, pathVar));
+    }
 }

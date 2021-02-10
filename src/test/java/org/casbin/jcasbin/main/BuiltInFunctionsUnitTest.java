@@ -16,6 +16,8 @@ package org.casbin.jcasbin.main;
 
 import org.junit.Test;
 import static org.casbin.jcasbin.main.TestUtil.testGlobMatch;
+import static org.casbin.jcasbin.main.TestUtil.testKeyGet;
+import static org.casbin.jcasbin.main.TestUtil.testKeyGet2;
 
 public class BuiltInFunctionsUnitTest {
 
@@ -60,5 +62,53 @@ public class BuiltInFunctionsUnitTest {
         testGlobMatch("/prefix/subprefix/foobar", "*/foo", false);
         testGlobMatch("/prefix/subprefix/foobar", "*/foo*", false);
         testGlobMatch("/prefix/subprefix/foobar", "*/foo/*", false);
+    }
+
+    @Test
+    public void testKeyGetFunc() {
+        testKeyGet("/foo", "/foo", "");
+        testKeyGet("/foo", "/foo*", "");
+        testKeyGet("/foo", "/foo/*", "");
+        testKeyGet("/foo/bar", "/foo", "");
+        testKeyGet("/foo/bar", "/foo*", "/bar");
+        testKeyGet("/foo/bar", "/foo/*", "bar");
+        testKeyGet("/foobar", "/foo", "");
+        testKeyGet("/foobar", "/foo*", "bar");
+        testKeyGet("/foobar", "/foo/*", "");
+    }
+
+    @Test
+    public void TestKeyGet2() {
+        testKeyGet2("/foo", "/foo", "id", "");
+        testKeyGet2("/foo", "/foo*", "id", "");
+        testKeyGet2("/foo", "/foo/*", "id", "");
+        testKeyGet2("/foo/bar", "/foo", "id", "");
+        // different with KeyMatch.
+        testKeyGet2("/foo/bar", "/foo*", "id", "");
+        testKeyGet2("/foo/bar", "/foo/*", "id", "");
+        testKeyGet2("/foobar", "/foo", "id", "");
+        // different with KeyMatch.
+        testKeyGet2("/foobar", "/foo*", "id", "");
+        testKeyGet2("/foobar", "/foo/*", "id", "");
+
+        testKeyGet2("/", "/:resource", "resource", "");
+        testKeyGet2("/resource1", "/:resource", "resource", "resource1");
+        testKeyGet2("/myid", "/:id/using/:resId", "id", "");
+        testKeyGet2("/myid/using/myresid", "/:id/using/:resId", "id", "myid");
+        testKeyGet2("/myid/using/myresid", "/:id/using/:resId", "resId", "myresid");
+
+        testKeyGet2("/proxy/myid", "/proxy/:id/*", "id", "");
+        testKeyGet2("/proxy/myid/", "/proxy/:id/*", "id", "myid");
+        testKeyGet2("/proxy/myid/res", "/proxy/:id/*", "id", "myid");
+        testKeyGet2("/proxy/myid/res/res2", "/proxy/:id/*", "id", "myid");
+        testKeyGet2("/proxy/myid/res/res2/res3", "/proxy/:id/*", "id", "myid");
+        testKeyGet2("/proxy/myid/res/res2/res3", "/proxy/:id/res/*", "id", "myid");
+        testKeyGet2("/proxy/", "/proxy/:id/*", "id", "");
+
+        testKeyGet2("/alice", "/:id", "id", "alice");
+        testKeyGet2("/alice/all", "/:id/all", "id", "alice");
+        testKeyGet2("/alice", "/:id/all", "id", "");
+        testKeyGet2("/alice/all", "/:id", "id", "");
+        testKeyGet2("/alice/all", "/:/all", "", "");
     }
 }

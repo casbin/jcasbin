@@ -182,6 +182,63 @@ public class BuiltInFunctions {
     }
 
     /**
+     * KeyGet returns the matched part. For example, "/foo/bar/foo" matches "/foo/*", "bar/foo" will been returned
+     *
+     * @param key1 the first argument.
+     * @param key2 the second argument.
+     * @return the matched part.
+     */
+    public static String keyGetFunc(String key1, String key2) {
+        int index = key2.indexOf('*');
+        if (index == -1) {
+            return "";
+        }
+        if (key1.length() > index) {
+            if (key1.substring(0, index).equals(key2.substring(0, index))) {
+                return key1.substring(index);
+            }
+        }
+        return "";
+    }
+
+    /**
+     * KeyGet2 returns value matched pattern.For example, "/resource1" matches "/:resource", if the pathVar == "resource", then "resource1" will be returned.
+     *
+     * @param key1 the first argument.
+     * @param key2 the second argument.
+     * @return the matched part.
+     */
+    public static String keyGet2Func(String key1, String key2, String pathVar) {
+        key2 = key2.replace("/*", "/.*");
+        String regexp = ":[^/]+";
+        Pattern re = Pattern.compile(regexp);
+        Matcher keys = re.matcher(key2);
+        List<String> keysList = new ArrayList<>();
+        while (keys.find()) {
+            keysList.add(keys.group());
+        }
+        key2 = keys.replaceAll("([^/]+)");
+        key2 = "^" + key2 + "$";
+        Pattern re2 = Pattern.compile(key2);
+        Matcher values = re2.matcher(key1);
+        List<String> valuesList = new ArrayList<>();
+        while (values.find()) {
+            for (int i = 0; i <= values.groupCount(); i++) {
+                valuesList.add(values.group(i));
+            }
+        }
+        if (valuesList.isEmpty()) {
+            return "";
+        }
+        for (int i = 0; i < keysList.size(); i++) {
+            if (pathVar.equals(keysList.get(i).substring(1))) {
+                return valuesList.get(i+1);
+            }
+        }
+        return "";
+    }
+
+    /**
      * regexMatch determines whether key1 matches the pattern of key2 in regular expression.
      *
      * @param key1 the first argument.

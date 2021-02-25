@@ -20,4 +20,3 @@ cache:
 before_script:
   - nvm install '12'
   - yarn global add @conveyal/maven-semantic-release semantic-release
-

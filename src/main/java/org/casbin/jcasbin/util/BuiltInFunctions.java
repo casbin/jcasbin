@@ -14,8 +14,6 @@
 
 package org.casbin.jcasbin.util;
 
-import bsh.EvalError;
-import bsh.Interpreter;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
@@ -25,7 +23,10 @@ import inet.ipaddr.AddressStringException;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
 import org.casbin.jcasbin.rbac.RoleManager;
+import org.codehaus.commons.compiler.CompileException;
+import org.codehaus.janino.ExpressionEvaluator;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
@@ -35,12 +36,7 @@ public class BuiltInFunctions {
 
     private static Pattern keyMatch2Pattern = Pattern.compile("(.*):[^/]+(.*)");
     private static Pattern keyMatch3Pattern = Pattern.compile("(.*)\\{[^/]+}(.*)");
-
-    private static final Interpreter interpreter;
-
-    static {
-        interpreter = new Interpreter();
-    }
+    private static Pattern evalPattern = Pattern.compile("(?<=\\.).*?(?=\\.| )");
 
     /**
      * keyMatch determines whether key1 matches the pattern of key2 (similar to RESTful path), key2
@@ -379,21 +375,33 @@ public class BuiltInFunctions {
      * @return The result of the eval.
      */
     public static boolean eval(String eval, Map<String, Object> env) {
+        ExpressionEvaluator evaluator = new ExpressionEvaluator();
         Map<String, Map<String, Object>> evalModels = getEvalModels(env);
         try {
-            for (final Entry<String, Map<String, Object>> entry : evalModels.entrySet()) {
-                // String key
-                interpreter.set(entry.getKey(), entry.getValue());
+            List<String> parameterNameList = new ArrayList<>();
+            List<Object> parameterValueList = new ArrayList<>();
+            List<Class<?>> parameterClassList = new ArrayList<>();
+            for (Map.Entry<String, Object> entry: env.entrySet()) {
+                parameterNameList.add(entry.getKey());
+                parameterValueList.add(entry.getValue());
+                parameterClassList.add(entry.getValue().getClass());
             }
-
             List<String> sortedSrc = new ArrayList<>(getReplaceTargets(evalModels));
             sortedSrc.sort((o1, o2) -> o1.length() > o2.length() ? -1 : 1);
             for (String s : sortedSrc) {
-                eval = eval.replace("." + s, ".get(\"" + s + "\")");
+                eval = eval.replace("." + s, "_" + s);
             }
-            return (boolean) interpreter.eval(eval);
-        } catch (EvalError evalError) {
-            evalError.printStackTrace();
+            Matcher matcher = evalPattern.matcher(eval);
+            while (matcher.find()) {
+                for (int i = 0; i <= matcher.groupCount(); i++) {
+                    eval = eval.replace(matcher.group(), obtainFieldGetMethodName(matcher.group()));
+                }
+            }
+            evaluator.setParameters(parameterNameList.toArray(new String[0]), parameterClassList.toArray(new Class[0]));
+            evaluator.cook(eval);
+            return (boolean) evaluator.evaluate(parameterValueList.toArray(new Object[0]));
+        } catch (InvocationTargetException | CompileException e) {
+            e.printStackTrace();
         }
         return false;
     }
@@ -418,5 +426,18 @@ public class BuiltInFunctions {
             ret.addAll(entry.getValue().keySet());
         }
         return ret;
+    }
+
+    /**
+     * Get the function name of its get method according to the field name.
+     * For example, the input parameter is "age", the output parameter is "getAge()"
+     *
+     * @param fieldName the file name.
+     * @return the function name of its get method.
+     */
+    private static String obtainFieldGetMethodName(String fieldName) {
+        return new StringBuffer().append("get")
+            .append(fieldName.substring(0, 1).toUpperCase())
+            .append(fieldName.substring(1)).append("()").toString();
     }
 }

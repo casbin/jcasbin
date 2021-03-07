@@ -20,22 +20,13 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: GPG_PASSPHRASE
 
-      - name: Set up Codecov
-      - uses: codecov/codecov-action@v1
-        with: ${{ secrets.COVERALLS_TOKEN }}
+      - name: Build with Maven
+        run: mvn clean test jacoco:report coveralls:report -DrepoToken=${{ secrets.COVERALLS_TOKEN }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v1
         with:
           node-version: 12
-
-      - name: Build with Maven
-        run: mvn clean test cobertura:cobertura
-
-      - name: Codecov
-        uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Sematic Release
         run: |

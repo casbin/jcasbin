@@ -29,7 +29,7 @@ import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.Dispatcher;
 import org.casbin.jcasbin.persist.WatcherEx;
-import org.casbin.jcasbin.persist.file_adapter.FilteredAdapter;
+import org.casbin.jcasbin.persist.FilteredAdapter;
 import org.casbin.jcasbin.persist.Watcher;
 import org.casbin.jcasbin.rbac.DefaultRoleManager;
 import org.casbin.jcasbin.rbac.RoleManager;
@@ -237,7 +237,7 @@ public class CoreEnforcer {
     public void loadFilteredPolicy(Object filter) {
         model.clearPolicy();
         FilteredAdapter filteredAdapter;
-        if (adapter instanceof org.casbin.jcasbin.persist.FilteredAdapter) {
+        if (adapter instanceof FilteredAdapter) {
             filteredAdapter = (FilteredAdapter) adapter;
         } else {
             throw new CasbinAdapterException("Filtered policies are not supported by this adapter.");

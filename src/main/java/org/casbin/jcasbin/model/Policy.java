@@ -21,6 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Policy represents the whole access control policy user defined.
+ */
 public class Policy {
     public Map<String, Map<String, Assertion>> model;
 

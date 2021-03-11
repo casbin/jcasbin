@@ -106,10 +106,12 @@ public class Model extends Policy {
             }
         }
     }
+    
     /*
      * Helper function for loadModel and loadModelFromText
+     * 
+     * @param config the configuration parser
      */
-    
     private void loadSections(Config cfg) {
         loadSection(this, cfg, "r");
         loadSection(this, cfg, "p");

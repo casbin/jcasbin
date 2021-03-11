@@ -106,15 +106,11 @@ public class Model extends Policy {
             }
         }
     }
-
-    /**
-     * loadModel loads the model from model CONF file.
-     *
-     * @param path the path of the model file.
+    /*
+     * Helper function for loadModel and loadModelFromText
      */
-    public void loadModel(String path) {
-        Config cfg = Config.newConfig(path);
-
+    
+    private void loadSections(Config cfg) {
         loadSection(this, cfg, "r");
         loadSection(this, cfg, "p");
         loadSection(this, cfg, "e");
@@ -124,19 +120,25 @@ public class Model extends Policy {
     }
 
     /**
+     * loadModel loads the model from model CONF file.
+     *
+     * @param path the path of the model file.
+     */
+    public void loadModel(String path) {
+        Config cfg = Config.newConfig(path);
+        
+        loadSections(cfg);
+    }
+
+    /**
      * loadModelFromText loads the model from the text.
      *
      * @param text the model text.
      */
     public void loadModelFromText(String text) {
         Config cfg = Config.newConfigFromText(text);
-
-        loadSection(this, cfg, "r");
-        loadSection(this, cfg, "p");
-        loadSection(this, cfg, "e");
-        loadSection(this, cfg, "m");
-
-        loadSection(this, cfg, "g");
+        
+        loadSections(cfg);
     }
 
     /**

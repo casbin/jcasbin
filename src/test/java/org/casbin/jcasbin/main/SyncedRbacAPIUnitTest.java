@@ -16,6 +16,8 @@ package org.casbin.jcasbin.main;
 
 import org.junit.Test;
 
+import java.util.Collections;
+
 import static java.util.Arrays.asList;
 import static org.casbin.jcasbin.main.TestUtil.*;
 import static org.junit.Assert.assertEquals;
@@ -150,6 +152,16 @@ public class SyncedRbacAPIUnitTest {
                         asList("data2_admin", "data2", "read"),
                         asList("data2_admin", "data2", "write")
                 )
+        );
+
+    }
+
+    @Test
+    public void testImplicitPermissionWithoutRoleAPI() {
+        Enforcer e = new SyncedEnforcer("examples/rbac_model.conf", "examples/rbac_with_hierarchy_policy_without_role.csv");
+        assertEquals(
+            e.getImplicitPermissionsForUser("alice"),
+            Collections.singletonList(asList("alice", "data1", "read"))
         );
 
     }

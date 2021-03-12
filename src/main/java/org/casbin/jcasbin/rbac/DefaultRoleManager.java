@@ -14,12 +14,7 @@
 
 package org.casbin.jcasbin.rbac;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiPredicate;
 
 import org.casbin.jcasbin.util.Util;
@@ -53,7 +48,7 @@ public class DefaultRoleManager implements RoleManager {
      * e.loadPolicy();
      * </pre>
      *
-     * 
+     *
      * @param maxHierarchyLevel the maximized allowed RBAC hierarchy level.
      * @param matchingFunc a matcher for supporting pattern in g
      * @param domainMatchingFunc a matcher for supporting domain pattern in g
@@ -216,7 +211,8 @@ public class DefaultRoleManager implements RoleManager {
         final DomainRoles allRoles = getMatchingDomainRoles(domain);
 
         if (!allRoles.hasRole(name, matchingFunc)) {
-            throw new IllegalArgumentException("error: name does not exist");
+            Util.logPrintfError("error: name does not exist");
+            return Collections.emptyList();
         }
 
         return allRoles.createRole(name, matchingFunc).getRoles();

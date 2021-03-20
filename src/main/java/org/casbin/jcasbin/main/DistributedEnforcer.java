@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.function.BooleanSupplier;
 
 /**
- * DistributedEnforcer wraps DistributedEnforcer for dispatcher.
+ * DistributedEnforcer wraps SyncedEnforcer for dispatcher.
  *
  * @author canxer314
  */

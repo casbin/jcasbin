@@ -14,9 +14,14 @@
 
 package org.casbin.jcasbin.util;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -199,18 +204,29 @@ public class Util {
     }
 
     /**
-     * splitCommaDelimited splits a comma-delimited string into a string array. It assumes that any
-     * number of whitespace might exist before or after the comma and that tokens do not include
+     * splitCommaDelimited splits a comma-delimited string according to the default processing method of the CSV file
+     * into a string array. It assumes that any number of whitespace might exist before or after the word and that tokens do not include
      * whitespace as part of their value.
      *
-     * @param s the comma-delimited string.
+     * @param s the string.
      * @return the array with the string tokens.
      */
     public static String[] splitCommaDelimited(String s) {
-        if (s == null) {
-            return null;
+        String[] records = null;
+        if (s != null) {
+            try {
+                CSVParser csvParser = CSVFormat.DEFAULT.parse(new StringReader(s));
+                List<CSVRecord> csvRecords = csvParser.getRecords();
+                records = new String[csvRecords.get(0).size()];
+                for (int i = 0; i < csvRecords.get(0).size(); i++) {
+                    records[i] = csvRecords.get(0).get(i).trim();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                Util.logPrintfError("CSV parser failed to parse this line:", s);
+            }
         }
-        return s.trim().split("\\s*,\\s*");
+        return records;
     }
 
     /**

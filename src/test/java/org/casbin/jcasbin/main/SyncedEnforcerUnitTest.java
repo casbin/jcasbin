@@ -427,6 +427,5 @@ public class SyncedEnforcerUnitTest {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-
     }
 }

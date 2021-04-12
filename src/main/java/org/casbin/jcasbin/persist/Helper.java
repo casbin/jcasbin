@@ -14,11 +14,11 @@
 
 package org.casbin.jcasbin.persist;
 
-import static org.casbin.jcasbin.util.Util.splitCommaDelimited;
-
 import org.casbin.jcasbin.model.Model;
 
 import java.util.Arrays;
+
+import static org.casbin.jcasbin.util.Util.splitCommaDelimited;
 
 public class Helper {
     public interface loadPolicyLineHandler<T, U> {

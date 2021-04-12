@@ -14,14 +14,14 @@
 
 package org.casbin.jcasbin.main;
 
-import static org.casbin.jcasbin.main.TestUtil.testDomainEnforce;
-import static org.casbin.jcasbin.main.TestUtil.testEnforce;
-import static org.casbin.jcasbin.main.TestUtil.testEnforceWithoutUsers;
+import org.casbin.jcasbin.rbac.RoleManager;
+import org.junit.Test;
 
 import java.util.List;
 
-import org.casbin.jcasbin.rbac.RoleManager;
-import org.junit.Test;
+import static org.casbin.jcasbin.main.TestUtil.testDomainEnforce;
+import static org.casbin.jcasbin.main.TestUtil.testEnforce;
+import static org.casbin.jcasbin.main.TestUtil.testEnforceWithoutUsers;
 
 public class ModelUnitTest {
     @Test

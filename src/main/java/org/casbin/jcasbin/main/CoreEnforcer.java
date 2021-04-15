@@ -222,6 +222,7 @@ public class CoreEnforcer {
     public void loadPolicy() {
         model.clearPolicy();
         adapter.loadPolicy(model);
+        model.sortPoliciesByPriority();
 
         model.printPolicy();
         if (autoBuildRoleLinks) {
@@ -247,6 +248,7 @@ public class CoreEnforcer {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        model.sortPoliciesByPriority();
         model.printPolicy();
         if (autoBuildRoleLinks) {
             buildRoleLinks();

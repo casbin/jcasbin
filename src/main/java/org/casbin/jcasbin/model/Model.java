@@ -202,6 +202,19 @@ public class Model extends Policy {
         }
     }
 
+    /**
+     * sort policies based on priority value
+     */
+    public void sortPoliciesByPriority() {
+        for (Map.Entry<String, Assertion> entry : model.get("p").entrySet()) {
+            Assertion assertion = entry.getValue();
+            if (!(entry.getKey() + "_priority").equals(assertion.tokens[0])) {
+                continue;
+            }
+            assertion.policy.sort(Comparator.comparingInt(p -> Integer.parseInt(p.get(0))));
+        }
+    }
+
     public enum PolicyOperations {
         POLICY_ADD,
         POLICY_REMOVE

@@ -180,9 +180,30 @@ public class Policy {
      */
     public boolean addPolicy(String sec, String ptype, List<String> rule) {
         if (!hasPolicy(sec, ptype, rule)) {
-            model.get(sec).get(ptype).policy.add(rule);
+            Assertion assertion = model.get(sec).get(ptype);
+            List<List<String>> policy = assertion.policy;
+
+            // ensure the policies is ordered by priority value
+            if ("p".equals(sec) && (ptype + "_priority").equals(assertion.tokens[0])) {
+                int value = Integer.parseInt(rule.get(0));
+                int left = 0, right = policy.size();
+                // binary insert
+                while (left < right) {
+                    int mid = (left + right) >>> 1;
+                    if (value > Integer.parseInt(policy.get(mid).get(0))) {
+                        left = mid + 1;
+                    } else {
+                        right = mid;
+                    }
+                }
+                policy.add(left, rule);
+            } else {
+                policy.add(rule);
+            }
+
             return true;
         }
+
         return false;
     }
 

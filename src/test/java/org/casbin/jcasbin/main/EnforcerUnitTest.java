@@ -500,4 +500,30 @@ public class EnforcerUnitTest {
         testDomainEnforce(enforcer, "alice", "domain1", "data1", "read", true);
         testDomainEnforce(enforcer, "alice", "domain1", "data2", "write", false);
     }
+
+    @Test
+    public void testPriorityExplicit() {
+        Enforcer e = new Enforcer("examples/priority_model_explicit.conf", "examples/priority_policy_explicit.csv");
+
+        testEnforce(e, "alice", "data1", "write", true);
+        testEnforce(e, "alice", "data1", "read", true);
+        testEnforce(e, "bob", "data2", "read", false);
+        testEnforce(e, "bob", "data2", "write", true);
+        testEnforce(e, "data1_deny_group", "data1", "read", false);
+        testEnforce(e, "data1_deny_group", "data1", "write", false);
+        testEnforce(e, "data2_allow_group", "data2", "read", true);
+        testEnforce(e, "data2_allow_group", "data2", "write", true);
+
+        // add a higher priority policy
+        e.addPolicy("1", "bob", "data2", "write", "deny");
+
+        testEnforce(e, "alice", "data1", "write", true);
+        testEnforce(e, "alice", "data1", "read", true);
+        testEnforce(e, "bob", "data2", "read", false);
+        testEnforce(e, "bob", "data2", "write", false);
+        testEnforce(e, "data1_deny_group", "data1", "read", false);
+        testEnforce(e, "data1_deny_group", "data1", "write", false);
+        testEnforce(e, "data2_allow_group", "data2", "read", true);
+        testEnforce(e, "data2_allow_group", "data2", "write", true);
+    }
 }

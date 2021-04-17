@@ -19,6 +19,7 @@ import static org.casbin.jcasbin.util.Util.splitCommaDelimited;
 import org.casbin.jcasbin.config.Config;
 import org.casbin.jcasbin.util.Util;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -198,6 +199,21 @@ public class Model extends Policy {
         for (Map.Entry<String, Map<String, Assertion>> entry : model.entrySet()) {
             for (Map.Entry<String, Assertion> entry2 : entry.getValue().entrySet()) {
                 Util.logPrintf("%s.%s: %s", entry.getKey(), entry2.getKey(), entry2.getValue().value);
+            }
+        }
+    }
+
+    /**
+     * sort policies by priority value
+     */
+    public void sortPoliciesByPriority() {
+        if (model.containsKey("p")) {
+            for (Map.Entry<String, Assertion> entry : model.get("p").entrySet()) {
+                Assertion assertion = entry.getValue();
+                if (!(entry.getKey() + "_priority").equals(assertion.tokens[0])) {
+                    continue;
+                }
+                assertion.policy.sort(Comparator.comparingInt(p -> Integer.parseInt(p.get(0))));
             }
         }
     }

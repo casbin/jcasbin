@@ -450,7 +450,6 @@ public class EnforcerUnitTest {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-
     }
 
     @Test

@@ -192,6 +192,15 @@ public class CoreEnforcer {
     }
 
     /**
+     * getRoleManager gets the current role manager.
+     *
+     * @return the role manager of the enforcer.
+     */
+    public RoleManager getRoleManager() {
+        return rm;
+    }
+
+    /**
      * SetRoleManager sets the current role manager.
      *
      * @param rm the role manager.

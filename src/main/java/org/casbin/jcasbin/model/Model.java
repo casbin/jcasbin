@@ -66,6 +66,7 @@ public class Model extends Policy {
         Assertion ast = new Assertion();
         ast.key = key;
         ast.value = value;
+        ast.initPriorityIndex();
 
         if (ast.value.equals("")) {
             return false;
@@ -73,8 +74,12 @@ public class Model extends Policy {
 
         if (sec.equals("r") || sec.equals("p")) {
             ast.tokens = splitCommaDelimited(ast.value);
-            for (int i = 0; i < ast.tokens.length; i ++) {
+            for (int i = 0; i < ast.tokens.length; i++) {
                 ast.tokens[i] = key + "_" + ast.tokens[i];
+
+                if ("p_priority".equals(ast.tokens[i])) {
+                    ast.priorityIndex = i;
+                }
             }
         } else {
             ast.value = Util.removeComments(Util.escapeAssertion(ast.value));
@@ -207,14 +212,17 @@ public class Model extends Policy {
      * sort policies by priority value
      */
     public void sortPoliciesByPriority() {
-        if (model.containsKey("p")) {
-            for (Map.Entry<String, Assertion> entry : model.get("p").entrySet()) {
-                Assertion assertion = entry.getValue();
-                if (!(entry.getKey() + "_priority").equals(assertion.tokens[0])) {
-                    continue;
-                }
-                assertion.policy.sort(Comparator.comparingInt(p -> Integer.parseInt(p.get(0))));
+        if (!model.containsKey("p")) {
+            return;
+        }
+
+        for (Map.Entry<String, Assertion> entry : model.get("p").entrySet()) {
+            Assertion assertion = entry.getValue();
+            int priorityIndex = assertion.priorityIndex;
+            if (priorityIndex < 0) {
+                continue;
             }
+            assertion.policy.sort(Comparator.comparingInt(p -> Integer.parseInt(p.get(priorityIndex))));
         }
     }
 

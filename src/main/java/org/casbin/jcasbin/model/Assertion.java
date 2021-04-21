@@ -30,6 +30,7 @@ public class Assertion {
     public String[] tokens;
     public List<List<String>> policy;
     public RoleManager rm;
+    public int priorityIndex;
 
     public Assertion() {
         policy = new ArrayList<>();
@@ -93,5 +94,9 @@ public class Assertion {
                     throw new IllegalArgumentException("invalid operation:" + op.toString());
             }
         }
+    }
+
+    public void initPriorityIndex() {
+        priorityIndex = -1;
     }
 }

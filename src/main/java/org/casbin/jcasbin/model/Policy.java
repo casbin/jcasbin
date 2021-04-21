@@ -182,15 +182,16 @@ public class Policy {
         if (!hasPolicy(sec, ptype, rule)) {
             Assertion assertion = model.get(sec).get(ptype);
             List<List<String>> policy = assertion.policy;
+            int priorityIndex = assertion.priorityIndex;
 
             // ensure the policies is ordered by priority value
-            if ("p".equals(sec) && (ptype + "_priority").equals(assertion.tokens[0])) {
-                int value = Integer.parseInt(rule.get(0));
+            if ("p".equals(sec) && priorityIndex >= 0) {
+                int value = Integer.parseInt(rule.get(priorityIndex));
                 int left = 0, right = policy.size();
                 // binary insert
                 while (left < right) {
                     int mid = (left + right) >>> 1;
-                    if (value > Integer.parseInt(policy.get(mid).get(0))) {
+                    if (value > Integer.parseInt(policy.get(mid).get(priorityIndex))) {
                         left = mid + 1;
                     } else {
                         right = mid;

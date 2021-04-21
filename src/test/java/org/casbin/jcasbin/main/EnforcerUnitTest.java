@@ -514,7 +514,7 @@ public class EnforcerUnitTest {
         testEnforce(e, "data2_allow_group", "data2", "write", true);
 
         // add a higher priority policy
-        e.addPolicy("1", "bob", "data2", "write", "deny");
+        e.addPolicy("bob", "data2", "write", "deny", "1");
 
         testEnforce(e, "alice", "data1", "write", true);
         testEnforce(e, "alice", "data1", "read", true);

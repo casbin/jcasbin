@@ -1,12 +1,12 @@
-p, 10, data1_deny_group, data1, read, deny
-p, 10, data1_deny_group, data1, write, deny
-p, 10, data2_allow_group, data2, read, allow
-p, 10, data2_allow_group, data2, write, allow
+p, data1_deny_group, data1, read, deny, 10
+p, data1_deny_group, data1, write, deny, 10
+p, data2_allow_group, data2, read, allow, 10
+p, data2_allow_group, data2, write, allow, 10
 
 
-p, 1, alice, data1, write, allow
-p, 1, alice, data1, read, allow
-p, 1, bob, data2, read, deny
+p, alice, data1, write, allow, 1
+p, alice, data1, read, allow, 1
+p, bob, data2, read, deny, 1
 
 g, bob, data2_allow_group
 g, alice, data1_deny_group

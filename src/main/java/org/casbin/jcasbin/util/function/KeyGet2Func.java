@@ -16,8 +16,8 @@ package org.casbin.jcasbin.util.function;
 
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
-import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.runtime.type.AviatorString;
 import org.casbin.jcasbin.util.BuiltInFunctions;
 
 import java.util.Map;
@@ -30,15 +30,16 @@ import java.util.Map;
  */
 public class KeyGet2Func extends AbstractFunction {
     @Override
-    public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+    public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2, AviatorObject arg3) {
         String key1 = FunctionUtils.getStringValue(arg1, env);
         String key2 = FunctionUtils.getStringValue(arg2, env);
+        String pathVar = FunctionUtils.getStringValue(arg3, env);
 
-        return AviatorBoolean.valueOf(BuiltInFunctions.keyMatch(key1, key2));
+        return new AviatorString(BuiltInFunctions.keyGet2Func(key1, key2, pathVar));
     }
 
     @Override
     public String getName() {
-        return "ketGet2";
+        return "keyGet2";
     }
 }

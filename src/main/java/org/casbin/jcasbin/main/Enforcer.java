@@ -487,4 +487,19 @@ public class Enforcer extends ManagementEnforcer {
         }
         return res;
     }
+
+    /**
+     * BatchEnforce enforce in batches
+     *
+     * @param rules the rules.
+     * @return the results
+     */
+    public List<Boolean> batchEnforce(List<List<String>> rules) {
+        List<Boolean> results = new ArrayList<>();
+        for (List<String> rule:rules) {
+            boolean result = this.enforce(rule.get(0), rule.get(1), rule.get(2));
+            results.add(result);
+        }
+        return results;
+    }
 }

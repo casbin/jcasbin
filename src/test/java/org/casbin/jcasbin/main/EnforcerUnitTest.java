@@ -18,10 +18,12 @@ import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
 import org.casbin.jcasbin.util.Util;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
@@ -524,5 +526,15 @@ public class EnforcerUnitTest {
         testEnforce(e, "data1_deny_group", "data1", "write", false);
         testEnforce(e, "data2_allow_group", "data2", "read", true);
         testEnforce(e, "data2_allow_group", "data2", "write", true);
+    }
+
+    @Test
+    public void testBatchEnforce() {
+        Enforcer e = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv");
+
+        List<Boolean> results = asList(true, true, false);
+        List<Boolean> myResults = e.batchEnforce(asList(asList("alice", "data1", "read"),
+            asList("bob", "data2", "write"), asList("jack", "data3", "read")));
+        Assert.assertArrayEquals(myResults.toArray(new Boolean[0]), results.toArray(new Boolean[0]));
     }
 }

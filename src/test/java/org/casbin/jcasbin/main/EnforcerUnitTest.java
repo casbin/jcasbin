@@ -529,12 +529,47 @@ public class EnforcerUnitTest {
     }
 
     @Test
+    public void testEnforceWithMatcher() {
+        Enforcer e = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv");
+
+        // the previous matcher is
+        // m = r.sub == p.sub && r.obj == p.obj && r.act == p.act
+        testEnforce(e, "alice", "data1", "read", true);
+        testEnforce(e, "bob", "data2", "write", true);
+        testEnforce(e, "root", "data2", "read", false);
+        testEnforce(e, "root", "data3", "read", false);
+        testEnforce(e, "jack", "data3", "read", false);
+
+        // custom matcher
+        String matcher = "m = r.sub == 'root' || r.sub == p.sub && r.obj == p.obj && r.act == p.act";
+        TestUtil.testEnforceWithMatcher(e, matcher, "alice", "data1", "read", true);
+        TestUtil.testEnforceWithMatcher(e, matcher, "bob", "data2", "write", true);
+        TestUtil.testEnforceWithMatcher(e, matcher, "root", "data2", "read", true);
+        TestUtil.testEnforceWithMatcher(e, matcher, "root", "data3", "read", true);
+        TestUtil.testEnforceWithMatcher(e, matcher, "jack", "data3", "read", false);
+    }
+
+    @Test
     public void testBatchEnforce() {
         Enforcer e = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv");
 
         List<Boolean> results = asList(true, true, false);
         List<Boolean> myResults = e.batchEnforce(asList(asList("alice", "data1", "read"),
             asList("bob", "data2", "write"), asList("jack", "data3", "read")));
+        Assert.assertArrayEquals(myResults.toArray(new Boolean[0]), results.toArray(new Boolean[0]));
+    }
+
+    @Test
+    public void testBatchEnforceWithMatcher() {
+        Enforcer e = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv");
+
+        // the previous matcher is
+        // m = r.sub == p.sub && r.obj == p.obj && r.act == p.act
+        String matcher = "m = r.sub == 'root' || r.sub == p.sub && r.obj == p.obj && r.act == p.act";
+        List<Boolean> results = asList(true, true, true, true, false);
+        List<Boolean> myResults = e.batchEnforceWithMatcher(matcher, asList(asList("alice", "data1", "read"),
+            asList("bob", "data2", "write"), asList("root", "data2", "read"),
+            asList("root", "data3", "read"), asList("jack", "data3", "read")));
         Assert.assertArrayEquals(myResults.toArray(new Boolean[0]), results.toArray(new Boolean[0]));
     }
 }

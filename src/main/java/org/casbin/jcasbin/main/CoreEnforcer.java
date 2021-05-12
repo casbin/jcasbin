@@ -344,14 +344,15 @@ public class CoreEnforcer {
     }
 
     /**
-     * enforce decides whether a "subject" can access a "object" with
-     * the operation "action", input parameters are usually: (sub, obj, act).
+     * enforce use a custom matcher to decide whether a "subject" can access a "object" with the operation "action",
+     * input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "" or null.
      *
-     * @param rvals the request needs to be mediated, usually an array
-     *              of strings, can be class instances if ABAC is used.
+     * @param matcher the custom matcher.
+     * @param rvals   the request needs to be mediated, usually an array
+     *                of strings, can be class instances if ABAC is used.
      * @return whether to allow the request.
      */
-    public boolean enforce(Object... rvals) {
+    private boolean enforce(String matcher, Object... rvals) {
         if (!enabled) {
             return true;
         }
@@ -385,29 +386,35 @@ public class CoreEnforcer {
                 }
             }
         }
-        String expString = model.model.get("m").get("m").value;
+
+        String expString;
+        if (matcher == null || "".equals(matcher)) {
+            expString = model.model.get("m").get("m").value;
+        } else {
+            expString = Util.removeComments(Util.escapeAssertion(matcher));
+        }
         Expression expression = aviatorEval.compile(expString, true);
 
-        Effect policyEffects[];
-        float matcherResults[];
+        Effect[] policyEffects;
+        float[] matcherResults;
         int policyLen;
         if ((policyLen = model.model.get("p").get("p").policy.size()) != 0) {
             policyEffects = new Effect[policyLen];
             matcherResults = new float[policyLen];
 
-            for (int i = 0; i < model.model.get("p").get("p").policy.size(); i ++) {
+            for (int i = 0; i < model.model.get("p").get("p").policy.size(); i++) {
                 List<String> pvals = model.model.get("p").get("p").policy.get(i);
 
                 // Util.logPrint("Policy Rule: " + pvals);
                 // Select the rule based on request size
                 Map<String, Object> parameters = new HashMap<>();
                 getRTokens(parameters, rvals);
-                for (int j = 0; j < model.model.get("p").get("p").tokens.length; j ++) {
+                for (int j = 0; j < model.model.get("p").get("p").tokens.length; j++) {
                     String token = model.model.get("p").get("p").tokens[j];
                     parameters.put(token, pvals.get(j));
                 }
 
-                Object result =  expression.execute(parameters);
+                Object result = expression.execute(parameters);
                 // Util.logPrint("Result: " + result);
 
                 if (result instanceof Boolean) {
@@ -427,9 +434,9 @@ public class CoreEnforcer {
                 }
                 if (parameters.containsKey("p_eft")) {
                     String eft = (String) parameters.get("p_eft");
-                    if (eft.equals("allow")) {
+                    if ("allow".equals(eft)) {
                         policyEffects[i] = Effect.Allow;
-                    } else if (eft.equals("deny")) {
+                    } else if ("deny".equals(eft)) {
                         policyEffects[i] = Effect.Deny;
                     } else {
                         policyEffects[i] = Effect.Indeterminate;
@@ -438,7 +445,7 @@ public class CoreEnforcer {
                     policyEffects[i] = Effect.Allow;
                 }
 
-                if (model.model.get("e").get("e").value.equals("priority(p_eft) || deny")) {
+                if ("priority(p_eft) || deny".equals(model.model.get("e").get("e").value)) {
                     break;
                 }
             }
@@ -447,11 +454,11 @@ public class CoreEnforcer {
             matcherResults = new float[1];
 
             Map<String, Object> parameters = new HashMap<>();
-            for (int j = 0; j < model.model.get("r").get("r").tokens.length; j ++) {
+            for (int j = 0; j < model.model.get("r").get("r").tokens.length; j++) {
                 String token = model.model.get("r").get("r").tokens[j];
                 parameters.put(token, rvals[j]);
             }
-            for (int j = 0; j < model.model.get("p").get("p").tokens.length; j ++) {
+            for (int j = 0; j < model.model.get("p").get("p").tokens.length; j++) {
                 String token = model.model.get("p").get("p").tokens[j];
                 parameters.put(token, "");
             }
@@ -469,7 +476,7 @@ public class CoreEnforcer {
         boolean result = eft.mergeEffects(model.model.get("e").get("e").value, policyEffects, matcherResults);
 
         StringBuilder reqStr = new StringBuilder("Request: ");
-        for (int i = 0; i < rvals.length; i ++) {
+        for (int i = 0; i < rvals.length; i++) {
             String rval = rvals[i].toString();
 
             if (i != rvals.length - 1) {
@@ -482,6 +489,31 @@ public class CoreEnforcer {
         Util.logPrint(reqStr.toString());
 
         return result;
+    }
+
+    /**
+     * enforce decides whether a "subject" can access a "object" with
+     * the operation "action", input parameters are usually: (sub, obj, act).
+     *
+     * @param rvals the request needs to be mediated, usually an array
+     *              of strings, can be class instances if ABAC is used.
+     * @return whether to allow the request.
+     */
+    public boolean enforce(Object... rvals) {
+        return enforce(null, rvals);
+    }
+
+    /**
+     * enforceWithMatcher use a custom matcher to decide whether a "subject" can access a "object" with the operation "action",
+     * input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "" or null.
+     *
+     * @param matcher the custom matcher.
+     * @param rvals   the request needs to be mediated, usually an array
+     *                of strings, can be class instances if ABAC is used.
+     * @return whether to allow the request.
+     */
+    public boolean enforceWithMatcher(String matcher, Object... rvals) {
+        return enforce(matcher, rvals);
     }
 
     private void getRTokens(Map<String, Object> parameters, Object ...rvals) {

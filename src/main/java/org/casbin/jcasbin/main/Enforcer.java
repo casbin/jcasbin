@@ -502,4 +502,20 @@ public class Enforcer extends ManagementEnforcer {
         }
         return results;
     }
+
+    /**
+     * batchEnforceWithMatcher enforce with matcher in batches
+     *
+     * @param matcher the custom matcher.
+     * @param rules   the rules.
+     * @return the results
+     */
+    public List<Boolean> batchEnforceWithMatcher(String matcher, List<List<String>> rules) {
+        List<Boolean> results = new ArrayList<>();
+        for (List<String> rule : rules) {
+            boolean result = this.enforceWithMatcher(matcher, rule.get(0), rule.get(1), rule.get(2));
+            results.add(result);
+        }
+        return results;
+    }
 }

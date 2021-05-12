@@ -27,6 +27,10 @@ public class TestUtil {
         assertEquals(res, e.enforce(sub, obj, act));
     }
 
+    static void testEnforceWithMatcher(Enforcer e, String matcher, Object sub, Object obj, String act, boolean res) {
+        assertEquals(res, e.enforceWithMatcher(matcher, sub, obj, act));
+    }
+
     static void testEnforceWithoutUsers(Enforcer e, String obj, String act, boolean res) {
         assertEquals(res, e.enforce(obj, act));
     }

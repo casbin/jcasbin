@@ -195,6 +195,58 @@ public class SyncedEnforcer extends Enforcer {
     }
 
     /**
+     * enforceWithMatcher use a custom matcher to decide whether a "subject" can access a "object" with the operation "action",
+     * input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "" or null.
+     *
+     * @param matcher the custom matcher.
+     * @param rvals   the request needs to be mediated, usually an array
+     *                of strings, can be class instances if ABAC is used.
+     * @return whether to allow the request.
+     */
+    @Override
+    public boolean enforceWithMatcher(String matcher, Object... rvals) {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.enforceWithMatcher(matcher, rvals);
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * batchEnforce enforce in batches
+     *
+     * @param rules the rules.
+     * @return the results
+     */
+    @Override
+    public List<Boolean> batchEnforce(List<List<String>> rules) {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.batchEnforce(rules);
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * batchEnforceWithMatcher enforce with matcher in batches
+     *
+     * @param matcher the custom matcher.
+     * @param rules   the rules.
+     * @return the results
+     */
+    @Override
+    public List<Boolean> batchEnforceWithMatcher(String matcher, List<List<String>> rules) {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.batchEnforceWithMatcher(matcher, rules);
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
      * getAllSubjects gets the list of subjects that show up in the current policy.
      *
      * @return all the subjects in "p" policy rules. It actually collects the

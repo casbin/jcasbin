@@ -14,6 +14,8 @@
 
 package org.casbin.jcasbin.util;
 
+import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
@@ -23,12 +25,8 @@ import inet.ipaddr.AddressStringException;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
 import org.casbin.jcasbin.rbac.RoleManager;
-import org.codehaus.commons.compiler.CompileException;
-import org.codehaus.janino.ExpressionEvaluator;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,7 +34,6 @@ public class BuiltInFunctions {
 
     private static Pattern keyMatch2Pattern = Pattern.compile("(.*):[^/]+(.*)");
     private static Pattern keyMatch3Pattern = Pattern.compile("(.*)\\{[^/]+}(.*)");
-    private static Pattern evalPattern = Pattern.compile("(?<=\\.).*?(?=\\.| )");
 
     /**
      * keyMatch determines whether key1 matches the pattern of key2 (similar to RESTful path), key2
@@ -363,81 +360,20 @@ public class BuiltInFunctions {
     }
 
     /**
-     * eval calculates the stringified boolean expression and return its result. The syntax of
-     * expressions is exactly the same as Java. Flaw: dynamically generated classes or non-static
-     * inner class cannot be used.
+     * eval calculates the stringified boolean expression and return its result.
      *
-     * @author tldyl
-     * @since 2020-07-02
-     *
-     * @param eval Boolean expression.
-     * @param env Parameters.
-     * @return The result of the eval.
+     * @param eval        the stringified boolean expression.
+     * @param env         the key-value pair of the parameters in the expression.
+     * @param aviatorEval the AviatorEvaluatorInstance object which contains built-in functions and custom functions.
+     * @return the result of the eval.
      */
-    public static boolean eval(String eval, Map<String, Object> env) {
-        ExpressionEvaluator evaluator = new ExpressionEvaluator();
-        Map<String, Map<String, Object>> evalModels = getEvalModels(env);
-        try {
-            List<String> parameterNameList = new ArrayList<>();
-            List<Object> parameterValueList = new ArrayList<>();
-            List<Class<?>> parameterClassList = new ArrayList<>();
-            for (Map.Entry<String, Object> entry: env.entrySet()) {
-                parameterNameList.add(entry.getKey());
-                parameterValueList.add(entry.getValue());
-                parameterClassList.add(entry.getValue().getClass());
-            }
-            List<String> sortedSrc = new ArrayList<>(getReplaceTargets(evalModels));
-            sortedSrc.sort((o1, o2) -> o1.length() > o2.length() ? -1 : 1);
-            for (String s : sortedSrc) {
-                eval = eval.replace("." + s, "_" + s);
-            }
-            Matcher matcher = evalPattern.matcher(eval);
-            while (matcher.find()) {
-                for (int i = 0; i <= matcher.groupCount(); i++) {
-                    eval = eval.replace(matcher.group(), obtainFieldGetMethodName(matcher.group()));
-                }
-            }
-            evaluator.setParameters(parameterNameList.toArray(new String[0]), parameterClassList.toArray(new Class[0]));
-            evaluator.cook(eval);
-            return (boolean) evaluator.evaluate(parameterValueList.toArray(new Object[0]));
-        } catch (InvocationTargetException | CompileException e) {
-            e.printStackTrace();
+    public static boolean eval(String eval, Map<String, Object> env, AviatorEvaluatorInstance aviatorEval) {
+        boolean res;
+        if (aviatorEval != null) {
+            res = (boolean) aviatorEval.execute(eval, env);
+        } else {
+            res = (boolean) AviatorEvaluator.execute(eval, env);
         }
-        return false;
-    }
-
-    /**
-     * getEvalModels extracts the value from env and assemble it into a EvalModel object.
-     *
-     * @param env the map.
-     */
-    private static Map<String, Map<String, Object>> getEvalModels(Map<String, Object> env) {
-        final Map<String, Map<String, Object>> evalModels = new HashMap<>();
-        for (final Entry<String, Object> entry : env.entrySet()) {
-            final String[] names = entry.getKey().split("_");
-            evalModels.computeIfAbsent(names[0], k -> new HashMap<>()).put(names[1], entry.getValue());
-        }
-        return evalModels;
-    }
-
-    private static Set<String> getReplaceTargets(Map<String, Map<String, Object>> evalModels) {
-        Set<String> ret = new HashSet<>();
-        for (final Entry<String, Map<String, Object>> entry : evalModels.entrySet()) {
-            ret.addAll(entry.getValue().keySet());
-        }
-        return ret;
-    }
-
-    /**
-     * Get the function name of its get method according to the field name.
-     * For example, the input parameter is "age", the output parameter is "getAge()"
-     *
-     * @param fieldName the file name.
-     * @return the function name of its get method.
-     */
-    private static String obtainFieldGetMethodName(String fieldName) {
-        return new StringBuffer().append("get")
-            .append(fieldName.substring(0, 1).toUpperCase())
-            .append(fieldName.substring(1)).append("()").toString();
+        return res;
     }
 }

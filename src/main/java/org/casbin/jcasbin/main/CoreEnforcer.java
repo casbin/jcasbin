@@ -381,6 +381,7 @@ public class CoreEnforcer {
                     for (AviatorFunction f : functions.values()) {
                         aviatorEval.addFunction(f);
                     }
+                    fm.setAviatorEval(aviatorEval);
 
                     modelModCount = model.getModCount();
                 }
@@ -554,6 +555,7 @@ public class CoreEnforcer {
      */
     public void resetExpressionEvaluator() {
         aviatorEval = null;
+        fm.setAviatorEval(null);
     }
 
     public boolean isAutoNotifyWatcher() {

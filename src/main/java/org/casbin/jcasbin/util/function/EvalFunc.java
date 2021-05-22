@@ -14,7 +14,6 @@
 
 package org.casbin.jcasbin.util.function;
 
-import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorObject;
@@ -24,14 +23,17 @@ import java.util.Map;
 
 /**
  * EvalFunc is the wrapper for eval.
- * @author tldyl
- * @since 2020-07-02
+ * It extends CustomFunction, so it can be used in matcher and policy rule.
+ *
+ * @author shink
  */
-public class EvalFunc extends AbstractFunction {
+public class EvalFunc extends CustomFunction {
+
     @Override
     public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
-        String ev = FunctionUtils.getStringValue(arg1, env);
-        return AviatorBoolean.valueOf(BuiltInFunctions.eval(ev, env));
+        String eval = FunctionUtils.getStringValue(arg1, env);
+        eval = replaceTargets(eval, env);
+        return AviatorBoolean.valueOf(BuiltInFunctions.eval(eval, env, getAviatorEval()));
     }
 
     @Override

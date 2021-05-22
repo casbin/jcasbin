@@ -52,7 +52,7 @@ public class AbacAPIUnitTest {
         testDomainEnforce(e, "bob", "domain2", "data2", "read", true);
     }
 
-    public static class TestEvalRule { //This class must be static.
+    public static class TestEvalRule {
         private String name;
         private int age;
 

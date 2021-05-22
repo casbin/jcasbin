@@ -14,12 +14,11 @@
 
 package org.casbin.jcasbin.main;
 
-import com.googlecode.aviator.runtime.type.AviatorFunction;
 import org.casbin.jcasbin.effect.Effect;
 import org.casbin.jcasbin.model.Assertion;
 import org.casbin.jcasbin.util.Util;
+import org.casbin.jcasbin.util.function.CustomFunction;
 
-import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -475,6 +474,7 @@ public class ManagementEnforcer extends InternalEnforcer {
         boolean ruleAdded = addPolicy("g", ptype, params);
 
         aviatorEval = null;
+        fm.setAviatorEval(null);
         return ruleAdded;
     }
 
@@ -534,6 +534,7 @@ public class ManagementEnforcer extends InternalEnforcer {
         boolean ruleRemoved = removePolicy("g", ptype, params);
 
         aviatorEval = null;
+        fm.setAviatorEval(null);
         return ruleRemoved;
     }
 
@@ -561,18 +562,20 @@ public class ManagementEnforcer extends InternalEnforcer {
         boolean ruleRemoved = removeFilteredPolicy("g", ptype, fieldIndex, fieldValues);
 
         aviatorEval = null;
+        fm.setAviatorEval(null);
         return ruleRemoved;
     }
 
     /**
      * addFunction adds a customized function.
      *
-     * @param name the name of the new function.
-     * @param function the function.
+     * @param name the name of the function.
+     * @param function the custom function.
      */
-    public void addFunction(String name, AviatorFunction function) {
+    public void addFunction(String name, CustomFunction function) {
         fm.addFunction(name, function);
         aviatorEval = null;
+        fm.setAviatorEval(null);
     }
 
     /**

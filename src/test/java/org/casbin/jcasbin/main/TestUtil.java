@@ -14,10 +14,12 @@
 
 package org.casbin.jcasbin.main;
 
+import com.googlecode.aviator.AviatorEvaluatorInstance;
 import org.casbin.jcasbin.util.BuiltInFunctions;
 import org.casbin.jcasbin.util.Util;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -175,5 +177,9 @@ public class TestUtil {
 
     static void testKeyGet2(String key1, String key2, String pathVar, String res) {
         assertEquals(res, BuiltInFunctions.keyGet2Func(key1, key2, pathVar));
+    }
+
+    static void testEval(String eval, Map<String, Object> env, AviatorEvaluatorInstance aviatorEval, boolean res) {
+        assertEquals(res, BuiltInFunctions.eval(eval, env, aviatorEval));
     }
 }

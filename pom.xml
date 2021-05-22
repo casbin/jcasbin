@@ -188,7 +188,7 @@
         <dependency>
             <groupId>com.googlecode.aviator</groupId>
             <artifactId>aviator</artifactId>
-            <version>4.1.2</version>
+            <version>5.2.5</version>
         </dependency>
         <dependency>
             <groupId>com.github.seancfoley</groupId>
@@ -211,11 +211,6 @@
             <artifactId>jmh-generator-annprocess</artifactId>
             <version>1.19</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.janino</groupId>
-            <artifactId>janino</artifactId>
-            <version>3.1.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

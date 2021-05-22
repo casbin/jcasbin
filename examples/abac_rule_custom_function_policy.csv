@@ -1,0 +1,2 @@
+p, r.sub.name == 'alice' && custom(r.obj), r.obj, GET
+p, r.sub.age >= 18 && custom(r.obj), r.obj, GET

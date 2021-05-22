@@ -14,10 +14,14 @@
 
 package org.casbin.jcasbin.main;
 
+import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.AviatorEvaluatorInstance;
 import org.junit.Test;
-import static org.casbin.jcasbin.main.TestUtil.testGlobMatch;
-import static org.casbin.jcasbin.main.TestUtil.testKeyGet;
-import static org.casbin.jcasbin.main.TestUtil.testKeyGet2;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.casbin.jcasbin.main.TestUtil.*;
 
 public class BuiltInFunctionsUnitTest {
 
@@ -110,5 +114,22 @@ public class BuiltInFunctionsUnitTest {
         testKeyGet2("/alice", "/:id/all", "id", "");
         testKeyGet2("/alice/all", "/:id", "id", "");
         testKeyGet2("/alice/all", "/:/all", "", "");
+    }
+
+    @Test
+    public void testEvalFunc() {
+        AbacAPIUnitTest.TestEvalRule sub = new AbacAPIUnitTest.TestEvalRule("alice", 18);
+        Map<String, Object> env = new HashMap<>();
+        env.put("r_sub", sub);
+
+        testEval("r_sub.age > 0", env, null, true);
+        testEval("r_sub.name == 'alice'", env, null, true);
+        testEval("r_sub.name == 'bob'", env, null, false);
+
+        AviatorEvaluatorInstance aviatorEval = AviatorEvaluator.newInstance();
+        aviatorEval.addFunction(new FunctionTest.CustomFunc());
+        env.put("r_obj", "/test/url1/url2");
+
+        testEval("r_sub.age >= 18 && custom(r_obj)", env, aviatorEval, true);
     }
 }

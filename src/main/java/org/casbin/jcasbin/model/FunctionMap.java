@@ -14,6 +14,7 @@
 
 package org.casbin.jcasbin.model;
 
+import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import org.casbin.jcasbin.util.function.*;
 
@@ -37,6 +38,31 @@ public class FunctionMap {
      */
     public void addFunction(String name, AviatorFunction function) {
         fm.put(name, function);
+    }
+
+    /**
+     * setAviatorEval adds AviatorEvaluatorInstance to the custom function.
+     *
+     * @param name        the name of the custom function.
+     * @param aviatorEval the AviatorEvaluatorInstance object.
+     */
+    public void setAviatorEval(String name, AviatorEvaluatorInstance aviatorEval) {
+        if (fm.containsKey(name) && fm.get(name) instanceof CustomFunction) {
+            ((CustomFunction) fm.get(name)).setAviatorEval(aviatorEval);
+        }
+    }
+
+    /**
+     * setAviatorEval adds AviatorEvaluatorInstance to all the custom function.
+     *
+     * @param aviatorEval the AviatorEvaluatorInstance object.
+     */
+    public void setAviatorEval(AviatorEvaluatorInstance aviatorEval) {
+        for (AviatorFunction function : fm.values()) {
+            if (function instanceof CustomFunction) {
+                ((CustomFunction) function).setAviatorEval(aviatorEval);
+            }
+        }
     }
 
     /**

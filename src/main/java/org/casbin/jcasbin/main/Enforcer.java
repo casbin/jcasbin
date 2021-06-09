@@ -71,7 +71,8 @@ public class Enforcer extends ManagementEnforcer {
 
         initialize();
 
-        if (this.adapter != null) {
+        // fix: Enforcer pass FilteredAdapter will load all policy
+        if (this.adapter != null && !isFiltered()) {
             loadPolicy();
         }
     }

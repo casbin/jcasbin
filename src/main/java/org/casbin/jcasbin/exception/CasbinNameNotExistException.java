@@ -1,4 +1,4 @@
-// Copyright 2020 The casbin Authors. All Rights Reserved.
+// Copyright 2018 The casbin Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,17 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.casbin.jcasbin.main;
+package org.casbin.jcasbin.exception;
 
-import org.junit.Test;
+public class CasbinNameNotExistException extends RuntimeException {
 
-import static org.casbin.jcasbin.main.TestUtil.testDomainEnforce;
-
-public class GroupRoleManagerTest {
-    @Test
-    public void testGroupRoleManager() {
-        Enforcer e = new Enforcer("examples/group_with_domain_model.conf", "examples/group_with_domain_policy.csv");
-        testDomainEnforce(e, "alice", "domain1", "data1", "read", false);
+    public CasbinNameNotExistException(String message) {
+        super(message);
     }
 
 }

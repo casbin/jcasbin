@@ -14,11 +14,16 @@
 
 package org.casbin.jcasbin.main;
 
+import org.casbin.jcasbin.util.Util;
 import org.junit.Test;
+
+import java.util.Comparator;
+import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.casbin.jcasbin.main.TestUtil.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class RbacAPIUnitTest {
     @Test
@@ -147,5 +152,27 @@ public class RbacAPIUnitTest {
                 )
         );
 
+    }
+
+    private void testGetImplicitUsersForRole(Enforcer e, String name, List<String> res) {
+        List<String> myRes = e.getImplicitUsersForRole(name);
+        Comparator<String> comparator = String::compareTo;
+        myRes.sort(comparator);
+        res.sort(comparator);
+
+        if (!Util.arrayEquals(res, myRes)) {
+            fail("Implicit users for : " + name + ": " + myRes + ", supposed to be " + res);
+        }
+    }
+
+    @Test
+    public void testImplicitUsersForRole() {
+        Enforcer e = new Enforcer("examples/rbac_with_pattern_model.conf", "examples/rbac_with_pattern_policy.csv");
+
+        testGetImplicitUsersForRole(e, "book_admin", asList("alice"));
+        testGetImplicitUsersForRole(e, "pen_admin", asList("cathy", "bob"));
+
+        testGetImplicitUsersForRole(e, "book_group", asList("/book/*", "/book/:id", "/book2/{id}"));
+        testGetImplicitUsersForRole(e, "pen_group", asList("/pen/:id", "/pen2/{id}"));
     }
 }

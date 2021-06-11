@@ -26,11 +26,7 @@ import org.casbin.jcasbin.exception.CasbinMatcherException;
 import org.casbin.jcasbin.model.Assertion;
 import org.casbin.jcasbin.model.FunctionMap;
 import org.casbin.jcasbin.model.Model;
-import org.casbin.jcasbin.persist.Adapter;
-import org.casbin.jcasbin.persist.Dispatcher;
-import org.casbin.jcasbin.persist.WatcherEx;
-import org.casbin.jcasbin.persist.FilteredAdapter;
-import org.casbin.jcasbin.persist.Watcher;
+import org.casbin.jcasbin.persist.*;
 import org.casbin.jcasbin.rbac.DefaultRoleManager;
 import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.BuiltInFunctions;
@@ -51,8 +47,8 @@ public class CoreEnforcer {
 
     Adapter adapter;
     Watcher watcher;
-    RoleManager rm;
     Dispatcher dispatcher;
+    Map<String, RoleManager> rmMap;
 
     private boolean enabled;
     boolean autoSave;
@@ -67,7 +63,7 @@ public class CoreEnforcer {
     int modelModCount;
 
     void initialize() {
-        rm = new DefaultRoleManager(10);
+        rmMap = new HashMap<>();
         eft = new DefaultEffector();
         watcher = null;
 
@@ -75,6 +71,7 @@ public class CoreEnforcer {
         autoSave = true;
         autoBuildRoleLinks = true;
         dispatcher = null;
+        initRmMap();
     }
 
     /**
@@ -192,21 +189,21 @@ public class CoreEnforcer {
     }
 
     /**
-     * getRoleManager gets the current role manager.
+     * getRmMap gets the current role manager map.
      *
-     * @return the role manager of the enforcer.
+     * @return the role manager map of the enforcer.
      */
-    public RoleManager getRoleManager() {
-        return rm;
+    public Map<String, RoleManager> getRmMap() {
+        return rmMap;
     }
 
     /**
-     * SetRoleManager sets the current role manager.
+     * setRoleManager sets the current role manager for g.
      *
      * @param rm the role manager.
      */
     public void setRoleManager(RoleManager rm) {
-        this.rm = rm;
+        setRoleManager("g", rm);
     }
 
     /**
@@ -233,6 +230,7 @@ public class CoreEnforcer {
         adapter.loadPolicy(model);
         model.sortPoliciesByPriority();
 
+        clearRmMap();
         model.printPolicy();
         if (autoBuildRoleLinks) {
             buildRoleLinks();
@@ -258,6 +256,8 @@ public class CoreEnforcer {
             e.printStackTrace();
         }
         model.sortPoliciesByPriority();
+
+        initRmMap();
         model.printPolicy();
         if (autoBuildRoleLinks) {
             buildRoleLinks();
@@ -292,6 +292,46 @@ public class CoreEnforcer {
             } else {
                 watcher.update();
             }
+        }
+    }
+
+    /**
+     * setRoleManager sets role manager for ptype.
+     *
+     * @param ptype the policy type, can be "g", "g2", "g3", ..
+     * @param rm    the role manager.
+     */
+    public void setRoleManager(String ptype, RoleManager rm) {
+        rmMap.put(ptype, rm);
+    }
+
+    /**
+     * initRmMap initializes rmMap.
+     */
+    private void initRmMap() {
+        if (!model.model.containsKey("g")) {
+            return;
+        }
+
+        for (String ptype : model.model.get("g").keySet()) {
+            if (rmMap.containsKey(ptype)) {
+                rmMap.get(ptype).clear();
+            } else {
+                rmMap.put(ptype, new DefaultRoleManager(10));
+            }
+        }
+    }
+
+    /**
+     * clearRmMap clears rmMap.
+     */
+    private void clearRmMap() {
+        if (!model.model.containsKey("g")) {
+            return;
+        }
+
+        for (String ptype : model.model.get("g").keySet()) {
+            rmMap.get(ptype).clear();
         }
     }
 
@@ -339,8 +379,10 @@ public class CoreEnforcer {
      * role inheritance relations.
      */
     public void buildRoleLinks() {
-        rm.clear();
-        model.buildRoleLinks(rm);
+        for (RoleManager rm : rmMap.values()) {
+            rm.clear();
+        }
+        model.buildRoleLinks(rmMap);
     }
 
     /**

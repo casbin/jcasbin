@@ -11,5 +11,8 @@ g, cathy, pen_admin
 
 g2, /book/*, book_group
 
+g2, /book/:id, book_group
+g2, /pen/:id, pen_group
+
 g2, /book2/{id}, book_group
 g2, /pen2/{id}, pen_group

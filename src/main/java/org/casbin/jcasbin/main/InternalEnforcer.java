@@ -14,6 +14,7 @@
 
 package org.casbin.jcasbin.main;
 
+import org.casbin.jcasbin.model.Assertion;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.BatchAdapter;
 import org.casbin.jcasbin.persist.UpdatableAdapter;
@@ -107,7 +108,7 @@ class InternalEnforcer extends CoreEnforcer {
      * @param rules the rules.
      */
     public void buildIncrementalRoleLinks(Model.PolicyOperations op, String ptype, List<List<String>> rules) {
-        model.buildIncrementalRoleLinks(rm, op, "g", ptype, rules);
+        model.buildIncrementalRoleLinks(rmMap, op, "g", ptype, rules);
     }
 
     /**
@@ -300,5 +301,18 @@ class InternalEnforcer extends CoreEnforcer {
         }
 
         return true;
+    }
+
+    int getDomainIndex(String ptype) {
+        Assertion ast = model.model.get("p").get(ptype);
+        String pattern = String.format("%s_dom", ptype);
+        int index = ast.tokens.length;
+        for (int i = 0; i < ast.tokens.length; i++) {
+            if (ast.tokens[i].equals(pattern)) {
+                index = i;
+                break;
+            }
+        }
+        return index;
     }
 }

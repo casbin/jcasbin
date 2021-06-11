@@ -14,16 +14,13 @@
 
 package org.casbin.jcasbin.main;
 
-import static java.util.Arrays.asList;
-import static org.casbin.jcasbin.main.TestUtil.testDomainEnforce;
-import static org.casbin.jcasbin.main.TestUtil.testEnforce;
-import static org.casbin.jcasbin.main.TestUtil.testGetImplicitPermissionsInDomain;
-import static org.casbin.jcasbin.main.TestUtil.testGetRolesInDomain;
-
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
 import org.casbin.jcasbin.rbac.DefaultRoleManager;
 import org.casbin.jcasbin.util.BuiltInFunctions;
 import org.junit.Test;
+
+import static java.util.Arrays.asList;
+import static org.casbin.jcasbin.main.TestUtil.*;
 
 public class RbacAPIWithPatternMatchUnitTest {
 
@@ -31,7 +28,7 @@ public class RbacAPIWithPatternMatchUnitTest {
     public void testEnforceAPIWithKeyMatch3Pattern() {
         final Enforcer e = new Enforcer("examples/rbac_with_pattern_model.conf");
         e.setAdapter(new FileAdapter("examples/rbac_with_pattern_policy.csv"));
-        e.setRoleManager(new DefaultRoleManager(10, BuiltInFunctions::keyMatch3, null));
+        e.setRoleManager("g2", new DefaultRoleManager(10, BuiltInFunctions::keyMatch3, null));
         e.loadPolicy();
 
         testEnforce(e, "alice", "/book/1", "GET", true);

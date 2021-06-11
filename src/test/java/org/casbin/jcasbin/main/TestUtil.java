@@ -159,7 +159,7 @@ public class TestUtil {
     }
 
     static void testGetImplicitPermissionsInDomain(Enforcer e, String name, String domain, List<List<String>> res) {
-        List<List<String>> myRes = e.getImplicitPermissionsForUserInDomain(name, domain);
+        List<List<String>> myRes = e.getImplicitPermissionsForUser(name, domain);
         Util.logPrint("Permissions for " + name + " under " + domain + ": " + myRes);
 
         if (!Util.array2DEquals(res, myRes)) {

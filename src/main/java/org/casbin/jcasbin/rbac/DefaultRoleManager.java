@@ -14,10 +14,11 @@
 
 package org.casbin.jcasbin.rbac;
 
+import org.casbin.jcasbin.exception.CasbinNameNotExistException;
+import org.casbin.jcasbin.util.Util;
+
 import java.util.*;
 import java.util.function.BiPredicate;
-
-import org.casbin.jcasbin.util.Util;
 
 public class DefaultRoleManager implements RoleManager {
     private static String defaultDomain = "casbin::default";
@@ -159,7 +160,7 @@ public class DefaultRoleManager implements RoleManager {
         final DomainRoles allRoles = getOrCreateDomainRoles(domainName(domain));
 
         if (!allRoles.hasRole(name1) || !allRoles.hasRole(name2)) {
-            throw new IllegalArgumentException("error: name1 or name2 does not exist");
+            throw new CasbinNameNotExistException("error: name1 or name2 does not exist");
         }
 
         final Role role1 = allRoles.getOrCreate(name1);
@@ -229,8 +230,8 @@ public class DefaultRoleManager implements RoleManager {
 
         final DomainRoles allRoles = getMatchingDomainRoles(domain);
 
-        if (!allRoles.hasRole(name, domainMatchingFunc)) {
-            throw new IllegalArgumentException("error: name does not exist");
+        if (!allRoles.hasRole(name, matchingFunc)) {
+            throw new CasbinNameNotExistException("error: name does not exist");
         }
 
         final List<String> names = new ArrayList<>();

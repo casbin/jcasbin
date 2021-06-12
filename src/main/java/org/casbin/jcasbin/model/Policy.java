@@ -30,11 +30,14 @@ public class Policy {
     /**
      * buildRoleLinks initializes the roles in RBAC.
      *
-     * @param rm the role manager.
+     * @param rmMap the role manager map.
      */
-    public void buildRoleLinks(RoleManager rm) {
+    public void buildRoleLinks(Map<String, RoleManager> rmMap) {
         if (model.containsKey("g")) {
-            for (Assertion ast : model.get("g").values()) {
+            for (Map.Entry<String, Assertion> entry : model.get("g").entrySet()) {
+                String ptype = entry.getKey();
+                Assertion ast = entry.getValue();
+                RoleManager rm = rmMap.get(ptype);
                 ast.buildRoleLinks(rm);
             }
         }
@@ -136,9 +139,9 @@ public class Policy {
 
         for (List<String> rule : model.get(sec).get(ptype).policy) {
             boolean matched = true;
-            for (int i = 0; i < fieldValues.length; i ++) {
+            for (int i = 0; i < fieldValues.length; i++) {
                 String fieldValue = fieldValues[i];
-                if (!fieldValue.equals("") && !rule.get(fieldIndex + i).equals(fieldValue)) {
+                if (fieldValue != null && !"".equals(fieldValue) && !rule.get(fieldIndex + i).equals(fieldValue)) {
                     matched = false;
                     break;
                 }
@@ -359,9 +362,9 @@ public class Policy {
         return values;
     }
 
-    public void buildIncrementalRoleLinks(RoleManager rm, Model.PolicyOperations op, String sec, String ptype, List<List<String>> rules) {
-        if (sec.equals("g")) {
-            model.get(sec).get(ptype).buildIncrementalRoleLinks(rm, op, rules);
+    public void buildIncrementalRoleLinks(Map<String, RoleManager> rmMap, Model.PolicyOperations op, String sec, String ptype, List<List<String>> rules) {
+        if ("g".equals(sec)) {
+            model.get(sec).get(ptype).buildIncrementalRoleLinks(rmMap.get(ptype), op, rules);
         }
     }
 

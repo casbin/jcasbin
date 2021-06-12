@@ -1256,14 +1256,15 @@ public class SyncedEnforcer extends Enforcer {
     /**
      * getPermissionsForUser gets permissions for a user or role.
      *
-     * @param user the user.
+     * @param user   the user.
+     * @param domain the user's domain.
      * @return the permissions, a permission is usually like (obj, act). It is actually the rule without the subject.
      */
     @Override
-    public List<List<String>> getPermissionsForUser(String user) {
+    public List<List<String>> getPermissionsForUser(String user, String... domain) {
         try {
             READ_WRITE_LOCK.readLock().lock();
-            return super.getPermissionsForUser(user);
+            return super.getPermissionsForUser(user, domain);
         } finally {
             READ_WRITE_LOCK.readLock().unlock();
         }
@@ -1427,14 +1428,15 @@ public class SyncedEnforcer extends Enforcer {
      * getPermissionsForUser("alice") can only get: [["alice", "data2", "read"]].
      * But getImplicitPermissionsForUser("alice") will get: [["admin", "data1", "read"], ["alice", "data2", "read"]].
      *
-     * @param user the user.
+     * @param user   the user.
+     * @param domain the user's domain.
      * @return implicit permissions for a user or role.
      */
     @Override
-    public List<List<String>> getImplicitPermissionsForUser(String user) {
+    public List<List<String>> getImplicitPermissionsForUser(String user, String... domain) {
         try {
             READ_WRITE_LOCK.readLock().lock();
-            return super.getImplicitPermissionsForUser(user);
+            return super.getImplicitPermissionsForUser(user, domain);
         } finally {
             READ_WRITE_LOCK.readLock().unlock();
         }

@@ -14,14 +14,15 @@
 
 package org.casbin.jcasbin.main;
 
+import org.casbin.jcasbin.exception.CasbinNameNotExistException;
+import org.casbin.jcasbin.model.Assertion;
 import org.casbin.jcasbin.model.FunctionMap;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
+import org.casbin.jcasbin.rbac.RoleManager;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Enforcer = ManagementEnforcer + RBAC API.
@@ -115,10 +116,7 @@ public class Enforcer extends ManagementEnforcer {
     public List<String> getRolesForUser(String name) {
         try {
             return model.model.get("g").get("g").rm.getRoles(name);
-        } catch (IllegalArgumentException e) {
-            if (!"error: name does not exist".equals(e.getMessage())) {
-                throw e;
-            }
+        } catch (CasbinNameNotExistException ignored) {
         }
         return Collections.emptyList();
     }
@@ -132,10 +130,7 @@ public class Enforcer extends ManagementEnforcer {
     public List<String> getUsersForRole(String name) {
         try {
             return model.model.get("g").get("g").rm.getUsers(name);
-        } catch (IllegalArgumentException e) {
-            if (!"error: name does not exist".equals(e.getMessage())) {
-                throw e;
-            }
+        } catch (CasbinNameNotExistException ignored) {
         }
         return Collections.emptyList();
     }
@@ -333,11 +328,28 @@ public class Enforcer extends ManagementEnforcer {
     /**
      * getPermissionsForUser gets permissions for a user or role.
      *
-     * @param user the user.
+     * @param user   the user.
+     * @param domain domain.
      * @return the permissions, a permission is usually like (obj, act). It is actually the rule without the subject.
      */
-    public List<List<String>> getPermissionsForUser(String user) {
-        return getFilteredPolicy(0, user);
+    public List<List<String>> getPermissionsForUser(String user, String... domain) {
+        List<List<String>> permissions = new ArrayList<>();
+        for (Map.Entry<String, Assertion> entry : model.model.get("p").entrySet()) {
+            String ptype = entry.getKey();
+            Assertion ast = entry.getValue();
+            String[] args = new String[ast.tokens.length];
+            args[0] = user;
+
+            if (domain.length > 0) {
+                int index = getDomainIndex(ptype);
+                if (index < ast.tokens.length) {
+                    args[index] = domain[0];
+                }
+            }
+            permissions.addAll(getFilteredPolicy(0, args));
+        }
+
+        return permissions;
     }
 
     /**
@@ -377,10 +389,7 @@ public class Enforcer extends ManagementEnforcer {
     public List<String> getRolesForUserInDomain(String name, String domain) {
         try {
             return model.model.get("g").get("g").rm.getRoles(name, domain);
-        } catch (IllegalArgumentException e) {
-            if (!"error: name does not exist".equals(e.getMessage())) {
-                throw e;
-            }
+        } catch (CasbinNameNotExistException ignored) {
         }
         return Collections.emptyList();
     }
@@ -432,16 +441,57 @@ public class Enforcer extends ManagementEnforcer {
      * getRolesForUser("alice") can only get: ["role:admin"].
      * But getImplicitRolesForUser("alice") will get: ["role:admin", "role:user"].
      *
-     * @param name   the user
-     * @param domain the domain
+     * @param name   the user.
+     * @param domain the user's domain.
      * @return implicit roles that a user has.
      */
     public List<String> getImplicitRolesForUser(String name, String... domain) {
-        List<String> roles = this.rm.getRoles(name, domain);
-        List<String> res = new ArrayList<>(roles);
-        for (String n : roles) {
-            res.addAll(this.getImplicitRolesForUser(n, domain));
+        List<String> res = new ArrayList<>();
+        Deque<String> queue = new LinkedList<>();
+        queue.offerLast(name);
+
+        while (!queue.isEmpty()) {
+            name = queue.pollFirst();
+            for (RoleManager rm : rmMap.values()) {
+                List<String> roles = rm.getRoles(name, domain);
+                for (String role : roles) {
+                    if (res.contains(role)) continue;
+                    res.add(role);
+                    queue.offerLast(role);
+                }
+            }
         }
+
+        return res;
+    }
+
+    /**
+     * getImplicitUsersForRole gets implicit users for a role.
+     *
+     * @param name   the role.
+     * @param domain the role's domain.
+     * @return implicit users that a role has.
+     */
+    public List<String> getImplicitUsersForRole(String name, String... domain) {
+        Deque<String> queue = new LinkedList<>();
+        queue.offerLast(name);
+        List<String> res = new ArrayList<>();
+
+        while (!queue.isEmpty()) {
+            name = queue.pollFirst();
+            for (RoleManager rm : rmMap.values()) {
+                try {
+                    List<String> users = rm.getUsers(name, domain);
+                    for (String user : users) {
+                        if (res.contains(user)) continue;
+                        res.add(user);
+                        queue.offerLast(user);
+                    }
+                } catch (CasbinNameNotExistException ignored) {
+                }
+            }
+        }
+
         return res;
     }
 
@@ -456,16 +506,17 @@ public class Enforcer extends ManagementEnforcer {
      * getPermissionsForUser("alice") can only get: [["alice", "data2", "read"]].
      * But getImplicitPermissionsForUser("alice") will get: [["admin", "data1", "read"], ["alice", "data2", "read"]].
      *
-     * @param user the user.
+     * @param user   the user.
+     * @param domain the user's domain.
      * @return implicit permissions for a user or role.
      */
-    public List<List<String>> getImplicitPermissionsForUser(String user) {
+    public List<List<String>> getImplicitPermissionsForUser(String user, String... domain) {
         List<String> roles = new ArrayList<>();
         roles.add(user);
-        roles.addAll(this.getImplicitRolesForUser(user));
+        roles.addAll(getImplicitRolesForUser(user, domain));
         List<List<String>> res = new ArrayList<>();
-        for (String n : roles) {
-            res.addAll(this.getPermissionsForUser(n));
+        for (String role : roles) {
+            res.addAll(this.getPermissionsForUser(role, domain));
         }
         return res;
     }

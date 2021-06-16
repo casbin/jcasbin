@@ -14,6 +14,8 @@
 
 package org.casbin.jcasbin.persist;
 
+import java.util.function.Consumer;
+
 /**
  * Watcher is the interface for Casbin watchers.
  */
@@ -26,6 +28,15 @@ public interface Watcher {
      * @param runnable the callback function, will be called when policy is updated.
      */
     void setUpdateCallback(Runnable runnable);
+
+    /**
+     * SetUpdateCallback sets the callback function that the watcher will call
+     * when the policy in DB has been changed by other instances.
+     * A classic callback is Enforcer.loadPolicy().
+     *
+     * @param func the callback function, will be called when policy is updated.
+     */
+    void setUpdateCallback(Consumer<String> func);
 
     /**
      * Update calls the update callback of other instances to synchronize their policy.

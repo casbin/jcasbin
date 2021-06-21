@@ -63,6 +63,24 @@ public class DefaultRoleManager implements RoleManager {
         this.domainMatchingFunc = domainMatchingFunc;
     }
 
+    /**
+     * addMatchingFunc support use pattern in g.
+     *
+     * @param matchingFunc the matching function.
+     */
+    public void addMatchingFunc(BiPredicate<String, String> matchingFunc) {
+        this.matchingFunc = matchingFunc;
+    }
+
+    /**
+     * addDomainMatchingFunc support use domain pattern in g
+     *
+     * @param domainMatchingFunc the domain matching function.
+     */
+    public void addDomainMatchingFunc(BiPredicate<String, String> domainMatchingFunc) {
+        this.domainMatchingFunc = domainMatchingFunc;
+    }
+
     private String domainName(String... domain) {
         return domain.length == 0 ? defaultDomain : domain[0];
     }

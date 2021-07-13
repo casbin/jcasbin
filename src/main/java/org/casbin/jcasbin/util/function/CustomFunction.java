@@ -27,13 +27,13 @@ public abstract class CustomFunction extends AbstractFunction {
     private AviatorEvaluatorInstance aviatorEval;
 
     public String replaceTargets(String exp, Map<String, Object> env) {
-        for (String key : env.keySet()) {
-            int index;
-            if ((index = key.indexOf('_')) != -1) {
-                String s = key.substring(index + 1);
-                exp = exp.replace("." + s, "_" + s);
-            }
+        //Replace the first dot, because it can't be recognized by the 'reg' below.
+        if (exp.startsWith( "r") || exp.startsWith( "p")) {
+            exp = exp.replaceFirst("\\.","_");
         }
+        //match example: "&&r.","||r."，"=r."
+        String reg = "([| =)(&<>,+\\-*/!])((r|p)[0-9]*)\\.";
+        exp = exp.replaceAll(reg,"$1$2_");
         return exp;
     }
 

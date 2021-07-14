@@ -40,6 +40,13 @@ public class UtilTest {
     assertEquals("(r_attp.value || p_attr)p_u", Util.escapeAssertion("(r.attp.value || p.attr)p.u"));
   }
 
+    @Test
+    public void testConvertInSyntax(){
+        assertEquals("seq.some(r_obj, fn(x) {x == r_sub}) != nil", Util.convertInSyntax("r_sub in (r_obj)"));
+        assertEquals("seq.some(r_obj, fn(x) {x == r_sub.name}) != nil", Util.convertInSyntax("r_sub.name in (r_obj)"));
+        assertEquals("seq.some(r_obj.name, fn(x) {x == r_sub.name}) != nil", Util.convertInSyntax("r_sub.name in (r_obj.name)"));
+    }
+
   @Test
   public void testRemoveComments(){
     assertEquals("r.act == p.act", Util.removeComments("r.act == p.act # comments"));

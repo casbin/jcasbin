@@ -14,6 +14,8 @@
 
 package org.casbin.jcasbin.main;
 
+import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.Expression;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
@@ -23,7 +25,9 @@ import org.junit.Test;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
@@ -219,9 +223,18 @@ public class EnforcerUnitTest {
     }
 
     @Test
+    public void testInOp() {
+        Enforcer e = new Enforcer("examples/in_op_sytanx.conf", "examples/in_op_sytanx.csv");
+
+        TestSub sub = new TestSub("alice");
+        TestObj obj = new TestObj(new String[]{"alice","bob"});
+
+        assertTrue(e.enforce(sub,obj));
+    }
+
+    @Test
     public void testReloadPolicy() {
         Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
-
         e.loadPolicy();
         testGetPolicy(e, asList(asList("alice", "data1", "read"), asList("bob", "data2", "write"), asList("data2_admin", "data2", "read"), asList("data2_admin", "data2", "write")));
     }
@@ -571,5 +584,47 @@ public class EnforcerUnitTest {
             asList("bob", "data2", "write"), asList("root", "data2", "read"),
             asList("root", "data3", "read"), asList("jack", "data3", "read")));
         Assert.assertArrayEquals(myResults.toArray(new Boolean[0]), results.toArray(new Boolean[0]));
+    }
+
+    public static class TestSub{
+        private String name;
+
+        public TestSub(String name) {
+            this.name = name;
+        }
+
+        public String getName() { return name; }
+
+        public void setName(String name) { this.name = name; }
+    }
+    public static class TestAdmins{
+        private String name;
+
+        public TestAdmins(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+    public static class TestObj{
+        private String[] admins;
+
+        public TestObj(String[] admins) {
+            this.admins = admins;
+        }
+
+        public String[] getAdmins() {
+            return admins;
+        }
+
+        public void setAdmins(String[] admins) {
+            this.admins = admins;
+        }
     }
 }

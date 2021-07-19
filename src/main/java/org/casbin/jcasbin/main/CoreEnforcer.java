@@ -17,6 +17,7 @@ package org.casbin.jcasbin.main;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
+import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import org.casbin.jcasbin.effect.DefaultEffector;
 import org.casbin.jcasbin.effect.Effect;
@@ -436,6 +437,8 @@ public class CoreEnforcer {
         } else {
             expString = Util.removeComments(Util.escapeAssertion(matcher));
         }
+
+        expString = Util.convertInSyntax(expString);
         Expression expression = aviatorEval.compile(expString, true);
 
         Effect[] policyEffects;

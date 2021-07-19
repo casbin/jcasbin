@@ -108,6 +108,23 @@ public class Util {
     }
 
     /**
+     * convertInSyntax Convert 'in' to 'seq' to fit aviatorscript,because aviatorscript don't support native 'in' syntax
+     *
+     * @param expString the value of the matcher
+     * @return the 'seq' expression.
+     */
+    public static String convertInSyntax(String expString) {
+        String reg = "((r|p)[0-9]*?_[.a-zA-Z]*?) *?in *?\\((.*?)\\)";
+        Matcher m1 = Pattern.compile(reg).matcher(expString);
+        StringBuffer sb = new StringBuffer();
+        boolean flag=false;
+        while (m1.find()) {
+            flag=true;
+            m1.appendReplacement(sb,"seq.some($3, fn(x) {x == $1}) != nil");
+        }
+        return flag?sb.toString():expString;
+    }
+    /**
      * removeComments removes the comments starting with # in the text.
      *
      * @param s a line in the model.

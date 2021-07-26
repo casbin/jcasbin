@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
 public class BuiltInFunctions {
 
     private static Pattern keyMatch2Pattern = Pattern.compile("(.*):[^/]+(.*)");
-    private static Pattern keyMatch3Pattern = Pattern.compile("(.*)\\{[^/]+}(.*)");
+    private static Pattern keyMatch3Pattern = Pattern.compile("(.*)\\{[^/]+\\}(.*)");
 
     /**
      * keyMatch determines whether key1 matches the pattern of key2 (similar to RESTful path), key2
@@ -119,7 +119,7 @@ public class BuiltInFunctions {
      * @return whether key1 matches key2.
      */
     public static boolean keyMatch4(String key1, String key2) {
-        String regEx = "\\{[^/]+}";
+        String regEx = "\\{[^/]+\\}";
         Pattern p = Pattern.compile(regEx);
         Matcher m = p.matcher(key2);
 

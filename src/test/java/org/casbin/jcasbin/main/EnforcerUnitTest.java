@@ -227,9 +227,11 @@ public class EnforcerUnitTest {
         Enforcer e = new Enforcer("examples/in_op_sytanx.conf", "examples/in_op_sytanx.csv");
 
         TestSub sub = new TestSub("alice");
+        TestSub sub2 = new TestSub("alice2");
         TestObj obj = new TestObj(new String[]{"alice","bob"});
 
         assertTrue(e.enforce(sub,obj));
+        assertFalse(e.enforce(sub2,obj));
     }
 
     @Test

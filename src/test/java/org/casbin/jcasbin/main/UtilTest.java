@@ -42,9 +42,9 @@ public class UtilTest {
 
     @Test
     public void testConvertInSyntax(){
-        assertEquals("seq.some(r_obj, fn(x) {x == r_sub}) != nil", Util.convertInSyntax("r_sub in (r_obj)"));
-        assertEquals("seq.some(r_obj, fn(x) {x == r_sub.name}) != nil", Util.convertInSyntax("r_sub.name in (r_obj)"));
-        assertEquals("seq.some(r_obj.name, fn(x) {x == r_sub.name}) != nil", Util.convertInSyntax("r_sub.name in (r_obj.name)"));
+        assertEquals("include(r_obj, r_sub)", Util.convertInSyntax("r_sub in r_obj"));
+        assertEquals("include(r_obj, r_sub.name)", Util.convertInSyntax("r_sub.name in r_obj"));
+        assertEquals("include(r_obj.name, r_sub.name)", Util.convertInSyntax("r_sub.name in r_obj.name"));
     }
 
   @Test

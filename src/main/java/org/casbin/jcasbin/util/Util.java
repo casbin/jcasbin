@@ -108,19 +108,19 @@ public class Util {
     }
 
     /**
-     * convertInSyntax Convert 'in' to 'seq' to fit aviatorscript,because aviatorscript don't support native 'in' syntax
+     * convertInSyntax Convert 'in' to 'include' to fit aviatorscript,because aviatorscript don't support native 'in' syntax
      *
      * @param expString the value of the matcher
-     * @return the 'seq' expression.
+     * @return the 'include' expression.
      */
     public static String convertInSyntax(String expString) {
-        String reg = "((r|p)[0-9]*?_[.a-zA-Z]*?) *?in *?\\((.*?)\\)";
+        String reg = "([a-zA-Z0-9_.()\"]*) +in +([a-zA-Z0-9_.()\"]*)";
         Matcher m1 = Pattern.compile(reg).matcher(expString);
         StringBuffer sb = new StringBuffer();
         boolean flag=false;
         while (m1.find()) {
             flag=true;
-            m1.appendReplacement(sb,"seq.some($3, fn(x) {x == $1}) != nil");
+            m1.appendReplacement(sb,"include($2, $1)");
         }
         return flag?sb.toString():expString;
     }

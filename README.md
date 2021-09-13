@@ -118,7 +118,7 @@ For Maven:
 <dependency>
   <groupId>org.casbin</groupId>
   <artifactId>jcasbin</artifactId>
-  <version>1.6.3</version>
+  <version>1.x.y (replace with latest version)</version>
 </dependency>
 ```
 

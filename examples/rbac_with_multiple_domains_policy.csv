@@ -1,0 +1,9 @@
+#p, editor, data1, edit, dom1
+p, editor, data1, edit, dom2
+
+p, reader, data1, read, dom2
+p, writer, data1, write, dom3
+
+g, alice, editor, dom1
+g, alice, reader, dom2
+g, alice, writer, dom3

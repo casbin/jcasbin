@@ -37,7 +37,7 @@ public class TestUtil {
         assertEquals(res, e.enforce(obj, act));
     }
 
-    static void testDomainEnforce(Enforcer e, String sub, String dom, String obj, String act, boolean res) {
+    static void testDomainEnforce(Enforcer e, Object sub, Object dom, Object obj, Object act, boolean res) {
         assertEquals(res, e.enforce(sub, dom, obj, act));
     }
 

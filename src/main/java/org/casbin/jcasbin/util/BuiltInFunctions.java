@@ -16,11 +16,11 @@ package org.casbin.jcasbin.util;
 
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
+import com.googlecode.aviator.runtime.function.AbstractVariadicFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
-import com.googlecode.aviator.runtime.type.AviatorBoolean;
-import com.googlecode.aviator.runtime.type.AviatorFunction;
-import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.runtime.type.*;
 import inet.ipaddr.AddressStringException;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
@@ -324,31 +324,42 @@ public class BuiltInFunctions {
      * @return the function.
      */
     public static AviatorFunction generateGFunction(String name, RoleManager rm) {
-        return new AbstractFunction() {
-            @Override
-            public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
-                String name1 = FunctionUtils.getStringValue(arg1, env);
-                String name2 = FunctionUtils.getStringValue(arg2, env);
+        return new AbstractVariadicFunction() {
 
-                if (rm == null) {
-                    return AviatorBoolean.valueOf(name1.equals(name2));
-                } else {
-                    boolean res = rm.hasLink(name1, name2);
-                    return AviatorBoolean.valueOf(res);
+            @Override
+            public AviatorObject variadicCall(Map<String, Object> env, AviatorObject... args) {
+                int len = args.length;
+                if(len < 2){
+                    return AviatorBoolean.valueOf(false);
                 }
-            }
-
-            @Override
-            public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2, AviatorObject arg3) {
-                String name1 = FunctionUtils.getStringValue(arg1, env);
-                String name2 = FunctionUtils.getStringValue(arg2, env);
-
+                String name1 = FunctionUtils.getStringValue(args[0], env);
+                String name2 = FunctionUtils.getStringValue(args[1], env);
                 if (rm == null) {
                     return AviatorBoolean.valueOf(name1.equals(name2));
-                } else {
-                    String domain = FunctionUtils.getStringValue(arg3, env);
-                    boolean res = rm.hasLink(name1, name2, domain);
-                    return AviatorBoolean.valueOf(res);
+                }
+                switch (len){
+                    case 2:
+                        return AviatorBoolean.valueOf(rm.hasLink(name1, name2));
+                    case 3:
+                        String domain = FunctionUtils.getStringValue(args[2], env);
+                        return AviatorBoolean.valueOf(rm.hasLink(name1, name2, domain));
+                    case 4:
+                        String p_dom = FunctionUtils.getStringValue(args[3], env);
+                        Object domainObj = FunctionUtils.getJavaObject(args[2], env);
+
+                        boolean res = false;
+                        if (domainObj instanceof java.util.List){
+                            Sequence domainSeq = RuntimeUtils.seq(domainObj,env);
+                            for (Object r_dom : domainSeq) {
+                                if (r_dom.equals(p_dom) && rm.hasLink(name1, name2, (String) r_dom)){
+                                    res = true;
+                                    break;
+                                }
+                            }
+                        }
+                        return AviatorBoolean.valueOf(res);
+                    default:
+                        return AviatorBoolean.valueOf(false);
                 }
             }
 

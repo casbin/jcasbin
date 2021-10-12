@@ -17,6 +17,7 @@ package org.casbin.jcasbin.main;
 import org.casbin.jcasbin.rbac.RoleManager;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.casbin.jcasbin.main.TestUtil.testDomainEnforce;
@@ -148,6 +149,15 @@ public class ModelUnitTest {
         testDomainEnforce(e, "bob", "domain2", "data1", "write", false);
         testDomainEnforce(e, "bob", "domain2", "data2", "read", true);
         testDomainEnforce(e, "bob", "domain2", "data2", "write", true);
+    }
+
+    @Test
+    public void testRBACModelWithMultiDomains() {
+        Enforcer e = new Enforcer("examples/rbac_with_multiple_domains_model.conf", "examples/rbac_with_multiple_domains_policy.csv");
+
+        testDomainEnforce(e, "alice", "data1", "edit", Arrays.asList("dom1","dom2","dom3"),false);
+        testDomainEnforce(e, "alice", "data1", "read", Arrays.asList("dom1","dom2","dom3"),true);
+        testDomainEnforce(e, "alice", "data1", "write", Arrays.asList("dom1","dom2","dom3"),true);
     }
 
     @Test

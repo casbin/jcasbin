@@ -91,6 +91,12 @@ public class ManagementAPIUnitTest {
         e.removeFilteredPolicy(1, "data2");
 
         testGetPolicy(e, asList(asList("eve", "data3", "read")));
+
+        e.updatePolicy(asList("eve", "data3", "read"), asList("eve", "data2", "read"));
+        testGetPolicy(e, asList(asList("eve", "data2", "read")));
+
+        e.updateNamedPolicy("p", asList("eve", "data2", "read"), asList("eve", "data4", "read"));
+        testGetPolicy(e, asList(asList("eve", "data4", "read")));
     }
 
     @Test
@@ -122,6 +128,28 @@ public class ManagementAPIUnitTest {
         testGetUsers(e, "data3_admin", asList("eve"));
 
         e.removeFilteredGroupingPolicy(0, "bob");
+
+        testGetRoles(e, "alice", asList());
+        testGetRoles(e, "bob", asList());
+        testGetRoles(e, "eve", asList("data3_admin"));
+        testGetRoles(e, "non_exist", asList());
+
+        testGetUsers(e, "data1_admin", asList());
+        testGetUsers(e, "data2_admin", asList());
+        testGetUsers(e, "data3_admin", asList("eve"));
+
+        e.updateGroupingPolicy(asList("eve", "data3_admin"), asList("eve", "data3_admin_update"));
+
+        testGetRoles(e, "alice", asList());
+        testGetRoles(e, "bob", asList());
+        testGetRoles(e, "eve", asList("data3_admin_update"));
+        testGetRoles(e, "non_exist", asList());
+
+        testGetUsers(e, "data1_admin", asList());
+        testGetUsers(e, "data2_admin", asList());
+        testGetUsers(e, "data3_admin_update", asList("eve"));
+
+        e.updateNamedGroupingPolicy("g", asList("eve", "data3_admin_update"), asList("eve", "data3_admin"));
 
         testGetRoles(e, "alice", asList());
         testGetRoles(e, "bob", asList());

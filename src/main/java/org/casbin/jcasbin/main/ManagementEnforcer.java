@@ -315,6 +315,29 @@ public class ManagementEnforcer extends InternalEnforcer {
     }
 
     /**
+     * UpdateGroupingPolicy updates an authorization rule to the current named policy.
+     *
+     * @param params1  the old rule.
+     * @param params2 the new rule.
+     * @return succeeds or not.
+     */
+    public boolean updateGroupingPolicy(List<String> params1, List<String> params2) {
+        return updateNamedGroupingPolicy("g", params1, params2);
+    }
+
+    /**
+     * updateNamedGroupingPolicy updates an authorization rule to the current named policy.
+     *
+     * @param ptype the policy type, can be "g", "g2", "g3", ..
+     * @param params1  the old rule.
+     * @param params2 the new rule.
+     * @return succeeds or not.
+     */
+    public boolean updateNamedGroupingPolicy(String ptype, List<String> params1, List<String> params2) {
+        return updatePolicy("g", ptype, params1, params2);
+    }
+
+    /**
      * AddNamedPolicy adds an authorization rule to the current named policy.
      * If the rule already exists, the function returns false and the rule will not be added.
      * Otherwise the function returns true by adding the new rule.

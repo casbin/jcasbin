@@ -332,13 +332,32 @@ public class BuiltInFunctions {
                 if(len < 2){
                     return AviatorBoolean.valueOf(false);
                 }
-                String name1 = FunctionUtils.getStringValue(args[0], env);
+                Object name1Obj = FunctionUtils.getJavaObject(args[0], env);
                 String name2 = FunctionUtils.getStringValue(args[1], env);
+                Sequence name1List = null;
+                String name1 = null;
+                if (name1Obj instanceof java.util.List) {
+                    name1List = RuntimeUtils.seq(name1Obj,env);
+                }
+                else{
+                    name1 = (String) name1Obj;
+                }
+
                 if (rm == null) {
                     return AviatorBoolean.valueOf(name1.equals(name2));
                 }
                 switch (len){
                     case 2:
+                        if (name1List!=null) {
+                            boolean res = false;
+                            for (Object obj : name1List) {
+                                if (rm.hasLink((String) obj, name2)){
+                                    res = true;
+                                    break;
+                                }
+                            }
+                            return AviatorBoolean.valueOf(res);
+                        }
                         return AviatorBoolean.valueOf(rm.hasLink(name1, name2));
                     case 3:
                         String domain = FunctionUtils.getStringValue(args[2], env);

@@ -21,6 +21,7 @@ import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
 import org.casbin.jcasbin.rbac.RoleManager;
+import org.casbin.jcasbin.util.Util;
 
 import java.util.*;
 
@@ -104,8 +105,19 @@ public class Enforcer extends ManagementEnforcer {
      * @param enableLog whether to enable Casbin's log.
      */
     public Enforcer(String modelPath, String policyFile, boolean enableLog) {
-        this(modelPath, new FileAdapter(policyFile));
-        this.enableLog(enableLog);
+        this(modelPath, preprocessParams(policyFile, enableLog));
+    }
+
+    /**
+     *  Set the enable log flag before the parent constructor prints model's log.
+     *
+     * @param policyFile the path of the policy file.
+     * @param enableLog whether to enable Casbin's log.
+     * @return the adapter.
+     */
+    private static FileAdapter preprocessParams(String policyFile, boolean enableLog) {
+        Util.enableLog = enableLog;
+        return new FileAdapter(policyFile);
     }
 
     /**

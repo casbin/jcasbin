@@ -79,6 +79,32 @@ public class ManagementAPIUnitTest {
         e.addPolicy("eve", "data3", "read");
         e.addPolicy("eve", "data3", "read");
 
+        String[][] rules = {
+            {"jack", "data4", "read"},
+            {"jack", "data4", "read"},
+            {"jack", "data4", "read"},
+            {"katy", "data4", "write"},
+            {"leyo", "data4", "read"},
+            {"katy", "data4", "write"},
+            {"katy", "data4", "write"},
+            {"ham", "data4", "write"},
+        };
+
+        e.addPolicies(rules);
+        e.addPolicies(rules);
+
+        testGetPolicy(e, asList(
+            asList("data2_admin", "data2", "read"),
+            asList("data2_admin", "data2", "write"),
+            asList("eve", "data3", "read"),
+            asList("jack", "data4", "read"),
+            asList("katy", "data4", "write"),
+            asList("leyo", "data4", "read"),
+            asList("ham", "data4", "write")));
+
+        e.removePolicies(rules);
+        e.removePolicies(rules);
+
         List<String> namedPolicy = asList("eve", "data3", "read");
         e.removeNamedPolicy("p", namedPolicy);
         e.addNamedPolicy("p", namedPolicy);

@@ -63,11 +63,26 @@ public class Enforcer extends ManagementEnforcer {
      * @param adapter the adapter.
      */
     public Enforcer(Model m, Adapter adapter) {
+        this(m, adapter, true);
+    }
+
+    /**
+     * Enforcer initializes an enforcer with a model, a database adapter and an enable log flag.
+     *
+     * @param m the model.
+     * @param adapter the adapter.
+     * @param enableLog whether to enable Casbin's log.
+     */
+    public Enforcer(Model m, Adapter adapter, boolean enableLog) {
         this.adapter = adapter;
         this.watcher = null;
 
         model = m;
-        model.printModel();
+        if (enableLog) {
+            model.printModel();
+        } else {
+            this.enableLog(false);
+        }
         fm = FunctionMap.loadFunctionMap();
 
         initialize();
@@ -104,8 +119,9 @@ public class Enforcer extends ManagementEnforcer {
      * @param enableLog whether to enable Casbin's log.
      */
     public Enforcer(String modelPath, String policyFile, boolean enableLog) {
-        this(modelPath, new FileAdapter(policyFile));
-        this.enableLog(enableLog);
+        this(newModel(modelPath, ""), new FileAdapter(policyFile), enableLog);
+        this.modelPath =  modelPath;
+
     }
 
     /**

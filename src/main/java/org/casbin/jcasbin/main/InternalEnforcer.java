@@ -225,7 +225,7 @@ class InternalEnforcer extends CoreEnforcer {
      * removePolicies removes rules from the current policy.
      */
     boolean removePolicies(String sec, String ptype, List<List<String>> rules) {
-        if (model.hasPolicies(sec, ptype, rules)) {
+        if (!model.hasPolicies(sec, ptype, rules)) {
             return false;
         }
 

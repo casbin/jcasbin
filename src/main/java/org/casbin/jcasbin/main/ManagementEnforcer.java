@@ -20,6 +20,7 @@ import org.casbin.jcasbin.util.Util;
 import org.casbin.jcasbin.util.function.CustomFunction;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * ManagementEnforcer = InternalEnforcer + Management API.
@@ -267,6 +268,18 @@ public class ManagementEnforcer extends InternalEnforcer {
     }
 
     /**
+     * addPolicies adds authorization rules to the current policy.
+     * If the rule already exists, the function returns false for the corresponding rule and the rule will not be added.
+     * Otherwise the function returns true for the corresponding rule by adding the new rule.
+     *
+     * @param rules the "p" policy rules, ptype "p" is implicitly used.
+     * @return succeeds or not.
+     */
+    public boolean addPolicies(List<List<String>> rules) {
+        return addNamedPolicies("p", rules);
+    }
+
+    /**
      * updatePolicy update an authorization rule to the current policy.
      *
      * @param params1  the old rule.
@@ -290,6 +303,18 @@ public class ManagementEnforcer extends InternalEnforcer {
     }
 
     /**
+     * addPolicies adds authorization rules to the current policy.
+     * If the rule already exists, the function returns false for the corresponding rule and the rule will not be added.
+     * Otherwise the function returns true for the corresponding rule by adding the new rule.
+     *
+     * @param rules the "p" policy rules, ptype "p" is implicitly used.
+     * @return succeeds or not.
+     */
+    public boolean addPolicies(String[][] rules) {
+        return addPolicies(Arrays.stream(rules).map(Arrays::asList).collect(Collectors.toList()));
+    }
+
+    /**
      * AddNamedPolicy adds an authorization rule to the current named policy.
      * If the rule already exists, the function returns false and the rule will not be added.
      * Otherwise the function returns true by adding the new rule.
@@ -300,6 +325,19 @@ public class ManagementEnforcer extends InternalEnforcer {
      */
     public boolean addNamedPolicy(String ptype, List<String> params) {
         return addPolicy("p", ptype, params);
+    }
+
+    /**
+     * addNamedPolicies adds authorization rules to the current named policy.
+     * If the rule already exists, the function returns false for the corresponding rule and the rule will not be added.
+     * Otherwise the function returns true for the corresponding by adding the new rule.
+     *
+     * @param ptype the policy type, can be "p", "p2", "p3", ..
+     * @param rules the "p" policy rules.
+     * @return succeeds or not.
+     */
+    public boolean addNamedPolicies(String ptype, List<List<String>> rules) {
+        return addPolicies("p", ptype, rules);
     }
 
     /**
@@ -371,6 +409,26 @@ public class ManagementEnforcer extends InternalEnforcer {
     }
 
     /**
+     * removePolicies removes authorization rules from the current policy.
+     *
+     * @param rules the "p" policy rules, ptype "p" is implicitly used.
+     * @return succeeds or not.
+     */
+    public boolean removePolicies(List<List<String>> rules) {
+        return removeNamedPolicies("p", rules);
+    }
+
+    /**
+     * removePolicies removes authorization rules from the current policy.
+     *
+     * @param rules the "p" policy rules, ptype "p" is implicitly used.
+     * @return succeeds or not.
+     */
+    public boolean removePolicies(String[][] rules) {
+        return removePolicies(Arrays.stream(rules).map(Arrays::asList).collect(Collectors.toList()));
+    }
+
+    /**
      * removeFilteredPolicy removes an authorization rule from the current policy, field filters can be specified.
      *
      * @param fieldIndex the policy rule's start index to be matched.
@@ -403,6 +461,17 @@ public class ManagementEnforcer extends InternalEnforcer {
      */
     public boolean removeNamedPolicy(String ptype, String... params) {
         return removeNamedPolicy(ptype, Arrays.asList(params));
+    }
+
+    /**
+     * removeNamedPolicies removes authorization rules from the current named policy.
+     *
+     * @param ptype ptype the policy type, can be "p", "p2", "p3", ..
+     * @param rules the "p" policy rules.
+     * @return succeeds or not.
+     */
+    public boolean removeNamedPolicies(String ptype, List<List<String>> rules) {
+        return removePolicies("p", ptype, rules);
     }
 
     /**

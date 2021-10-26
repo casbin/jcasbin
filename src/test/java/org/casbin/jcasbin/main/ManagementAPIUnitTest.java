@@ -138,11 +138,28 @@ public class ManagementAPIUnitTest {
         e.addGroupingPolicy("bob", "data1_admin");
         e.addGroupingPolicy("eve", "data3_admin");
 
+        String[][] groupingRules = {
+            {"ham", "data4_admin"},
+            {"jack", "data5_admin"}
+        };
+
+        e.addGroupingPolicies(groupingRules);
+        testGetRoles(e, "ham", asList("data4_admin"));
+        testGetRoles(e, "jack", asList("data5_admin"));
+        e.removeGroupingPolicies(groupingRules);
+
         List<String> namedGroupingPolicy = asList("alice", "data2_admin");
         testGetRoles(e, "alice", asList());
         e.addNamedGroupingPolicy("g", namedGroupingPolicy);
         testGetRoles(e, "alice", asList("data2_admin"));
         e.removeNamedGroupingPolicy("g", namedGroupingPolicy);
+
+        e.addNamedGroupingPolicies("g", groupingRules);
+        e.addNamedGroupingPolicies("g", groupingRules);
+        testGetRoles(e, "ham", asList("data4_admin"));
+        testGetRoles(e, "jack", asList("data5_admin"));
+        e.removeNamedGroupingPolicies("g", groupingRules);
+        e.removeNamedGroupingPolicies("g", groupingRules);
 
         testGetRoles(e, "alice", asList());
         testGetRoles(e, "bob", asList("data1_admin"));

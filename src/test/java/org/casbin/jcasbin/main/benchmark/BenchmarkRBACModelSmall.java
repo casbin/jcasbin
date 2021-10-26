@@ -27,10 +27,11 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Mode.AverageTime)
 public class BenchmarkRBACModelSmall {
-    private static Enforcer e = new Enforcer("examples/rbac_model.conf", "", false);
+  private static Enforcer e = new Enforcer("examples/rbac_model.conf", "", false);
 
-    public static void main(String args[]) throws RunnerException {
-        Options opt = new OptionsBuilder()
+  public static void main(String args[]) throws RunnerException {
+    Options opt =
+        new OptionsBuilder()
             .include(BenchmarkRBACModelSmall.class.getName())
             .exclude("Pref")
             .warmupIterations(3)
@@ -38,27 +39,27 @@ public class BenchmarkRBACModelSmall {
             .addProfiler(GCProfiler.class)
             .forks(1)
             .build();
-        new Runner(opt).run();
-    }
+    new Runner(opt).run();
+  }
 
-    @Threads(1)
-    @Benchmark
-    public static void benchmarkRBACModelSmall() {
-        for (int i = 0; i < 1000; i++) {
-            e.enforce("user501", "data9", "read");
-        }
+  @Threads(1)
+  @Benchmark
+  public static void benchmarkRBACModelSmall() {
+    for (int i = 0; i < 1000; i++) {
+      e.enforce("user501", "data9", "read");
     }
+  }
 
-    static {
-        e.enableAutoBuildRoleLinks(false);
-        // 100 roles, 10 resources.
-        for (int i = 0; i < 100; i++) {
-            e.addPolicy(String.format("group%d", i), String.format("data%d", i/10), "read");
-        }
-        // 1000 users.
-        for (int i = 0; i < 1000; i++) {
-            e.addGroupingPolicy(String.format("user%d", i), String.format("group%d", i/10));
-        }
-        e.buildRoleLinks();
+  static {
+    e.enableAutoBuildRoleLinks(false);
+    // 100 roles, 10 resources.
+    for (int i = 0; i < 100; i++) {
+      e.addPolicy(String.format("group%d", i), String.format("data%d", i / 10), "read");
     }
+    // 1000 users.
+    for (int i = 0; i < 1000; i++) {
+      e.addGroupingPolicy(String.format("user%d", i), String.format("group%d", i / 10));
+    }
+    e.buildRoleLinks();
+  }
 }

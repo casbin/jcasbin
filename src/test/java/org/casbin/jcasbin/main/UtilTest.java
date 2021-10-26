@@ -24,7 +24,7 @@ import org.junit.Test;
 public class UtilTest {
 
   @Test
-  public void testEscapeAssertion(){
+  public void testEscapeAssertion() {
     assertEquals("r_attr.value == p_attr", Util.escapeAssertion("r.attr.value == p.attr"));
     assertEquals("r_attp.value || p_attr", Util.escapeAssertion("r.attp.value || p.attr"));
     assertEquals("r_attp.value &&p_attr", Util.escapeAssertion("r.attp.value &&p.attr"));
@@ -37,18 +37,20 @@ public class UtilTest {
     assertEquals("!r_attp.value /p_attr", Util.escapeAssertion("!r.attp.value /p.attr"));
     assertEquals("g(r_sub, p_sub) == p_attr", Util.escapeAssertion("g(r.sub, p.sub) == p.attr"));
     assertEquals("g(r_sub,p_sub) == p_attr", Util.escapeAssertion("g(r.sub,p.sub) == p.attr"));
-    assertEquals("(r_attp.value || p_attr)p_u", Util.escapeAssertion("(r.attp.value || p.attr)p.u"));
+    assertEquals(
+        "(r_attp.value || p_attr)p_u", Util.escapeAssertion("(r.attp.value || p.attr)p.u"));
   }
 
-    @Test
-    public void testConvertInSyntax(){
-        assertEquals("include(r_obj, r_sub)", Util.convertInSyntax("r_sub in r_obj"));
-        assertEquals("include(r_obj, r_sub.name)", Util.convertInSyntax("r_sub.name in r_obj"));
-        assertEquals("include(r_obj.name, r_sub.name)", Util.convertInSyntax("r_sub.name in r_obj.name"));
-    }
+  @Test
+  public void testConvertInSyntax() {
+    assertEquals("include(r_obj, r_sub)", Util.convertInSyntax("r_sub in r_obj"));
+    assertEquals("include(r_obj, r_sub.name)", Util.convertInSyntax("r_sub.name in r_obj"));
+    assertEquals(
+        "include(r_obj.name, r_sub.name)", Util.convertInSyntax("r_sub.name in r_obj.name"));
+  }
 
   @Test
-  public void testRemoveComments(){
+  public void testRemoveComments() {
     assertEquals("r.act == p.act", Util.removeComments("r.act == p.act # comments"));
     assertEquals("r.act == p.act", Util.removeComments("r.act == p.act#comments"));
     assertEquals("r.act == p.act", Util.removeComments("r.act == p.act###"));
@@ -57,16 +59,17 @@ public class UtilTest {
   }
 
   @Test
-  public void testSplitCommaDelimited(){
+  public void testSplitCommaDelimited() {
     assertNull(Util.splitCommaDelimited(null));
-    assertArrayEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("a,b,c"));
-    assertArrayEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("a, b, c"));
-    assertArrayEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("a ,b ,c"));
-    assertArrayEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("  a,     b   ,c     "));
+    assertArrayEquals(new String[] {"a", "b", "c"}, Util.splitCommaDelimited("a,b,c"));
+    assertArrayEquals(new String[] {"a", "b", "c"}, Util.splitCommaDelimited("a, b, c"));
+    assertArrayEquals(new String[] {"a", "b", "c"}, Util.splitCommaDelimited("a ,b ,c"));
+    assertArrayEquals(
+        new String[] {"a", "b", "c"}, Util.splitCommaDelimited("  a,     b   ,c     "));
   }
 
   @Test
   public void testReplaceEval() {
-      Util.logPrint(Util.replaceEval("eval(test)", "testEval"));
+    Util.logPrint(Util.replaceEval("eval(test)", "testEval"));
   }
 }

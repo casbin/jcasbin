@@ -16,8 +16,7 @@ package org.casbin.jcasbin.exception;
 
 public class CasbinNameNotExistException extends RuntimeException {
 
-    public CasbinNameNotExistException(String message) {
-        super(message);
-    }
-
+  public CasbinNameNotExistException(String message) {
+    super(message);
+  }
 }

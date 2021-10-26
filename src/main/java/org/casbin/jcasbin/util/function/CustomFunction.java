@@ -19,29 +19,27 @@ import com.googlecode.aviator.runtime.function.AbstractFunction;
 
 import java.util.Map;
 
-/**
- * @author: shink
- */
+/** @author: shink */
 public abstract class CustomFunction extends AbstractFunction {
 
-    private AviatorEvaluatorInstance aviatorEval;
+  private AviatorEvaluatorInstance aviatorEval;
 
-    public String replaceTargets(String exp, Map<String, Object> env) {
-        //Replace the first dot, because it can't be recognized by the 'reg' below.
-        if (exp.startsWith( "r") || exp.startsWith( "p")) {
-            exp = exp.replaceFirst("\\.","_");
-        }
-        //match example: "&&r.","||r."，"=r."
-        String reg = "([| =)(&<>,+\\-*/!])((r|p)[0-9]*)\\.";
-        exp = exp.replaceAll(reg,"$1$2_");
-        return exp;
+  public String replaceTargets(String exp, Map<String, Object> env) {
+    // Replace the first dot, because it can't be recognized by the 'reg' below.
+    if (exp.startsWith("r") || exp.startsWith("p")) {
+      exp = exp.replaceFirst("\\.", "_");
     }
+    // match example: "&&r.","||r."，"=r."
+    String reg = "([| =)(&<>,+\\-*/!])((r|p)[0-9]*)\\.";
+    exp = exp.replaceAll(reg, "$1$2_");
+    return exp;
+  }
 
-    public AviatorEvaluatorInstance getAviatorEval() {
-        return aviatorEval;
-    }
+  public AviatorEvaluatorInstance getAviatorEval() {
+    return aviatorEval;
+  }
 
-    public void setAviatorEval(AviatorEvaluatorInstance aviatorEval) {
-        this.aviatorEval = aviatorEval;
-    }
+  public void setAviatorEval(AviatorEvaluatorInstance aviatorEval) {
+    this.aviatorEval = aviatorEval;
+  }
 }

@@ -21,69 +21,76 @@ import static org.casbin.jcasbin.main.TestUtil.testEnforce;
 
 public class SyncedDistributedAPIUnitTest {
 
-    @Test
-    public void testDistributedAPI() {
-        DistributedEnforcer de = new DistributedEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
+  @Test
+  public void testDistributedAPI() {
+    DistributedEnforcer de =
+        new DistributedEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
 
-        de.addPolicySelf(() -> false, "p", "p", asList(
+    de.addPolicySelf(
+        () -> false,
+        "p",
+        "p",
+        asList(
             asList("alice", "data1", "read"),
             asList("bob", "data2", "write"),
             asList("data2_admin", "data2", "read"),
             asList("data2_admin", "data2", "write")));
-        de.addPolicySelf(() -> false, "g", "g", asList(asList("alice", "data2_admin")));
+    de.addPolicySelf(() -> false, "g", "g", asList(asList("alice", "data2_admin")));
 
-        testEnforce(de, "alice", "data1", "read", true);
-        testEnforce(de, "alice", "data1", "write", false);
-        testEnforce(de, "bob", "data2", "read", false);
-        testEnforce(de, "bob", "data2", "write", true);
-        testEnforce(de, "data2_admin", "data2", "read", true);
-        testEnforce(de, "data2_admin", "data2", "write", true);
-        testEnforce(de, "alice", "data2", "read", true);
-        testEnforce(de, "alice", "data2", "write", true);
+    testEnforce(de, "alice", "data1", "read", true);
+    testEnforce(de, "alice", "data1", "write", false);
+    testEnforce(de, "bob", "data2", "read", false);
+    testEnforce(de, "bob", "data2", "write", true);
+    testEnforce(de, "data2_admin", "data2", "read", true);
+    testEnforce(de, "data2_admin", "data2", "write", true);
+    testEnforce(de, "alice", "data2", "read", true);
+    testEnforce(de, "alice", "data2", "write", true);
 
-        de.updatePolicySelf(() -> false, "p", "p", asList("alice", "data1", "read"), asList("alice", "data1", "write"));
-        de.updatePolicySelf(() -> false, "g", "g", asList("alice", "data2_admin"), asList("tom", "alice"));
+    de.updatePolicySelf(
+        () -> false, "p", "p", asList("alice", "data1", "read"), asList("alice", "data1", "write"));
+    de.updatePolicySelf(
+        () -> false, "g", "g", asList("alice", "data2_admin"), asList("tom", "alice"));
 
-        testEnforce(de, "alice", "data1", "read", false);
-        testEnforce(de, "alice", "data1", "write", true);
-        testEnforce(de, "bob", "data2", "read", false);
-        testEnforce(de, "bob", "data2", "write", true);
-        testEnforce(de, "data2_admin", "data2", "read", true);
-        testEnforce(de, "data2_admin", "data2", "write", true);
-        testEnforce(de, "tom", "data1", "read", false);
-        testEnforce(de, "tom", "data1", "write", true);
+    testEnforce(de, "alice", "data1", "read", false);
+    testEnforce(de, "alice", "data1", "write", true);
+    testEnforce(de, "bob", "data2", "read", false);
+    testEnforce(de, "bob", "data2", "write", true);
+    testEnforce(de, "data2_admin", "data2", "read", true);
+    testEnforce(de, "data2_admin", "data2", "write", true);
+    testEnforce(de, "tom", "data1", "read", false);
+    testEnforce(de, "tom", "data1", "write", true);
 
-        de.removePolicySelf(() -> false, "p", "p", asList(asList("alice", "data1", "write")));
-        de.removePolicySelf(() -> false, "g", "g", asList(asList("alice", "data2_admin")));
+    de.removePolicySelf(() -> false, "p", "p", asList(asList("alice", "data1", "write")));
+    de.removePolicySelf(() -> false, "g", "g", asList(asList("alice", "data2_admin")));
 
-        testEnforce(de, "alice", "data1", "read", false);
-        testEnforce(de, "alice", "data1", "write", false);
-        testEnforce(de, "bob", "data2", "read", false);
-        testEnforce(de, "bob", "data2", "write", true);
-        testEnforce(de, "data2_admin", "data2", "read", true);
-        testEnforce(de, "data2_admin", "data2", "write", true);
-        testEnforce(de, "alice", "data2", "read", false);
-        testEnforce(de, "alice", "data2", "write", false);
+    testEnforce(de, "alice", "data1", "read", false);
+    testEnforce(de, "alice", "data1", "write", false);
+    testEnforce(de, "bob", "data2", "read", false);
+    testEnforce(de, "bob", "data2", "write", true);
+    testEnforce(de, "data2_admin", "data2", "read", true);
+    testEnforce(de, "data2_admin", "data2", "write", true);
+    testEnforce(de, "alice", "data2", "read", false);
+    testEnforce(de, "alice", "data2", "write", false);
 
-        de.removeFilteredPolicySelf(() -> false, "p", "p", 0, "bob", "data2", "write");
-        de.removeFilteredPolicySelf(() -> false, "g", "g", 0, "tom", "data2_admin");
+    de.removeFilteredPolicySelf(() -> false, "p", "p", 0, "bob", "data2", "write");
+    de.removeFilteredPolicySelf(() -> false, "g", "g", 0, "tom", "data2_admin");
 
-        testEnforce(de, "alice", "data1", "read", false);
-        testEnforce(de, "alice", "data1", "write", false);
-        testEnforce(de, "bob", "data2", "read", false);
-        testEnforce(de, "bob", "data2", "write", false);
-        testEnforce(de, "data2_admin", "data2", "read", true);
-        testEnforce(de, "data2_admin", "data2", "write", true);
-        testEnforce(de, "tom", "data1", "read", false);
-        testEnforce(de, "tom", "data1", "write", false);
+    testEnforce(de, "alice", "data1", "read", false);
+    testEnforce(de, "alice", "data1", "write", false);
+    testEnforce(de, "bob", "data2", "read", false);
+    testEnforce(de, "bob", "data2", "write", false);
+    testEnforce(de, "data2_admin", "data2", "read", true);
+    testEnforce(de, "data2_admin", "data2", "write", true);
+    testEnforce(de, "tom", "data1", "read", false);
+    testEnforce(de, "tom", "data1", "write", false);
 
-        de.clearPolicySelf(() -> false);
+    de.clearPolicySelf(() -> false);
 
-        testEnforce(de, "alice", "data1", "read", false);
-        testEnforce(de, "alice", "data1", "write", false);
-        testEnforce(de, "bob", "data2", "read", false);
-        testEnforce(de, "bob", "data2", "write", false);
-        testEnforce(de, "data2_admin", "data2", "read", false);
-        testEnforce(de, "data2_admin", "data2", "write", false);
-    }
+    testEnforce(de, "alice", "data1", "read", false);
+    testEnforce(de, "alice", "data1", "write", false);
+    testEnforce(de, "bob", "data2", "read", false);
+    testEnforce(de, "bob", "data2", "write", false);
+    testEnforce(de, "data2_admin", "data2", "read", false);
+    testEnforce(de, "data2_admin", "data2", "write", false);
+  }
 }

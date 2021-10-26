@@ -1,0 +1,14 @@
+# Example workflow
+name: Format
+
+on: [ push, pull_request ]
+
+jobs:
+
+  formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2 # v2 minimum required
+      - uses: axel-op/googlejavaformat-action@v3
+        with:
+          args: "--skip-sorting-imports --skip-javadoc-formatting --set-exit-if-changed"

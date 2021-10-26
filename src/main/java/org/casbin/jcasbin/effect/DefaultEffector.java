@@ -14,64 +14,57 @@
 
 package org.casbin.jcasbin.effect;
 
-/**
- * DefaultEffector is default effector for Casbin.
- */
+/** DefaultEffector is default effector for Casbin. */
 public class DefaultEffector implements Effector {
-    /**
-     * DefaultEffector is the constructor for DefaultEffector.
-     */
-    public DefaultEffector() {
-    }
+  /** DefaultEffector is the constructor for DefaultEffector. */
+  public DefaultEffector() {}
 
-    /**
-     * mergeEffects merges all matching results collected by the enforcer into a single decision.
-     */
-    @Override
-    public boolean mergeEffects(String expr, Effect[] effects, float[] results) {
-        boolean result;
-        if (expr.equals("some(where (p_eft == allow))")) {
-            result = false;
-            for (Effect eft : effects) {
-                if (eft == Effect.Allow) {
-                    result = true;
-                    break;
-                }
-            }
-        } else if (expr.equals("!some(where (p_eft == deny))")) {
-            result = true;
-            for (Effect eft : effects) {
-                if (eft == Effect.Deny) {
-                    result = false;
-                    break;
-                }
-            }
-        } else if (expr.equals("some(where (p_eft == allow)) && !some(where (p_eft == deny))")) {
-            result = false;
-            for (Effect eft : effects) {
-                if (eft == Effect.Allow) {
-                    result = true;
-                } else if (eft == Effect.Deny) {
-                    result = false;
-                    break;
-                }
-            }
-        } else if (expr.equals("priority(p_eft) || deny")) {
-            result = false;
-            for (Effect eft : effects) {
-                if (eft != Effect.Indeterminate) {
-                    if (eft == Effect.Allow) {
-                        result = true;
-                    } else {
-                        result = false;
-                    }
-                    break;
-                }
-            }
-        } else {
-            throw new UnsupportedOperationException("unsupported effect");
+  /** mergeEffects merges all matching results collected by the enforcer into a single decision. */
+  @Override
+  public boolean mergeEffects(String expr, Effect[] effects, float[] results) {
+    boolean result;
+    if (expr.equals("some(where (p_eft == allow))")) {
+      result = false;
+      for (Effect eft : effects) {
+        if (eft == Effect.Allow) {
+          result = true;
+          break;
         }
-
-        return result;
+      }
+    } else if (expr.equals("!some(where (p_eft == deny))")) {
+      result = true;
+      for (Effect eft : effects) {
+        if (eft == Effect.Deny) {
+          result = false;
+          break;
+        }
+      }
+    } else if (expr.equals("some(where (p_eft == allow)) && !some(where (p_eft == deny))")) {
+      result = false;
+      for (Effect eft : effects) {
+        if (eft == Effect.Allow) {
+          result = true;
+        } else if (eft == Effect.Deny) {
+          result = false;
+          break;
+        }
+      }
+    } else if (expr.equals("priority(p_eft) || deny")) {
+      result = false;
+      for (Effect eft : effects) {
+        if (eft != Effect.Indeterminate) {
+          if (eft == Effect.Allow) {
+            result = true;
+          } else {
+            result = false;
+          }
+          break;
+        }
+      }
+    } else {
+      throw new UnsupportedOperationException("unsupported effect");
     }
+
+    return result;
+  }
 }

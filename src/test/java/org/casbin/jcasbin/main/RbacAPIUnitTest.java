@@ -26,153 +26,157 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class RbacAPIUnitTest {
-    @Test
-    public void testRoleAPI() {
-        Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
+  @Test
+  public void testRoleAPI() {
+    Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
 
-        testGetRoles(e, "alice", asList("data2_admin"));
-        testGetRoles(e, "bob", asList());
-        testGetRoles(e, "data2_admin", asList());
-        testGetRoles(e, "non_exist", asList());
+    testGetRoles(e, "alice", asList("data2_admin"));
+    testGetRoles(e, "bob", asList());
+    testGetRoles(e, "data2_admin", asList());
+    testGetRoles(e, "non_exist", asList());
 
-        testHasRole(e, "alice", "data1_admin", false);
-        testHasRole(e, "alice", "data2_admin", true);
+    testHasRole(e, "alice", "data1_admin", false);
+    testHasRole(e, "alice", "data2_admin", true);
 
-        e.addRoleForUser("alice", "data1_admin");
+    e.addRoleForUser("alice", "data1_admin");
 
-        testGetRoles(e, "alice", asList("data1_admin", "data2_admin"));
-        testGetRoles(e, "bob", asList());
-        testGetRoles(e, "data2_admin", asList());
+    testGetRoles(e, "alice", asList("data1_admin", "data2_admin"));
+    testGetRoles(e, "bob", asList());
+    testGetRoles(e, "data2_admin", asList());
 
-        e.deleteRoleForUser("alice", "data1_admin");
+    e.deleteRoleForUser("alice", "data1_admin");
 
-        testGetRoles(e, "alice", asList("data2_admin"));
-        testGetRoles(e, "bob", asList());
-        testGetRoles(e, "data2_admin", asList());
+    testGetRoles(e, "alice", asList("data2_admin"));
+    testGetRoles(e, "bob", asList());
+    testGetRoles(e, "data2_admin", asList());
 
-        e.deleteRolesForUser("alice");
+    e.deleteRolesForUser("alice");
 
-        testGetRoles(e, "alice", asList());
-        testGetRoles(e, "bob", asList());
-        testGetRoles(e, "data2_admin", asList());
+    testGetRoles(e, "alice", asList());
+    testGetRoles(e, "bob", asList());
+    testGetRoles(e, "data2_admin", asList());
 
-        e.addRoleForUser("alice", "data1_admin");
-        e.deleteUser("alice");
+    e.addRoleForUser("alice", "data1_admin");
+    e.deleteUser("alice");
 
-        testGetRoles(e, "alice", asList());
-        testGetRoles(e, "bob", asList());
-        testGetRoles(e, "data2_admin", asList());
+    testGetRoles(e, "alice", asList());
+    testGetRoles(e, "bob", asList());
+    testGetRoles(e, "data2_admin", asList());
 
-        e.addRoleForUser("alice", "data2_admin");
+    e.addRoleForUser("alice", "data2_admin");
 
-        testEnforce(e, "alice", "data1", "read", true);
-        testEnforce(e, "alice", "data1", "write", false);
-        testEnforce(e, "alice", "data2", "read", true);
-        testEnforce(e, "alice", "data2", "write", true);
-        testEnforce(e, "bob", "data1", "read", false);
-        testEnforce(e, "bob", "data1", "write", false);
-        testEnforce(e, "bob", "data2", "read", false);
-        testEnforce(e, "bob", "data2", "write", true);
+    testEnforce(e, "alice", "data1", "read", true);
+    testEnforce(e, "alice", "data1", "write", false);
+    testEnforce(e, "alice", "data2", "read", true);
+    testEnforce(e, "alice", "data2", "write", true);
+    testEnforce(e, "bob", "data1", "read", false);
+    testEnforce(e, "bob", "data1", "write", false);
+    testEnforce(e, "bob", "data2", "read", false);
+    testEnforce(e, "bob", "data2", "write", true);
 
-        e.deleteRole("data2_admin");
+    e.deleteRole("data2_admin");
 
-        testEnforce(e, "alice", "data1", "read", true);
-        testEnforce(e, "alice", "data1", "write", false);
-        testEnforce(e, "alice", "data2", "read", false);
-        testEnforce(e, "alice", "data2", "write", false);
-        testEnforce(e, "bob", "data1", "read", false);
-        testEnforce(e, "bob", "data1", "write", false);
-        testEnforce(e, "bob", "data2", "read", false);
-        testEnforce(e, "bob", "data2", "write", true);
+    testEnforce(e, "alice", "data1", "read", true);
+    testEnforce(e, "alice", "data1", "write", false);
+    testEnforce(e, "alice", "data2", "read", false);
+    testEnforce(e, "alice", "data2", "write", false);
+    testEnforce(e, "bob", "data1", "read", false);
+    testEnforce(e, "bob", "data1", "write", false);
+    testEnforce(e, "bob", "data2", "read", false);
+    testEnforce(e, "bob", "data2", "write", true);
+  }
+
+  @Test
+  public void testPermissionAPI() {
+    Enforcer e =
+        new Enforcer(
+            "examples/basic_without_resources_model.conf",
+            "examples/basic_without_resources_policy.csv");
+
+    testEnforceWithoutUsers(e, "alice", "read", true);
+    testEnforceWithoutUsers(e, "alice", "write", false);
+    testEnforceWithoutUsers(e, "bob", "read", false);
+    testEnforceWithoutUsers(e, "bob", "write", true);
+
+    testGetPermissions(e, "alice", asList(asList("alice", "read")));
+    testGetPermissions(e, "bob", asList(asList("bob", "write")));
+
+    testHasPermission(e, "alice", asList("read"), true);
+    testHasPermission(e, "alice", asList("write"), false);
+    testHasPermission(e, "bob", asList("read"), false);
+    testHasPermission(e, "bob", asList("write"), true);
+
+    e.deletePermission("read");
+
+    testEnforceWithoutUsers(e, "alice", "read", false);
+    testEnforceWithoutUsers(e, "alice", "write", false);
+    testEnforceWithoutUsers(e, "bob", "read", false);
+    testEnforceWithoutUsers(e, "bob", "write", true);
+
+    e.addPermissionForUser("bob", "read");
+
+    testEnforceWithoutUsers(e, "alice", "read", false);
+    testEnforceWithoutUsers(e, "alice", "write", false);
+    testEnforceWithoutUsers(e, "bob", "read", true);
+    testEnforceWithoutUsers(e, "bob", "write", true);
+
+    e.deletePermissionForUser("bob", "read");
+
+    testEnforceWithoutUsers(e, "alice", "read", false);
+    testEnforceWithoutUsers(e, "alice", "write", false);
+    testEnforceWithoutUsers(e, "bob", "read", false);
+    testEnforceWithoutUsers(e, "bob", "write", true);
+
+    e.deletePermissionsForUser("bob");
+
+    testEnforceWithoutUsers(e, "alice", "read", false);
+    testEnforceWithoutUsers(e, "alice", "write", false);
+    testEnforceWithoutUsers(e, "bob", "read", false);
+    testEnforceWithoutUsers(e, "bob", "write", false);
+  }
+
+  @Test
+  public void testImplicitRoleAPI() {
+    Enforcer e =
+        new Enforcer("examples/rbac_model.conf", "examples/rbac_with_hierarchy_policy.csv");
+    assertEquals(e.getImplicitRolesForUser("alice"), asList("admin", "data1_admin", "data2_admin"));
+  }
+
+  @Test
+  public void testImplicitPermissionAPI() {
+    Enforcer e =
+        new Enforcer("examples/rbac_model.conf", "examples/rbac_with_hierarchy_policy.csv");
+    assertEquals(
+        e.getImplicitPermissionsForUser("alice"),
+        asList(
+            asList("alice", "data1", "read"),
+            asList("data1_admin", "data1", "read"),
+            asList("data1_admin", "data1", "write"),
+            asList("data2_admin", "data2", "read"),
+            asList("data2_admin", "data2", "write")));
+  }
+
+  private void testGetImplicitUsersForRole(Enforcer e, String name, List<String> res) {
+    List<String> myRes = e.getImplicitUsersForRole(name);
+    Comparator<String> comparator = String::compareTo;
+    myRes.sort(comparator);
+    res.sort(comparator);
+
+    if (!Util.arrayEquals(res, myRes)) {
+      fail("Implicit users for : " + name + ": " + myRes + ", supposed to be " + res);
     }
+  }
 
-    @Test
-    public void testPermissionAPI() {
-        Enforcer e = new Enforcer("examples/basic_without_resources_model.conf", "examples/basic_without_resources_policy.csv");
+  @Test
+  public void testImplicitUsersForRole() {
+    Enforcer e =
+        new Enforcer(
+            "examples/rbac_with_pattern_model.conf", "examples/rbac_with_pattern_policy.csv");
 
-        testEnforceWithoutUsers(e, "alice", "read", true);
-        testEnforceWithoutUsers(e, "alice", "write", false);
-        testEnforceWithoutUsers(e, "bob", "read", false);
-        testEnforceWithoutUsers(e, "bob", "write", true);
+    testGetImplicitUsersForRole(e, "book_admin", asList("alice"));
+    testGetImplicitUsersForRole(e, "pen_admin", asList("cathy", "bob"));
 
-        testGetPermissions(e, "alice", asList(asList("alice", "read")));
-        testGetPermissions(e, "bob", asList(asList("bob", "write")));
-
-        testHasPermission(e, "alice", asList("read"), true);
-        testHasPermission(e, "alice", asList("write"), false);
-        testHasPermission(e, "bob", asList("read"), false);
-        testHasPermission(e, "bob", asList("write"), true);
-
-        e.deletePermission("read");
-
-        testEnforceWithoutUsers(e, "alice", "read", false);
-        testEnforceWithoutUsers(e, "alice", "write", false);
-        testEnforceWithoutUsers(e, "bob", "read", false);
-        testEnforceWithoutUsers(e, "bob", "write", true);
-
-        e.addPermissionForUser("bob", "read");
-
-        testEnforceWithoutUsers(e, "alice", "read", false);
-        testEnforceWithoutUsers(e, "alice", "write", false);
-        testEnforceWithoutUsers(e, "bob", "read", true);
-        testEnforceWithoutUsers(e, "bob", "write", true);
-
-        e.deletePermissionForUser("bob", "read");
-
-        testEnforceWithoutUsers(e, "alice", "read", false);
-        testEnforceWithoutUsers(e, "alice", "write", false);
-        testEnforceWithoutUsers(e, "bob", "read", false);
-        testEnforceWithoutUsers(e, "bob", "write", true);
-
-        e.deletePermissionsForUser("bob");
-
-        testEnforceWithoutUsers(e, "alice", "read", false);
-        testEnforceWithoutUsers(e, "alice", "write", false);
-        testEnforceWithoutUsers(e, "bob", "read", false);
-        testEnforceWithoutUsers(e, "bob", "write", false);
-    }
-
-    @Test
-    public void testImplicitRoleAPI() {
-        Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_with_hierarchy_policy.csv");
-        assertEquals(e.getImplicitRolesForUser("alice"), asList("admin", "data1_admin", "data2_admin"));
-    }
-
-    @Test
-    public void testImplicitPermissionAPI() {
-        Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_with_hierarchy_policy.csv");
-        assertEquals(
-                e.getImplicitPermissionsForUser("alice"),
-                asList(
-                        asList("alice", "data1", "read"),
-                        asList("data1_admin", "data1", "read"),
-                        asList("data1_admin", "data1", "write"),
-                        asList("data2_admin", "data2", "read"),
-                        asList("data2_admin", "data2", "write")
-                )
-        );
-
-    }
-
-    private void testGetImplicitUsersForRole(Enforcer e, String name, List<String> res) {
-        List<String> myRes = e.getImplicitUsersForRole(name);
-        Comparator<String> comparator = String::compareTo;
-        myRes.sort(comparator);
-        res.sort(comparator);
-
-        if (!Util.arrayEquals(res, myRes)) {
-            fail("Implicit users for : " + name + ": " + myRes + ", supposed to be " + res);
-        }
-    }
-
-    @Test
-    public void testImplicitUsersForRole() {
-        Enforcer e = new Enforcer("examples/rbac_with_pattern_model.conf", "examples/rbac_with_pattern_policy.csv");
-
-        testGetImplicitUsersForRole(e, "book_admin", asList("alice"));
-        testGetImplicitUsersForRole(e, "pen_admin", asList("cathy", "bob"));
-
-        testGetImplicitUsersForRole(e, "book_group", asList("/book/*", "/book/:id", "/book2/{id}"));
-        testGetImplicitUsersForRole(e, "pen_group", asList("/pen/:id", "/pen2/{id}"));
-    }
+    testGetImplicitUsersForRole(e, "book_group", asList("/book/*", "/book/:id", "/book2/{id}"));
+    testGetImplicitUsersForRole(e, "pen_group", asList("/pen/:id", "/pen2/{id}"));
+  }
 }

@@ -21,70 +21,69 @@ import org.casbin.jcasbin.util.function.*;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * FunctionMap represents the collection of Function.
- */
+/** FunctionMap represents the collection of Function. */
 public class FunctionMap {
-    /**
-     * AviatorFunction represents a function that is used in the matchers, used to get attributes in ABAC.
-     */
-    public Map<String, AviatorFunction> fm;
+  /**
+   * AviatorFunction represents a function that is used in the matchers, used to get attributes in
+   * ABAC.
+   */
+  public Map<String, AviatorFunction> fm;
 
-    /**
-     * addFunction adds an expression function.
-     *
-     * @param name the name of the new function.
-     * @param function the function.
-     */
-    public void addFunction(String name, AviatorFunction function) {
-        fm.put(name, function);
+  /**
+   * addFunction adds an expression function.
+   *
+   * @param name the name of the new function.
+   * @param function the function.
+   */
+  public void addFunction(String name, AviatorFunction function) {
+    fm.put(name, function);
+  }
+
+  /**
+   * setAviatorEval adds AviatorEvaluatorInstance to the custom function.
+   *
+   * @param name the name of the custom function.
+   * @param aviatorEval the AviatorEvaluatorInstance object.
+   */
+  public void setAviatorEval(String name, AviatorEvaluatorInstance aviatorEval) {
+    if (fm.containsKey(name) && fm.get(name) instanceof CustomFunction) {
+      ((CustomFunction) fm.get(name)).setAviatorEval(aviatorEval);
     }
+  }
 
-    /**
-     * setAviatorEval adds AviatorEvaluatorInstance to the custom function.
-     *
-     * @param name        the name of the custom function.
-     * @param aviatorEval the AviatorEvaluatorInstance object.
-     */
-    public void setAviatorEval(String name, AviatorEvaluatorInstance aviatorEval) {
-        if (fm.containsKey(name) && fm.get(name) instanceof CustomFunction) {
-            ((CustomFunction) fm.get(name)).setAviatorEval(aviatorEval);
-        }
+  /**
+   * setAviatorEval adds AviatorEvaluatorInstance to all the custom function.
+   *
+   * @param aviatorEval the AviatorEvaluatorInstance object.
+   */
+  public void setAviatorEval(AviatorEvaluatorInstance aviatorEval) {
+    for (AviatorFunction function : fm.values()) {
+      if (function instanceof CustomFunction) {
+        ((CustomFunction) function).setAviatorEval(aviatorEval);
+      }
     }
+  }
 
-    /**
-     * setAviatorEval adds AviatorEvaluatorInstance to all the custom function.
-     *
-     * @param aviatorEval the AviatorEvaluatorInstance object.
-     */
-    public void setAviatorEval(AviatorEvaluatorInstance aviatorEval) {
-        for (AviatorFunction function : fm.values()) {
-            if (function instanceof CustomFunction) {
-                ((CustomFunction) function).setAviatorEval(aviatorEval);
-            }
-        }
-    }
+  /**
+   * loadFunctionMap loads an initial function map.
+   *
+   * @return the constructor of FunctionMap.
+   */
+  public static FunctionMap loadFunctionMap() {
+    FunctionMap fm = new FunctionMap();
+    fm.fm = new HashMap<>();
 
-    /**
-     * loadFunctionMap loads an initial function map.
-     *
-     * @return the constructor of FunctionMap.
-     */
-    public static FunctionMap loadFunctionMap() {
-        FunctionMap fm = new FunctionMap();
-        fm.fm = new HashMap<>();
+    fm.addFunction("keyMatch", new KeyMatchFunc());
+    fm.addFunction("keyMatch2", new KeyMatch2Func());
+    fm.addFunction("keyMatch3", new KeyMatch3Func());
+    fm.addFunction("keyMatch4", new KeyMatch4Func());
+    fm.addFunction("keyGet", new KeyGetFunc());
+    fm.addFunction("keyGet2", new KeyGet2Func());
+    fm.addFunction("regexMatch", new RegexMatchFunc());
+    fm.addFunction("ipMatch", new IPMatchFunc());
+    fm.addFunction("eval", new EvalFunc());
+    fm.addFunction("globMatch", new GlobMatchFunc());
 
-        fm.addFunction("keyMatch", new KeyMatchFunc());
-        fm.addFunction("keyMatch2", new KeyMatch2Func());
-        fm.addFunction("keyMatch3", new KeyMatch3Func());
-        fm.addFunction("keyMatch4", new KeyMatch4Func());
-        fm.addFunction("keyGet", new KeyGetFunc());
-        fm.addFunction("keyGet2", new KeyGet2Func());
-        fm.addFunction("regexMatch", new RegexMatchFunc());
-        fm.addFunction("ipMatch", new IPMatchFunc());
-        fm.addFunction("eval", new EvalFunc());
-        fm.addFunction("globMatch", new GlobMatchFunc());
-
-        return fm;
-    }
+    return fm;
+  }
 }

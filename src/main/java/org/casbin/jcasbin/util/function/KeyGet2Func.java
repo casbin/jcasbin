@@ -29,17 +29,18 @@ import java.util.Map;
  * @since 2021/02/09
  */
 public class KeyGet2Func extends AbstractFunction {
-    @Override
-    public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2, AviatorObject arg3) {
-        String key1 = FunctionUtils.getStringValue(arg1, env);
-        String key2 = FunctionUtils.getStringValue(arg2, env);
-        String pathVar = FunctionUtils.getStringValue(arg3, env);
+  @Override
+  public AviatorObject call(
+      Map<String, Object> env, AviatorObject arg1, AviatorObject arg2, AviatorObject arg3) {
+    String key1 = FunctionUtils.getStringValue(arg1, env);
+    String key2 = FunctionUtils.getStringValue(arg2, env);
+    String pathVar = FunctionUtils.getStringValue(arg3, env);
 
-        return new AviatorString(BuiltInFunctions.keyGet2Func(key1, key2, pathVar));
-    }
+    return new AviatorString(BuiltInFunctions.keyGet2Func(key1, key2, pathVar));
+  }
 
-    @Override
-    public String getName() {
-        return "keyGet2";
-    }
+  @Override
+  public String getName() {
+    return "keyGet2";
+  }
 }

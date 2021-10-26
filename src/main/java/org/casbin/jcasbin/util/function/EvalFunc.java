@@ -22,22 +22,22 @@ import org.casbin.jcasbin.util.BuiltInFunctions;
 import java.util.Map;
 
 /**
- * EvalFunc is the wrapper for eval.
- * It extends CustomFunction, so it can be used in matcher and policy rule.
+ * EvalFunc is the wrapper for eval. It extends CustomFunction, so it can be used in matcher and
+ * policy rule.
  *
  * @author shink
  */
 public class EvalFunc extends CustomFunction {
 
-    @Override
-    public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
-        String eval = FunctionUtils.getStringValue(arg1, env);
-        eval = replaceTargets(eval, env);
-        return AviatorBoolean.valueOf(BuiltInFunctions.eval(eval, env, getAviatorEval()));
-    }
+  @Override
+  public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
+    String eval = FunctionUtils.getStringValue(arg1, env);
+    eval = replaceTargets(eval, env);
+    return AviatorBoolean.valueOf(BuiltInFunctions.eval(eval, env, getAviatorEval()));
+  }
 
-    @Override
-    public String getName() {
-        return "eval";
-    }
+  @Override
+  public String getName() {
+    return "eval";
+  }
 }

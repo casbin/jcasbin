@@ -16,7 +16,7 @@ package org.casbin.jcasbin.exception;
 
 public class CasbinConfigException extends RuntimeException {
 
-    public CasbinConfigException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public CasbinConfigException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

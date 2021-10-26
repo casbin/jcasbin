@@ -22,19 +22,17 @@ import org.casbin.jcasbin.util.BuiltInFunctions;
 
 import java.util.Map;
 
-/**
- * RegexMatchFunc is the wrapper for regexMatch.
- */
+/** RegexMatchFunc is the wrapper for regexMatch. */
 public class RegexMatchFunc extends AbstractFunction {
-    public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
-        String key1 = FunctionUtils.getStringValue(arg1, env);
-        String key2 = FunctionUtils.getStringValue(arg2, env);
+  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+    String key1 = FunctionUtils.getStringValue(arg1, env);
+    String key2 = FunctionUtils.getStringValue(arg2, env);
 
-        return AviatorBoolean.valueOf(BuiltInFunctions.regexMatch(key1, key2));
-    }
+    return AviatorBoolean.valueOf(BuiltInFunctions.regexMatch(key1, key2));
+  }
 
-    @Override
-    public String getName() {
-        return "regexMatch";
-    }
+  @Override
+  public String getName() {
+    return "regexMatch";
+  }
 }

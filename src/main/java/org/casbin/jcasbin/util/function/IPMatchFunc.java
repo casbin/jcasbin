@@ -22,20 +22,18 @@ import org.casbin.jcasbin.util.BuiltInFunctions;
 
 import java.util.Map;
 
-/**
- * IPMatchFunc is the wrapper for ipMatch.
- */
+/** IPMatchFunc is the wrapper for ipMatch. */
 public class IPMatchFunc extends AbstractFunction {
-    @Override
-    public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
-        String ip1 = FunctionUtils.getStringValue(arg1, env);
-        String ip2 = FunctionUtils.getStringValue(arg2, env);
+  @Override
+  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+    String ip1 = FunctionUtils.getStringValue(arg1, env);
+    String ip2 = FunctionUtils.getStringValue(arg2, env);
 
-        return AviatorBoolean.valueOf(BuiltInFunctions.ipMatch(ip1, ip2));
-    }
+    return AviatorBoolean.valueOf(BuiltInFunctions.ipMatch(ip1, ip2));
+  }
 
-    @Override
-    public String getName() {
-        return "ipMatch";
-    }
+  @Override
+  public String getName() {
+    return "ipMatch";
+  }
 }

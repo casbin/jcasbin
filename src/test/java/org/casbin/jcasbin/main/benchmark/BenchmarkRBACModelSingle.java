@@ -27,10 +27,12 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Mode.AverageTime)
 public class BenchmarkRBACModelSingle {
-    private static Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv", false);
+  private static Enforcer e =
+      new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv", false);
 
-    public static void main(String args[]) throws RunnerException {
-        Options opt = new OptionsBuilder()
+  public static void main(String args[]) throws RunnerException {
+    Options opt =
+        new OptionsBuilder()
             .include(BenchmarkRBACModelSingle.class.getName())
             .exclude("Pref")
             .warmupIterations(3)
@@ -38,14 +40,14 @@ public class BenchmarkRBACModelSingle {
             .addProfiler(GCProfiler.class)
             .forks(1)
             .build();
-        new Runner(opt).run();
-    }
+    new Runner(opt).run();
+  }
 
-    @Threads(1)
-    @Benchmark
-    public static void benchmarkRBACModel() {
-        for (int i = 0; i < 1000; i++) {
-            e.enforce("alice", "data2", "read");
-        }
+  @Threads(1)
+  @Benchmark
+  public static void benchmarkRBACModel() {
+    for (int i = 0; i < 1000; i++) {
+      e.enforce("alice", "data2", "read");
     }
+  }
 }

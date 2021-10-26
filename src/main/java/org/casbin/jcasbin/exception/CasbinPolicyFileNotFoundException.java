@@ -16,8 +16,7 @@ package org.casbin.jcasbin.exception;
 
 public class CasbinPolicyFileNotFoundException extends RuntimeException {
 
-    public CasbinPolicyFileNotFoundException(String message) {
-        super(message);
-    }
-
+  public CasbinPolicyFileNotFoundException(String message) {
+    super(message);
+  }
 }

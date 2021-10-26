@@ -19,10 +19,11 @@ import org.junit.Test;
 import static org.casbin.jcasbin.main.TestUtil.testDomainEnforce;
 
 public class GroupRoleManagerTest {
-    @Test
-    public void testGroupRoleManager() {
-        Enforcer e = new Enforcer("examples/group_with_domain_model.conf", "examples/group_with_domain_policy.csv");
-        testDomainEnforce(e, "alice", "domain1", "data1", "read", false);
-    }
-
+  @Test
+  public void testGroupRoleManager() {
+    Enforcer e =
+        new Enforcer(
+            "examples/group_with_domain_model.conf", "examples/group_with_domain_policy.csv");
+    testDomainEnforce(e, "alice", "domain1", "data1", "read", false);
+  }
 }

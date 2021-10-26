@@ -16,11 +16,11 @@ package org.casbin.jcasbin.exception;
 
 public class CasbinAdapterException extends RuntimeException {
 
-    public CasbinAdapterException(String message) {
-        super(message);
-    }
+  public CasbinAdapterException(String message) {
+    super(message);
+  }
 
-    public CasbinAdapterException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public CasbinAdapterException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

@@ -16,11 +16,11 @@ package org.casbin.jcasbin.exception;
 
 public class CasbinMatcherException extends RuntimeException {
 
-    public CasbinMatcherException(String message) {
-        super(message);
-    }
+  public CasbinMatcherException(String message) {
+    super(message);
+  }
 
-    public CasbinMatcherException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public CasbinMatcherException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

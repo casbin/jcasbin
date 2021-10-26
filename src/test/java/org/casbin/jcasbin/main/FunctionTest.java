@@ -27,30 +27,33 @@ import static org.casbin.jcasbin.main.TestUtil.testEnforce;
 
 public class FunctionTest {
 
-    @Test
-    public void testCustomFunction() {
-        Enforcer e = new Enforcer("examples/abac_rule_custom_function_model.conf", "examples/abac_rule_custom_function_policy.csv");
+  @Test
+  public void testCustomFunction() {
+    Enforcer e =
+        new Enforcer(
+            "examples/abac_rule_custom_function_model.conf",
+            "examples/abac_rule_custom_function_policy.csv");
 
-        // add a custom function
-        CustomFunc customFunc = new CustomFunc();
-        e.addFunction(customFunc.getName(), customFunc);
+    // add a custom function
+    CustomFunc customFunc = new CustomFunc();
+    e.addFunction(customFunc.getName(), customFunc);
 
-        testEnforce(e, new AbacAPIUnitTest.TestEvalRule("alice", 18), "/test/url1/url2/2", "GET", true);
-        testEnforce(e, new AbacAPIUnitTest.TestEvalRule("alice", 18), "/test/2", "GET", false);
-        testEnforce(e, new AbacAPIUnitTest.TestEvalRule("bob", 10), "/test/url1/url2/2", "GET", false);
+    testEnforce(e, new AbacAPIUnitTest.TestEvalRule("alice", 18), "/test/url1/url2/2", "GET", true);
+    testEnforce(e, new AbacAPIUnitTest.TestEvalRule("alice", 18), "/test/2", "GET", false);
+    testEnforce(e, new AbacAPIUnitTest.TestEvalRule("bob", 10), "/test/url1/url2/2", "GET", false);
+  }
+
+  public static class CustomFunc extends CustomFunction {
+    @Override
+    public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
+      String obj = FunctionUtils.getStringValue(arg1, env);
+      boolean res = Pattern.compile("/*/url1/url2/*", Pattern.CASE_INSENSITIVE).matcher(obj).find();
+      return AviatorBoolean.valueOf(res);
     }
 
-    public static class CustomFunc extends CustomFunction {
-        @Override
-        public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
-            String obj = FunctionUtils.getStringValue(arg1, env);
-            boolean res = Pattern.compile("/*/url1/url2/*", Pattern.CASE_INSENSITIVE).matcher(obj).find();
-            return AviatorBoolean.valueOf(res);
-        }
-
-        @Override
-        public String getName() {
-            return "custom";
-        }
+    @Override
+    public String getName() {
+      return "custom";
     }
+  }
 }

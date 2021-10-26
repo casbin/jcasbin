@@ -20,83 +20,84 @@ import org.casbin.jcasbin.util.Util;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Assertion represents an expression in a section of the model.
- * For example: r = sub, obj, act
- */
+/** Assertion represents an expression in a section of the model. For example: r = sub, obj, act */
 public class Assertion {
-    public String key;
-    public String value;
-    public String[] tokens;
-    public List<List<String>> policy;
-    public RoleManager rm;
-    public int priorityIndex;
+  public String key;
+  public String value;
+  public String[] tokens;
+  public List<List<String>> policy;
+  public RoleManager rm;
+  public int priorityIndex;
 
-    public Assertion() {
-        policy = new ArrayList<>();
+  public Assertion() {
+    policy = new ArrayList<>();
+  }
+
+  protected void buildRoleLinks(RoleManager rm) {
+    this.rm = rm;
+    int count = 0;
+    for (int i = 0; i < value.length(); i++) {
+      if (value.charAt(i) == '_') {
+        count++;
+      }
+    }
+    for (List<String> rule : policy) {
+      if (count < 2) {
+        throw new IllegalArgumentException(
+            "the number of \"_\" in role definition should be at least 2");
+      }
+      if (rule.size() < count) {
+        throw new IllegalArgumentException("grouping policy elements do not meet role definition");
+      }
+
+      if (count == 2) {
+        rm.addLink(rule.get(0), rule.get(1));
+      } else if (count == 3) {
+        rm.addLink(rule.get(0), rule.get(1), rule.get(2));
+      } else if (count == 4) {
+        rm.addLink(rule.get(0), rule.get(1), rule.get(2), rule.get(3));
+      }
     }
 
-    protected void buildRoleLinks(RoleManager rm) {
-        this.rm = rm;
-        int count = 0;
-        for (int i = 0; i < value.length(); i ++) {
-            if (value.charAt(i) == '_') {
-                count ++;
-            }
-        }
-        for (List<String> rule : policy) {
-            if (count < 2) {
-                throw new IllegalArgumentException("the number of \"_\" in role definition should be at least 2");
-            }
-            if (rule.size() < count) {
-                throw new IllegalArgumentException("grouping policy elements do not meet role definition");
-            }
+    Util.logPrint("Role links for: " + key);
+    rm.printRoles();
+  }
 
-            if (count == 2) {
-                rm.addLink(rule.get(0), rule.get(1));
-            } else if (count == 3) {
-                rm.addLink(rule.get(0), rule.get(1), rule.get(2));
-            } else if (count == 4) {
-                rm.addLink(rule.get(0), rule.get(1), rule.get(2), rule.get(3));
-            }
-        }
-
-        Util.logPrint("Role links for: " + key);
-        rm.printRoles();
+  public void buildIncrementalRoleLinks(
+      RoleManager rm, Model.PolicyOperations op, List<List<String>> rules) {
+    this.rm = rm;
+    int count = 0;
+    for (int i = 0; i < value.length(); i++) {
+      if (value.charAt(i) == '_') {
+        count++;
+      }
     }
-
-    public void buildIncrementalRoleLinks(RoleManager rm, Model.PolicyOperations op, List<List<String>> rules) {
-        this.rm = rm;
-        int count = 0;
-        for (int i = 0; i < value.length(); i ++) {
-            if (value.charAt(i) == '_') {
-                count ++;
-            }
-        }
-        for (List<String> rule : rules) {
-            if (count < 2) {
-                throw new IllegalArgumentException("the number of \"_\" in role definition should be at least 2");
-            }
-            if (rule.size() < count) {
-                throw new IllegalArgumentException("grouping policy elements do not meet role definition");
-            }
-            if (rule.size() > count) {
-                rule = rule.subList(0, count);
-            }
-            switch (op) {
-                case POLICY_ADD:
-                    rm.addLink(rule.get(0), rule.get(1), rule.subList(2, rule.size()).toArray(new String[0]));
-                    break;
-                case POLICY_REMOVE:
-                    rm.deleteLink(rule.get(0), rule.get(1), rule.subList(2, rule.size()).toArray(new String[0]));
-                    break;
-                default:
-                    throw new IllegalArgumentException("invalid operation:" + op.toString());
-            }
-        }
+    for (List<String> rule : rules) {
+      if (count < 2) {
+        throw new IllegalArgumentException(
+            "the number of \"_\" in role definition should be at least 2");
+      }
+      if (rule.size() < count) {
+        throw new IllegalArgumentException("grouping policy elements do not meet role definition");
+      }
+      if (rule.size() > count) {
+        rule = rule.subList(0, count);
+      }
+      switch (op) {
+        case POLICY_ADD:
+          rm.addLink(rule.get(0), rule.get(1), rule.subList(2, rule.size()).toArray(new String[0]));
+          break;
+        case POLICY_REMOVE:
+          rm.deleteLink(
+              rule.get(0), rule.get(1), rule.subList(2, rule.size()).toArray(new String[0]));
+          break;
+        default:
+          throw new IllegalArgumentException("invalid operation:" + op.toString());
+      }
     }
+  }
 
-    public void initPriorityIndex() {
-        priorityIndex = -1;
-    }
+  public void initPriorityIndex() {
+    priorityIndex = -1;
+  }
 }

@@ -21,15 +21,15 @@ import java.util.List;
  *
  * @author canxer314
  */
-public interface UpdatableAdapter extends Adapter{
+public interface UpdatableAdapter extends Adapter {
 
-    /**
-     * UpdatePolicy updates a policy rule from storage.
-     * This is part of the Auto-Save feature.
-     * @param sec the section, "p" or "g".
-     * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
-     * @param oldRule the old rule.
-     * @param newPolicy the new policy.
-     */
-    void updatePolicy(String sec, String ptype, List<String> oldRule, List<String> newPolicy);
+  /**
+   * UpdatePolicy updates a policy rule from storage. This is part of the Auto-Save feature.
+   *
+   * @param sec the section, "p" or "g".
+   * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
+   * @param oldRule the old rule.
+   * @param newPolicy the new policy.
+   */
+  void updatePolicy(String sec, String ptype, List<String> oldRule, List<String> newPolicy);
 }

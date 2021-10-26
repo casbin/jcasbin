@@ -15,5 +15,7 @@
 package org.casbin.jcasbin.effect;
 
 public enum Effect {
-    Allow, Indeterminate, Deny
+  Allow,
+  Indeterminate,
+  Deny
 }

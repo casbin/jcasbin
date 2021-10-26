@@ -29,257 +29,259 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Util {
-    public static boolean enableLog = true;
-    private static Pattern evalReg = Pattern.compile("\\beval\\(([^),]*)\\)");
+  public static boolean enableLog = true;
+  private static Pattern evalReg = Pattern.compile("\\beval\\(([^),]*)\\)");
 
-    private static Logger LOGGER = LoggerFactory.getLogger("org.casbin.jcasbin");
+  private static Logger LOGGER = LoggerFactory.getLogger("org.casbin.jcasbin");
 
-    /**
-     * logPrint prints the log.
-     *
-     * @param v the log.
-     */
-    public static void logPrint(String v) {
-        if (enableLog) {
-            LOGGER.info(v);
-        }
+  /**
+   * logPrint prints the log.
+   *
+   * @param v the log.
+   */
+  public static void logPrint(String v) {
+    if (enableLog) {
+      LOGGER.info(v);
+    }
+  }
+
+  /**
+   * logPrintf prints the log with the format.
+   *
+   * @param format the format of the log.
+   * @param v the log.
+   */
+  public static void logPrintf(String format, String... v) {
+    if (enableLog) {
+      String tmp = String.format(format, (Object[]) v);
+      LOGGER.info(tmp);
+    }
+  }
+
+  /**
+   * logPrintf prints the log with the format as a warning.
+   *
+   * @param format the format of the log.
+   * @param v the log.
+   */
+  public static void logPrintfWarn(String format, Object... v) {
+    if (enableLog) {
+      LOGGER.warn(format, v);
+    }
+  }
+
+  /**
+   * logPrintf prints the log with the format as an error.
+   *
+   * @param format the format of the log.
+   * @param v the log.
+   */
+  public static void logPrintfError(String format, Object... v) {
+    if (enableLog) {
+      LOGGER.error(format, v);
+    }
+  }
+
+  /**
+   * escapeAssertion escapes the dots in the assertion, because the expression evaluation doesn't
+   * support such variable names.
+   *
+   * @param s the value of the matcher and effect assertions.
+   * @return the escaped value.
+   */
+  public static String escapeAssertion(String s) {
+    // Replace the first dot, because the string doesn't start with "m="
+    // and is not covered by the regex.
+    if (s.startsWith("r") || s.startsWith("p")) {
+      s = s.replaceFirst("\\.", "_");
+    }
+    String regex = "(\\|| |=|\\)|\\(|&|<|>|,|\\+|-|!|\\*|\\/)(r|p)[0-9]*\\.";
+    Pattern p = Pattern.compile(regex);
+    Matcher m = p.matcher(s);
+    StringBuffer sb = new StringBuffer();
+
+    while (m.find()) {
+      m.appendReplacement(sb, m.group().replace(".", "_"));
     }
 
-    /**
-     * logPrintf prints the log with the format.
-     *
-     * @param format the format of the log.
-     * @param v the log.
-     */
-    public static void logPrintf(String format, String... v) {
-        if (enableLog) {
-            String tmp = String.format(format, (Object[]) v);
-            LOGGER.info(tmp);
-        }
+    m.appendTail(sb);
+    return sb.toString();
+  }
+
+  /**
+   * convertInSyntax Convert 'in' to 'include' to fit aviatorscript,because aviatorscript don't
+   * support native 'in' syntax
+   *
+   * @param expString the value of the matcher
+   * @return the 'include' expression.
+   */
+  public static String convertInSyntax(String expString) {
+    String reg = "([a-zA-Z0-9_.()\"]*) +in +([a-zA-Z0-9_.()\"]*)";
+    Matcher m1 = Pattern.compile(reg).matcher(expString);
+    StringBuffer sb = new StringBuffer();
+    boolean flag = false;
+    while (m1.find()) {
+      flag = true;
+      m1.appendReplacement(sb, "include($2, $1)");
+    }
+    return flag ? sb.toString() : expString;
+  }
+  /**
+   * removeComments removes the comments starting with # in the text.
+   *
+   * @param s a line in the model.
+   * @return the line without comments.
+   */
+  public static String removeComments(String s) {
+    int pos = s.indexOf("#");
+    if (pos == -1) {
+      return s;
+    }
+    return s.substring(0, pos).trim();
+  }
+
+  /**
+   * arrayEquals determines whether two string arrays are identical.
+   *
+   * @param a the first array.
+   * @param b the second array.
+   * @return whether a equals to b.
+   */
+  public static boolean arrayEquals(List<String> a, List<String> b) {
+    if (a == null) {
+      a = new ArrayList<>();
+    }
+    if (b == null) {
+      b = new ArrayList<>();
+    }
+    if (a.size() != b.size()) {
+      return false;
     }
 
-    /**
-     * logPrintf prints the log with the format as a warning.
-     *
-     * @param format the format of the log.
-     * @param v the log.
-     */
-    public static void logPrintfWarn(String format, Object... v) {
-        if (enableLog) {
-            LOGGER.warn(format, v);
-        }
+    for (int i = 0; i < a.size(); i++) {
+      if (!a.get(i).equals(b.get(i))) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * array2DEquals determines whether two 2-dimensional string arrays are identical.
+   *
+   * @param a the first 2-dimensional array.
+   * @param b the second 2-dimensional array.
+   * @return whether a equals to b.
+   */
+  public static boolean array2DEquals(List<List<String>> a, List<List<String>> b) {
+    if (a == null) {
+      a = new ArrayList<>();
+    }
+    if (b == null) {
+      b = new ArrayList<>();
+    }
+    if (a.size() != b.size()) {
+      return false;
     }
 
-    /**
-     * logPrintf prints the log with the format as an error.
-     *
-     * @param format the format of the log.
-     * @param v the log.
-     */
-    public static void logPrintfError(String format, Object... v) {
-        if (enableLog) {
-            LOGGER.error(format, v);
+    for (int i = 0; i < a.size(); i++) {
+      if (!arrayEquals(a.get(i), b.get(i))) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * arrayRemoveDuplicates removes any duplicated elements in a string array.
+   *
+   * @param s the array.
+   * @return the array without duplicates.
+   */
+  public static boolean arrayRemoveDuplicates(List<String> s) {
+    return true;
+  }
+
+  /**
+   * arrayToString gets a printable string for a string array.
+   *
+   * @param s the array.
+   * @return the string joined by the array elements.
+   */
+  public static String arrayToString(List<String> s) {
+    return String.join(", ", s);
+  }
+
+  /**
+   * paramsToString gets a printable string for variable number of parameters.
+   *
+   * @param s the parameters.
+   * @return the string joined by the parameters.
+   */
+  public static String paramsToString(String[] s) {
+    return String.join(", ", s);
+  }
+
+  /**
+   * splitCommaDelimited splits a comma-delimited string according to the default processing method
+   * of the CSV file into a string array. It assumes that any number of whitespace might exist
+   * before or after the word and that tokens do not include whitespace as part of their value.
+   *
+   * @param s the string.
+   * @return the array with the string tokens.
+   */
+  public static String[] splitCommaDelimited(String s) {
+    String[] records = null;
+    if (s != null) {
+      try {
+        CSVParser csvParser = CSVFormat.DEFAULT.parse(new StringReader(s));
+        List<CSVRecord> csvRecords = csvParser.getRecords();
+        records = new String[csvRecords.get(0).size()];
+        for (int i = 0; i < csvRecords.get(0).size(); i++) {
+          records[i] = csvRecords.get(0).get(i).trim();
         }
+      } catch (IOException e) {
+        e.printStackTrace();
+        Util.logPrintfError("CSV parser failed to parse this line:", s);
+      }
+    }
+    return records;
+  }
+
+  /**
+   * setEquals determines whether two string sets are identical.
+   *
+   * @param a the first set.
+   * @param b the second set.
+   * @return whether a equals to b.
+   */
+  public static boolean setEquals(List<String> a, List<String> b) {
+    if (a == null) {
+      a = new ArrayList<>();
+    }
+    if (b == null) {
+      b = new ArrayList<>();
+    }
+    if (a.size() != b.size()) {
+      return false;
     }
 
-    /**
-     * escapeAssertion escapes the dots in the assertion, because the expression evaluation doesn't support such variable names.
-     *
-     * @param s the value of the matcher and effect assertions.
-     * @return the escaped value.
-     */
-    public static String escapeAssertion(String s) {
-        //Replace the first dot, because the string doesn't start with "m="
-        // and is not covered by the regex.
-        if (s.startsWith("r") || s.startsWith("p")) {
-            s = s.replaceFirst("\\.", "_");
-        }
-        String regex = "(\\|| |=|\\)|\\(|&|<|>|,|\\+|-|!|\\*|\\/)(r|p)[0-9]*\\.";
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(s);
-        StringBuffer sb = new StringBuffer();
+    Collections.sort(a);
+    Collections.sort(b);
 
-        while (m.find()) {
-            m.appendReplacement(sb, m.group().replace(".", "_") );
-        }
-
-        m.appendTail(sb);
-        return sb.toString();
+    for (int i = 0; i < a.size(); i++) {
+      if (!a.get(i).equals(b.get(i))) {
+        return false;
+      }
     }
+    return true;
+  }
 
-    /**
-     * convertInSyntax Convert 'in' to 'include' to fit aviatorscript,because aviatorscript don't support native 'in' syntax
-     *
-     * @param expString the value of the matcher
-     * @return the 'include' expression.
-     */
-    public static String convertInSyntax(String expString) {
-        String reg = "([a-zA-Z0-9_.()\"]*) +in +([a-zA-Z0-9_.()\"]*)";
-        Matcher m1 = Pattern.compile(reg).matcher(expString);
-        StringBuffer sb = new StringBuffer();
-        boolean flag=false;
-        while (m1.find()) {
-            flag=true;
-            m1.appendReplacement(sb,"include($2, $1)");
-        }
-        return flag?sb.toString():expString;
-    }
-    /**
-     * removeComments removes the comments starting with # in the text.
-     *
-     * @param s a line in the model.
-     * @return the line without comments.
-     */
-    public static String removeComments(String s) {
-        int pos = s.indexOf("#");
-        if (pos == -1) {
-            return s;
-        }
-        return s.substring(0,pos).trim();
-    }
+  public static boolean hasEval(String exp) {
+    return evalReg.matcher(exp).matches();
+  }
 
-    /**
-     * arrayEquals determines whether two string arrays are identical.
-     *
-     * @param a the first array.
-     * @param b the second array.
-     * @return whether a equals to b.
-     */
-    public static boolean arrayEquals(List<String> a, List<String> b) {
-        if (a == null) {
-            a = new ArrayList<>();
-        }
-        if (b == null) {
-            b = new ArrayList<>();
-        }
-        if (a.size() != b.size()) {
-            return false;
-        }
-
-        for (int i = 0; i < a.size(); i ++) {
-            if (!a.get(i).equals(b.get(i))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * array2DEquals determines whether two 2-dimensional string arrays are identical.
-     *
-     * @param a the first 2-dimensional array.
-     * @param b the second 2-dimensional array.
-     * @return whether a equals to b.
-     */
-    public static boolean array2DEquals(List<List<String>> a, List<List<String>> b) {
-        if (a == null) {
-            a = new ArrayList<>();
-        }
-        if (b == null) {
-            b = new ArrayList<>();
-        }
-        if (a.size() != b.size()) {
-            return false;
-        }
-
-        for (int i = 0; i < a.size(); i ++) {
-            if (!arrayEquals(a.get(i), b.get(i))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * arrayRemoveDuplicates removes any duplicated elements in a string array.
-     *
-     * @param s the array.
-     * @return the array without duplicates.
-     */
-    public static boolean arrayRemoveDuplicates(List<String> s) {
-        return true;
-    }
-
-    /**
-     * arrayToString gets a printable string for a string array.
-     *
-     * @param s the array.
-     * @return the string joined by the array elements.
-     */
-    public static String arrayToString(List<String> s) {
-        return String.join(", ", s);
-    }
-
-    /**
-     * paramsToString gets a printable string for variable number of parameters.
-     *
-     * @param s the parameters.
-     * @return the string joined by the parameters.
-     */
-    public static String paramsToString(String[] s) {
-        return String.join(", ", s);
-    }
-
-    /**
-     * splitCommaDelimited splits a comma-delimited string according to the default processing method of the CSV file
-     * into a string array. It assumes that any number of whitespace might exist before or after the word and that tokens do not include
-     * whitespace as part of their value.
-     *
-     * @param s the string.
-     * @return the array with the string tokens.
-     */
-    public static String[] splitCommaDelimited(String s) {
-        String[] records = null;
-        if (s != null) {
-            try {
-                CSVParser csvParser = CSVFormat.DEFAULT.parse(new StringReader(s));
-                List<CSVRecord> csvRecords = csvParser.getRecords();
-                records = new String[csvRecords.get(0).size()];
-                for (int i = 0; i < csvRecords.get(0).size(); i++) {
-                    records[i] = csvRecords.get(0).get(i).trim();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                Util.logPrintfError("CSV parser failed to parse this line:", s);
-            }
-        }
-        return records;
-    }
-
-    /**
-     * setEquals determines whether two string sets are identical.
-     *
-     * @param a the first set.
-     * @param b the second set.
-     * @return whether a equals to b.
-     */
-    public static boolean setEquals(List<String> a, List<String> b) {
-        if (a == null) {
-            a = new ArrayList<>();
-        }
-        if (b == null) {
-            b = new ArrayList<>();
-        }
-        if (a.size() != b.size()) {
-            return false;
-        }
-
-        Collections.sort(a);
-        Collections.sort(b);
-
-        for (int i = 0; i < a.size(); i ++) {
-            if (!a.get(i).equals(b.get(i))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public static boolean hasEval(String exp) {
-        return evalReg.matcher(exp).matches();
-    }
-
-    public static String replaceEval(String s, String replacement) {
-        return evalReg.matcher(s).replaceAll("(" + replacement + ")");
-    }
+  public static String replaceEval(String s, String replacement) {
+    return evalReg.matcher(s).replaceAll("(" + replacement + ")");
+  }
 }

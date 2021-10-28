@@ -554,6 +554,30 @@ public class ManagementEnforcer extends InternalEnforcer {
     }
 
     /**
+     * addGroupingPolicies adds role inheritance rules to the current policy.
+     * If the rule already exists, the function returns false for the corresponding policy rule and the rule will not be added.
+     * Otherwise the function returns true for the corresponding policy rule by adding the new rule.
+     *
+     * @param rules the "g" policy rules, ptype "g" is implicitly used.
+     * @return succeeds or not.
+     */
+    public boolean addGroupingPolicies(List<List<String>> rules) {
+        return addNamedGroupingPolicies("g", rules);
+    }
+
+    /**
+     * addGroupingPolicies adds role inheritance rules to the current policy.
+     * If the rule already exists, the function returns false for the corresponding policy rule and the rule will not be added.
+     * Otherwise the function returns true for the corresponding policy rule by adding the new rule.
+     *
+     * @param rules the "g" policy rules, ptype "g" is implicitly used.
+     * @return succeeds or not.
+     */
+    public boolean addGroupingPolicies(String[][] rules) {
+        return addGroupingPolicies(Arrays.stream(rules).map(Arrays::asList).collect(Collectors.toList()));
+    }
+
+    /**
      * addNamedGroupingPolicy adds a named role inheritance rule to the current policy.
      * If the rule already exists, the function returns false and the rule will not be added.
      * Otherwise the function returns true by adding the new rule.
@@ -584,6 +608,32 @@ public class ManagementEnforcer extends InternalEnforcer {
     }
 
     /**
+     * addNamedGroupingPolicies adds named role inheritance rules to the current policy.
+     * If the rule already exists, the function returns false for the corresponding policy rule and the rule will not be added.
+     * Otherwise the function returns true for the corresponding policy rule by adding the new rule.
+     *
+     * @param ptype the policy type, can be "g", "g2", "g3", ..
+     * @param rules the "g" policy rules.
+     * @return succeeds or not.
+     */
+    public boolean addNamedGroupingPolicies(String ptype, List<List<String>> rules) {
+        return addPolicies("g", ptype, rules);
+    }
+
+    /**
+     * addNamedGroupingPolicies adds named role inheritance rules to the current policy.
+     * If the rule already exists, the function returns false for the corresponding policy rule and the rule will not be added.
+     * Otherwise the function returns true for the corresponding policy rule by adding the new rule.
+     *
+     * @param ptype the policy type, can be "g", "g2", "g3", ..
+     * @param rules the "g" policy rules.
+     * @return succeeds or not.
+     */
+    public boolean addNamedGroupingPolicies(String ptype, String[][] rules) {
+        return addNamedGroupingPolicies(ptype, Arrays.stream(rules).map(Arrays::asList).collect(Collectors.toList()));
+    }
+
+    /**
      * removeGroupingPolicy removes a role inheritance rule from the current policy.
      *
      * @param params the "g" policy rule, ptype "g" is implicitly used.
@@ -601,6 +651,26 @@ public class ManagementEnforcer extends InternalEnforcer {
      */
     public boolean removeGroupingPolicy(String... params) {
         return removeGroupingPolicy(Arrays.asList(params));
+    }
+
+    /**
+     * removeGroupingPolicies removes role inheritance rules from the current policy.
+     *
+     * @param rules the "g" policy rules, ptype "g" is implicitly used.
+     * @return succeeds or not.
+     */
+    public boolean removeGroupingPolicies(List<List<String>> rules) {
+        return removeNamedGroupingPolicies("g", rules);
+    }
+
+    /**
+     * removeGroupingPolicies removes role inheritance rules from the current policy.
+     *
+     * @param rules the "g" policy rules, ptype "g" is implicitly used.
+     * @return succeeds or not.
+     */
+    public boolean removeGroupingPolicies(String[][] rules) {
+        return removeGroupingPolicies(Arrays.stream(rules).map(Arrays::asList).collect(Collectors.toList()));
     }
 
     /**
@@ -639,6 +709,28 @@ public class ManagementEnforcer extends InternalEnforcer {
      */
     public boolean removeNamedGroupingPolicy(String ptype, String... params) {
         return removeNamedGroupingPolicy(ptype, Arrays.asList(params));
+    }
+
+    /**
+     * removeNamedGroupingPolicies removes role inheritance rules from the current named policy.
+     *
+     * @param ptype the policy type, can be "g", "g2", "g3", ..
+     * @param rules the "g" policy rules.
+     * @return succeeds or not.
+     */
+    public boolean removeNamedGroupingPolicies(String ptype, List<List<String>> rules) {
+        return removePolicies("g", ptype, rules);
+    }
+
+    /**
+     * removeNamedGroupingPolicies removes role inheritance rules from the current named policy.
+     *
+     * @param ptype the policy type, can be "g", "g2", "g3", ..
+     * @param rules the "g" policy rules.
+     * @return succeeds or not.
+     */
+    public boolean removeNamedGroupingPolicies(String ptype, String[][] rules) {
+        return removeNamedGroupingPolicies(ptype, Arrays.stream(rules).map(Arrays::asList).collect(Collectors.toList()));
     }
 
     /**

@@ -29,11 +29,12 @@ import org.casbin.jcasbin.rbac.RoleManager;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class BuiltInFunctions {
 
-    private static Pattern keyMatch2Pattern = Pattern.compile("(.*):[^/]+(.*)");
-    private static Pattern keyMatch3Pattern = Pattern.compile("(.*)\\{[^/]+\\}(.*)");
+    private static final Pattern KEY_MATCH2_PATTERN = Pattern.compile(":[^/]+");
+    private static final Pattern KEY_MATCH3_PATTERN = Pattern.compile("\\{[^/]+\\}");
 
     /**
      * keyMatch determines whether key1 matches the pattern of key2 (similar to RESTful path), key2
@@ -73,10 +74,7 @@ public class BuiltInFunctions {
      */
     public static boolean keyMatch2(String key1, String key2) {
         key2 = key2.replace("/*", "/.*");
-        while (key2.contains("/:")) {
-            key2 = "^" + keyMatch2Pattern.matcher(key2).replaceAll("$1[^/]+$2") + "$";
-        }
-
+        key2 = "^" + KEY_MATCH2_PATTERN.matcher(key2).replaceAll("[^/]+") + "$";
         return regexMatch(key1, key2);
     }
 
@@ -94,12 +92,12 @@ public class BuiltInFunctions {
      */
     public static boolean keyMatch3(String key1, String key2) {
         key2 = key2.replace("/*", "/.*");
-
-        while (key2.contains("/{")) {
-            key2 = keyMatch3Pattern.matcher(key2).replaceAll("$1[^/]+$2");
+        key2 = "^" + KEY_MATCH3_PATTERN.matcher(key2).replaceAll("[^/]+") + "$";
+        try {
+            return regexMatch(key1, key2);
+        } catch (PatternSyntaxException e) {
+            return false;
         }
-
-        return regexMatch(key1, key2);
     }
 
     /**
@@ -144,7 +142,7 @@ public class BuiltInFunctions {
                 if (key1.length() - (off + 1) < token.length()) {
                     return false;
                 }
-                if (!key1.substring(off, off + token.length()).equals(token)) {
+                if (!key1.startsWith(token, off)) {
                     return false;
                 }
                 key1 = key1.replaceFirst(token, ",");
@@ -239,7 +237,7 @@ public class BuiltInFunctions {
      * @return whether key1 matches key2.
      */
     public static boolean regexMatch(String key1, String key2) {
-        return Pattern.matches(key2, key1);
+        return Pattern.compile(key2).matcher(key1).lookingAt();
     }
 
     /**
@@ -283,7 +281,7 @@ public class BuiltInFunctions {
 
         Integer prefix = ipa2.getNetworkPrefixLength();
         IPAddress mask = ipa2.getNetwork().getNetworkMask(prefix, false);
-        return ipa1.mask(mask).equals(ipas2.getHostAddress());
+        return ipa1.mask(mask).equals(ipa2.mask(mask));
     }
 
     /**

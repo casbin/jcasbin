@@ -182,4 +182,28 @@ public class TestUtil {
     static void testEval(String eval, Map<String, Object> env, AviatorEvaluatorInstance aviatorEval, boolean res) {
         assertEquals(res, BuiltInFunctions.eval(eval, env, aviatorEval));
     }
+
+    static void testKeyMatch(String key1, String key2, boolean res) {
+        assertEquals(res, BuiltInFunctions.keyMatch(key1, key2));
+    }
+
+    static void testKeyMatch2(String key1, String key2, boolean res) {
+        assertEquals(res, BuiltInFunctions.keyMatch2(key1, key2));
+    }
+
+    static void testKeyMatch3(String key1, String key2, boolean res) {
+        assertEquals(res, BuiltInFunctions.keyMatch3(key1, key2));
+    }
+
+    static void testKeyMatch4(String key1, String key2, boolean res) {
+        assertEquals(res, BuiltInFunctions.keyMatch4(key1, key2));
+    }
+
+    static void testRegexMatch(String key1, String key2, boolean res) {
+        assertEquals(res, BuiltInFunctions.regexMatch(key1, key2));
+    }
+
+    static void testIpMatch(String ip1, String ip2, boolean res) {
+        assertEquals(res, BuiltInFunctions.ipMatch(ip1, ip2));
+    }
 }

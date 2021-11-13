@@ -26,46 +26,94 @@ import static org.casbin.jcasbin.main.TestUtil.*;
 public class BuiltInFunctionsUnitTest {
 
     @Test
-    public void testGlobMatchFunc() {
-        testGlobMatch("/foo", "/foo", true);
-        testGlobMatch("/foo", "/foo*", true);
-        testGlobMatch("/foo", "/foo/*", false);
-        testGlobMatch("/foo/bar", "/foo", false);
-        testGlobMatch("/foo/bar", "/foo*", false);
-        testGlobMatch("/foo/bar", "/foo/*", true);
-        testGlobMatch("/foobar", "/foo", false);
-        testGlobMatch("/foobar", "/foo*", true);
-        testGlobMatch("/foobar", "/foo/*", false);
+    public void testKeyMatchFunc() {
+        testKeyMatch("/foo", "/foo", true);
+        testKeyMatch("/foo", "/foo*", true);
+        testKeyMatch("/foo", "/foo/*", false);
+        testKeyMatch("/foo/bar", "/foo", false);
+        testKeyMatch("/foo/bar", "/foo*", true);
+        testKeyMatch("/foo/bar", "/foo/*", true);
+        testKeyMatch("/foobar", "/foo", false);
+        testKeyMatch("/foobar", "/foo*", true);
+        testKeyMatch("/foobar", "/foo/*", false);
+    }
 
-        testGlobMatch("/foo", "*/foo", true);
-        testGlobMatch("/foo", "*/foo*", true);
-        testGlobMatch("/foo", "*/foo/*", false);
-        testGlobMatch("/foo/bar", "*/foo", false);
-        testGlobMatch("/foo/bar", "*/foo*", false);
-        testGlobMatch("/foo/bar", "*/foo/*", true);
-        testGlobMatch("/foobar", "*/foo", false);
-        testGlobMatch("/foobar", "*/foo*", true);
-        testGlobMatch("/foobar", "*/foo/*", false);
+    @Test
+    public void testKeyMatch2Func() {
+        testKeyMatch2("/foo", "/foo", true);
+        testKeyMatch2("/foo", "/foo*", true);
+        testKeyMatch2("/foo", "/foo/*", false);
+        testKeyMatch2("/foo/bar", "/foo", false);
+        testKeyMatch2("/foo/bar", "/foo*", false);
+        testKeyMatch2("/foo/bar", "/foo/*", true);
+        testKeyMatch2("/foobar", "/foo", false);
+        testKeyMatch2("/foobar", "/foo*", false);
+        testKeyMatch2("/foobar", "/foo/*", false);
 
-        testGlobMatch("/prefix/foo", "*/foo", false);
-        testGlobMatch("/prefix/foo", "*/foo*", false);
-        testGlobMatch("/prefix/foo", "*/foo/*", false);
-        testGlobMatch("/prefix/foo/bar", "*/foo", false);
-        testGlobMatch("/prefix/foo/bar", "*/foo*", false);
-        testGlobMatch("/prefix/foo/bar", "*/foo/*", false);
-        testGlobMatch("/prefix/foobar", "*/foo", false);
-        testGlobMatch("/prefix/foobar", "*/foo*", false);
-        testGlobMatch("/prefix/foobar", "*/foo/*", false);
+        testKeyMatch2("/", "/:resource", false);
+        testKeyMatch2("/resource1", "/:resource", true);
+        testKeyMatch2("/myid", "/:id/using/:resId", false);
+        testKeyMatch2("/myid/using/myresid", "/:id/using/:resId", true);
 
-        testGlobMatch("/prefix/subprefix/foo", "*/foo", false);
-        testGlobMatch("/prefix/subprefix/foo", "*/foo*", false);
-        testGlobMatch("/prefix/subprefix/foo", "*/foo/*", false);
-        testGlobMatch("/prefix/subprefix/foo/bar", "*/foo", false);
-        testGlobMatch("/prefix/subprefix/foo/bar", "*/foo*", false);
-        testGlobMatch("/prefix/subprefix/foo/bar", "*/foo/*", false);
-        testGlobMatch("/prefix/subprefix/foobar", "*/foo", false);
-        testGlobMatch("/prefix/subprefix/foobar", "*/foo*", false);
-        testGlobMatch("/prefix/subprefix/foobar", "*/foo/*", false);
+        testKeyMatch2("/proxy/myid", "/proxy/:id/*", false);
+        testKeyMatch2("/proxy/myid/", "/proxy/:id/*", true);
+        testKeyMatch2("/proxy/myid/res", "/proxy/:id/*", true);
+        testKeyMatch2("/proxy/myid/res/res2", "/proxy/:id/*", true);
+        testKeyMatch2("/proxy/myid/res/res2/res3", "/proxy/:id/*", true);
+        testKeyMatch2("/proxy/", "/proxy/:id/*", false);
+
+        testKeyMatch2("/alice", "/:id", true);
+        testKeyMatch2("/alice/all", "/:id/all", true);
+        testKeyMatch2("/alice", "/:id/all", false);
+        testKeyMatch2("/alice/all", "/:id", false);
+
+        testKeyMatch2("/alice/all", "/:/all", false);
+    }
+
+    @Test
+    public void testKeyMatch3Func() {
+        // keyMatch3() is similar with KeyMatch2(), except using "/proxy/{id}" instead of "/proxy/:id".
+        testKeyMatch3("/foo", "/foo", true);
+        testKeyMatch3("/foo", "/foo*", true);
+        testKeyMatch3("/foo", "/foo/*", false);
+        testKeyMatch3("/foo/bar", "/foo", false);
+        testKeyMatch3("/foo/bar", "/foo*", false);
+        testKeyMatch3("/foo/bar", "/foo/*", true);
+        testKeyMatch3("/foobar", "/foo", false);
+        testKeyMatch3("/foobar", "/foo*", false);
+        testKeyMatch3("/foobar", "/foo/*", false);
+
+        testKeyMatch3("/", "/{resource}", false);
+        testKeyMatch3("/resource1", "/{resource}", true);
+        testKeyMatch3("/myid", "/{id}/using/{resId}", false);
+        testKeyMatch3("/myid/using/myresid", "/{id}/using/{resId}", true);
+
+        testKeyMatch3("/proxy/myid", "/proxy/{id}/*", false);
+        testKeyMatch3("/proxy/myid/", "/proxy/{id}/*", true);
+        testKeyMatch3("/proxy/myid/res", "/proxy/{id}/*", true);
+        testKeyMatch3("/proxy/myid/res/res2", "/proxy/{id}/*", true);
+        testKeyMatch3("/proxy/myid/res/res2/res3", "/proxy/{id}/*", true);
+        testKeyMatch3("/proxy/", "/proxy/{id}/*", false);
+
+        testKeyMatch3("/myid/using/myresid", "/{id/using/{resId}", false);
+    }
+
+    @Test
+    public void testKeyMatch4Func() {
+        // Besides what KeyMatch3 does, KeyMatch4 can also match repeated patterns.
+        testKeyMatch4("/parent/123/child/123", "/parent/{id}/child/{id}", true);
+        testKeyMatch4("/parent/123/child/456", "/parent/{id}/child/{id}", false);
+
+        testKeyMatch4("/parent/123/child/123", "/parent/{id}/child/{another_id}", true);
+        testKeyMatch4("/parent/123/child/456", "/parent/{id}/child/{another_id}", true);
+
+        testKeyMatch4("/parent/123/child/123/book/123", "/parent/{id}/child/{id}/book/{id}", true);
+        testKeyMatch4("/parent/123/child/123/book/456", "/parent/{id}/child/{id}/book/{id}", false);
+        testKeyMatch4("/parent/123/child/456/book/123", "/parent/{id}/child/{id}/book/{id}", false);
+        testKeyMatch4("/parent/123/child/456/book/", "/parent/{id}/child/{id}/book/{id}", false);
+        testKeyMatch4("/parent/123/child/456", "/parent/{id}/child/{id}/book/{id}", false);
+
+        testKeyMatch4("/parent/123/child/123", "/parent/{i/d}/child/{i/d}", false);
     }
 
     @Test
@@ -117,6 +165,30 @@ public class BuiltInFunctionsUnitTest {
     }
 
     @Test
+    public void testRegexMatchFunc() {
+        testRegexMatch("/topic/create", "/topic/create", true);
+        testRegexMatch("/topic/create/123", "/topic/create", true);
+        testRegexMatch("/topic/delete", "/topic/create", false);
+        testRegexMatch("/topic/edit", "/topic/edit/[0-9]+", false);
+        testRegexMatch("/topic/edit/123", "/topic/edit/[0-9]+", true);
+        testRegexMatch("/topic/edit/abc", "/topic/edit/[0-9]+", false);
+        testRegexMatch("/foo/delete/123", "/topic/delete/[0-9]+", false);
+        testRegexMatch("/topic/delete/0", "/topic/delete/[0-9]+", true);
+        testRegexMatch("/topic/edit/123s", "/topic/delete/[0-9]+", false);
+    }
+
+    @Test
+    public void testIpMatchFunc() {
+        testIpMatch("192.168.2.123", "192.168.2.0/24", true);
+        testIpMatch("192.168.2.123", "192.168.3.0/24", false);
+        testIpMatch("192.168.2.123", "192.168.2.0/16", true);
+        testIpMatch("192.168.2.123", "192.168.2.123", true);
+        testIpMatch("192.168.2.123", "192.168.2.123/32", true);
+        testIpMatch("10.0.0.11", "10.0.0.0/8", true);
+        testIpMatch("11.0.0.123", "10.0.0.0/8", false);
+    }
+
+    @Test
     public void testEvalFunc() {
         AbacAPIUnitTest.TestEvalRule sub = new AbacAPIUnitTest.TestEvalRule("alice", 18);
         Map<String, Object> env = new HashMap<>();
@@ -131,5 +203,48 @@ public class BuiltInFunctionsUnitTest {
         env.put("r_obj", "/test/url1/url2");
 
         testEval("r_sub.age >= 18 && custom(r_obj)", env, aviatorEval, true);
+    }
+
+    @Test
+    public void testGlobMatchFunc() {
+        testGlobMatch("/foo", "/foo", true);
+        testGlobMatch("/foo", "/foo*", true);
+        testGlobMatch("/foo", "/foo/*", false);
+        testGlobMatch("/foo/bar", "/foo", false);
+        testGlobMatch("/foo/bar", "/foo*", false);
+        testGlobMatch("/foo/bar", "/foo/*", true);
+        testGlobMatch("/foobar", "/foo", false);
+        testGlobMatch("/foobar", "/foo*", true);
+        testGlobMatch("/foobar", "/foo/*", false);
+
+        testGlobMatch("/foo", "*/foo", true);
+        testGlobMatch("/foo", "*/foo*", true);
+        testGlobMatch("/foo", "*/foo/*", false);
+        testGlobMatch("/foo/bar", "*/foo", false);
+        testGlobMatch("/foo/bar", "*/foo*", false);
+        testGlobMatch("/foo/bar", "*/foo/*", true);
+        testGlobMatch("/foobar", "*/foo", false);
+        testGlobMatch("/foobar", "*/foo*", true);
+        testGlobMatch("/foobar", "*/foo/*", false);
+
+        testGlobMatch("/prefix/foo", "*/foo", false);
+        testGlobMatch("/prefix/foo", "*/foo*", false);
+        testGlobMatch("/prefix/foo", "*/foo/*", false);
+        testGlobMatch("/prefix/foo/bar", "*/foo", false);
+        testGlobMatch("/prefix/foo/bar", "*/foo*", false);
+        testGlobMatch("/prefix/foo/bar", "*/foo/*", false);
+        testGlobMatch("/prefix/foobar", "*/foo", false);
+        testGlobMatch("/prefix/foobar", "*/foo*", false);
+        testGlobMatch("/prefix/foobar", "*/foo/*", false);
+
+        testGlobMatch("/prefix/subprefix/foo", "*/foo", false);
+        testGlobMatch("/prefix/subprefix/foo", "*/foo*", false);
+        testGlobMatch("/prefix/subprefix/foo", "*/foo/*", false);
+        testGlobMatch("/prefix/subprefix/foo/bar", "*/foo", false);
+        testGlobMatch("/prefix/subprefix/foo/bar", "*/foo*", false);
+        testGlobMatch("/prefix/subprefix/foo/bar", "*/foo/*", false);
+        testGlobMatch("/prefix/subprefix/foobar", "*/foo", false);
+        testGlobMatch("/prefix/subprefix/foobar", "*/foo*", false);
+        testGlobMatch("/prefix/subprefix/foobar", "*/foo/*", false);
     }
 }

@@ -173,6 +173,25 @@ public class BuiltInFunctions {
     }
 
     /**
+     * KeyMatch5 determines whether key1 matches the pattern of key2 and ignores the parameters in key2.
+     *
+     * <pre>
+     * For example, "/foo/bar?status=1&type=2" matches "/foo/bar"
+     * </pre>
+     *
+     * @param key1 the first argument.
+     * @param key2 the second argument.
+     * @return whether key1 matches key2.
+     */
+    public static boolean keyMatch5(String key1, String key2) {
+        int i = key1.indexOf('?');
+        if (i == -1) {
+            return key1.equals(key2);
+        }
+        return key1.substring(0, i).equals(key2);
+    }
+
+    /**
      * KeyGet returns the matched part. For example, "/foo/bar/foo" matches "/foo/*", "bar/foo" will been returned
      *
      * @param key1 the first argument.

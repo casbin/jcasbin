@@ -117,6 +117,15 @@ public class BuiltInFunctionsUnitTest {
     }
 
     @Test
+    public void testKeyMatch5Func() {
+        testKeyMatch5("/parent/child?status=1&type=2", "/parent/child", true);
+        testKeyMatch5("/parent?status=1&type=2", "/parent/child", false);
+        testKeyMatch5("/parent/child/?status=1&type=2", "/parent/child/", true);
+        testKeyMatch5("/parent/child/?status=1&type=2", "/parent/child", false);
+        testKeyMatch5("/parent/child?status=1&type=2", "/parent/child/", false);
+    }
+
+    @Test
     public void testKeyGetFunc() {
         testKeyGet("/foo", "/foo", "");
         testKeyGet("/foo", "/foo*", "");

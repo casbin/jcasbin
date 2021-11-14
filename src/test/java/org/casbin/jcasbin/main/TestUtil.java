@@ -199,6 +199,10 @@ public class TestUtil {
         assertEquals(res, BuiltInFunctions.keyMatch4(key1, key2));
     }
 
+    static void testKeyMatch5(String key1, String key2, boolean res) {
+        assertEquals(res, BuiltInFunctions.keyMatch5(key1, key2));
+    }
+
     static void testRegexMatch(String key1, String key2, boolean res) {
         assertEquals(res, BuiltInFunctions.regexMatch(key1, key2));
     }

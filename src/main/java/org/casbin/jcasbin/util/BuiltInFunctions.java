@@ -345,72 +345,58 @@ public class BuiltInFunctions {
 
             @Override
             public AviatorObject variadicCall(Map<String, Object> env, AviatorObject... args) {
-                Map<String, AviatorBoolean> memorized = new HashMap<>();
-
                 int len = args.length;
                 if(len < 2){
                     return AviatorBoolean.valueOf(false);
                 }
-                String key = "";
                 Object name1Obj = FunctionUtils.getJavaObject(args[0], env);
                 String name2 = FunctionUtils.getStringValue(args[1], env);
                 Sequence name1List = null;
                 String name1 = null;
                 if (name1Obj instanceof java.util.List) {
                     name1List = RuntimeUtils.seq(name1Obj,env);
-                    for (Object obj : name1List) {
-                        key += ";" + obj;
-                    }
-                    key += ";" + name2;
                 }
                 else{
                     name1 = (String) name1Obj;
-                    key = ";" + name1 + ";" + name2;
-                }
-
-                AviatorBoolean value = memorized.get(key);
-                if (value != null) {
-                    return value;
                 }
 
                 if (rm == null) {
-                    value = AviatorBoolean.valueOf(name1.equals(name2));
-                } else if (len == 2) {
-                    if (name1List!=null) {
-                        boolean res = false;
-                        for (Object obj : name1List) {
-                            if (rm.hasLink((String) obj, name2)){
-                                res = true;
-                                break;
-                            }
-                        }
-                        value = AviatorBoolean.valueOf(res);
-                    }
-                    value = AviatorBoolean.valueOf(rm.hasLink(name1, name2));
-                } else if (len == 3) {
-                    String domain = FunctionUtils.getStringValue(args[2], env);
-                    value = AviatorBoolean.valueOf(rm.hasLink(name1, name2, domain));
-                } else if (len == 4) {
-                    String p_dom = FunctionUtils.getStringValue(args[3], env);
-                    Object domainObj = FunctionUtils.getJavaObject(args[2], env);
-
-                    boolean res = false;
-                    if (domainObj instanceof java.util.List){
-                        Sequence domainSeq = RuntimeUtils.seq(domainObj,env);
-                        for (Object r_dom : domainSeq) {
-                            if (r_dom.equals(p_dom) && rm.hasLink(name1, name2, (String) r_dom)){
-                                res = true;
-                                break;
-                            }
-                        }
-                    }
-                    value = AviatorBoolean.valueOf(res);
-                } else {
-                    value = AviatorBoolean.valueOf(false);
+                    return AviatorBoolean.valueOf(name1.equals(name2));
                 }
+                switch (len){
+                    case 2:
+                        if (name1List!=null) {
+                            boolean res = false;
+                            for (Object obj : name1List) {
+                                if (rm.hasLink((String) obj, name2)){
+                                    res = true;
+                                    break;
+                                }
+                            }
+                            return AviatorBoolean.valueOf(res);
+                        }
+                        return AviatorBoolean.valueOf(rm.hasLink(name1, name2));
+                    case 3:
+                        String domain = FunctionUtils.getStringValue(args[2], env);
+                        return AviatorBoolean.valueOf(rm.hasLink(name1, name2, domain));
+                    case 4:
+                        String p_dom = FunctionUtils.getStringValue(args[3], env);
+                        Object domainObj = FunctionUtils.getJavaObject(args[2], env);
 
-                memorized.put(key, value);
-                return value;
+                        boolean res = false;
+                        if (domainObj instanceof java.util.List){
+                            Sequence domainSeq = RuntimeUtils.seq(domainObj,env);
+                            for (Object r_dom : domainSeq) {
+                                if (r_dom.equals(p_dom) && rm.hasLink(name1, name2, (String) r_dom)){
+                                    res = true;
+                                    break;
+                                }
+                            }
+                        }
+                        return AviatorBoolean.valueOf(res);
+                    default:
+                        return AviatorBoolean.valueOf(false);
+                }
             }
 
             @Override

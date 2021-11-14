@@ -74,4 +74,9 @@ public class DefaultEffector implements Effector {
 
         return result;
     }
+
+    @Override
+    public StreamEffector newStreamEffector(String expr) {
+        return new DefaultStreamEffector(expr);
+    }
 }

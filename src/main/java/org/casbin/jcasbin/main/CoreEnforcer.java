@@ -17,25 +17,30 @@ package org.casbin.jcasbin.main;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
-import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.casbin.jcasbin.effect.DefaultEffector;
 import org.casbin.jcasbin.effect.Effect;
 import org.casbin.jcasbin.effect.Effector;
+import org.casbin.jcasbin.effect.StreamEffector;
+import org.casbin.jcasbin.effect.StreamEffectorResult;
 import org.casbin.jcasbin.exception.CasbinAdapterException;
+import org.casbin.jcasbin.exception.CasbinEffectorException;
 import org.casbin.jcasbin.exception.CasbinMatcherException;
 import org.casbin.jcasbin.model.Assertion;
 import org.casbin.jcasbin.model.FunctionMap;
 import org.casbin.jcasbin.model.Model;
-import org.casbin.jcasbin.persist.*;
+import org.casbin.jcasbin.persist.Adapter;
+import org.casbin.jcasbin.persist.Dispatcher;
+import org.casbin.jcasbin.persist.FilteredAdapter;
+import org.casbin.jcasbin.persist.Watcher;
+import org.casbin.jcasbin.persist.WatcherEx;
 import org.casbin.jcasbin.rbac.DefaultRoleManager;
 import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.BuiltInFunctions;
 import org.casbin.jcasbin.util.Util;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * CoreEnforcer defines the core functionality of an enforcer.
@@ -441,6 +446,15 @@ public class CoreEnforcer {
         expString = Util.convertInSyntax(expString);
         Expression expression = aviatorEval.compile(expString, true);
 
+        StreamEffector streamEffector = null;
+        try {
+            streamEffector = this.eft.newStreamEffector(model.model.get("e").get("e").value);
+        } catch (Exception e) {
+            if (!(e instanceof UnsupportedOperationException)) {
+                throw new CasbinEffectorException(e);
+            }
+        }
+
         Effect[] policyEffects;
         float[] matcherResults;
         int policyLen;
@@ -466,19 +480,26 @@ public class CoreEnforcer {
                 if (result instanceof Boolean) {
                     if (!((boolean) result)) {
                         policyEffects[i] = Effect.Indeterminate;
+                    } else {
+                        policyEffects[i] = Effect.Allow;
+                    }
+                    if (streamEffector == null) {
                         continue;
                     }
                 } else if (result instanceof Float) {
                     if ((float) result == 0) {
                         policyEffects[i] = Effect.Indeterminate;
-                        continue;
                     } else {
                         matcherResults[i] = (float) result;
+                        policyEffects[i] = Effect.Allow;
+                    }
+                    if (streamEffector == null) {
+                        continue;
                     }
                 } else {
                     throw new CasbinMatcherException("matcher result should be bool, int or float");
                 }
-                if (parameters.containsKey("p_eft")) {
+                if (policyEffects[i] == Effect.Allow && parameters.containsKey("p_eft")) {
                     String eft = (String) parameters.get("p_eft");
                     if ("allow".equals(eft)) {
                         policyEffects[i] = Effect.Allow;
@@ -487,12 +508,17 @@ public class CoreEnforcer {
                     } else {
                         policyEffects[i] = Effect.Indeterminate;
                     }
-                } else {
-                    policyEffects[i] = Effect.Allow;
                 }
 
-                if ("priority(p_eft) || deny".equals(model.model.get("e").get("e").value)) {
-                    break;
+                if (streamEffector != null) {
+                    boolean done = streamEffector.push(policyEffects[i], i, policyLen);
+                    if (done) {
+                        break;
+                    }
+                } else {
+                    if ("priority(p_eft) || deny".equals(model.model.get("e").get("e").value)) {
+                        break;
+                    }
                 }
             }
         } else {
@@ -512,14 +538,28 @@ public class CoreEnforcer {
             Object result = expression.execute(parameters);
             // Util.logPrint("Result: " + result);
 
-            if ((boolean) result) {
-                policyEffects[0] = Effect.Allow;
+            if (streamEffector != null) {
+                if ((boolean) result) {
+                    streamEffector.push(Effect.Allow, 0, 1);
+                } else {
+                    streamEffector.push(Effect.Indeterminate, 0, 1);
+                }
             } else {
-                policyEffects[0] = Effect.Indeterminate;
+                if ((boolean) result) {
+                    policyEffects[0] = Effect.Allow;
+                } else {
+                    policyEffects[0] = Effect.Indeterminate;
+                }
             }
         }
 
-        boolean result = eft.mergeEffects(model.model.get("e").get("e").value, policyEffects, matcherResults);
+        boolean result;
+
+        if (streamEffector != null && streamEffector.current() != null) {
+            result = streamEffector.current().hasEffect();
+        } else {
+            result = eft.mergeEffects(model.model.get("e").get("e").value, policyEffects, matcherResults);
+        }
 
         StringBuilder reqStr = new StringBuilder("Request: ");
         for (int i = 0; i < rvals.length; i++) {
@@ -562,10 +602,12 @@ public class CoreEnforcer {
         return enforce(matcher, rvals);
     }
 
-    private void getRTokens(Map<String, Object> parameters, Object ...rvals) {
-        for(String rKey : model.model.get("r").keySet()) {
-            if(!(rvals.length == model.model.get("r").get(rKey).tokens.length)) { continue; }
-            for (int j = 0; j < model.model.get("r").get(rKey).tokens.length; j ++) {
+    private void getRTokens(Map<String, Object> parameters, Object... rvals) {
+        for (String rKey : model.model.get("r").keySet()) {
+            if (!(rvals.length == model.model.get("r").get(rKey).tokens.length)) {
+                continue;
+            }
+            for (int j = 0; j < model.model.get("r").get(rKey).tokens.length; j++) {
                 String token = model.model.get("r").get(rKey).tokens[j];
                 parameters.put(token, rvals[j]);
             }
@@ -573,8 +615,8 @@ public class CoreEnforcer {
         }
     }
 
-    public boolean validateEnforce(Object... rvals){
-        return  validateEnforceSection("r",rvals);
+    public boolean validateEnforce(Object... rvals) {
+        return validateEnforceSection("r", rvals);
     }
 
     private boolean validateEnforceSection(String section, Object... rvals) {

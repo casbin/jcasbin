@@ -341,31 +341,37 @@ public class BuiltInFunctions {
      * @return the function.
      */
     public static AviatorFunction generateGFunction(String name, RoleManager rm) {
-        return new AbstractVariadicFunction() {
 
+        Map<String, AviatorBoolean> memorized = new HashMap<>();
+
+        return new AbstractVariadicFunction() {
             @Override
             public AviatorObject variadicCall(Map<String, Object> env, AviatorObject... args) {
-                Map<String, AviatorBoolean> memorized = new HashMap<>();
-
                 int len = args.length;
                 if(len < 2){
                     return AviatorBoolean.valueOf(false);
                 }
-                String key = "";
                 Object name1Obj = FunctionUtils.getJavaObject(args[0], env);
                 String name2 = FunctionUtils.getStringValue(args[1], env);
                 Sequence name1List = null;
                 String name1 = null;
                 if (name1Obj instanceof java.util.List) {
                     name1List = RuntimeUtils.seq(name1Obj,env);
-                    for (Object obj : name1List) {
-                        key += ";" + obj;
-                    }
-                    key += ";" + name2;
-                }
-                else{
+                } else{
                     name1 = (String) name1Obj;
-                    key = ";" + name1 + ";" + name2;
+                }
+
+                String key = "";
+                for (int i = 0; i < len; i++) {
+                    Object nameObj = FunctionUtils.getJavaObject(args[i], env);
+                    if (nameObj instanceof java.util.List) {
+                        Sequence nameList = RuntimeUtils.seq(name, env);
+                        for (Object obj : nameList) {
+                            key += ";" + obj;
+                        }
+                    } else {
+                        key += ";" + nameObj;
+                    }
                 }
 
                 AviatorBoolean value = memorized.get(key);
@@ -408,7 +414,6 @@ public class BuiltInFunctions {
                 } else {
                     value = AviatorBoolean.valueOf(false);
                 }
-
                 memorized.put(key, value);
                 return value;
             }

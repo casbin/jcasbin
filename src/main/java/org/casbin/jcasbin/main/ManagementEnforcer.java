@@ -589,7 +589,6 @@ public class ManagementEnforcer extends InternalEnforcer {
     public boolean addNamedGroupingPolicy(String ptype, List<String> params) {
         boolean ruleAdded = addPolicy("g", ptype, params);
 
-        aviatorEval = null;
         fm.setAviatorEval(null);
         return ruleAdded;
     }
@@ -695,7 +694,6 @@ public class ManagementEnforcer extends InternalEnforcer {
     public boolean removeNamedGroupingPolicy(String ptype, List<String> params) {
         boolean ruleRemoved = removePolicy("g", ptype, params);
 
-        aviatorEval = null;
         fm.setAviatorEval(null);
         return ruleRemoved;
     }
@@ -745,7 +743,6 @@ public class ManagementEnforcer extends InternalEnforcer {
     public boolean removeFilteredNamedGroupingPolicy(String ptype, int fieldIndex, String... fieldValues) {
         boolean ruleRemoved = removeFilteredPolicy("g", ptype, fieldIndex, fieldValues);
 
-        aviatorEval = null;
         fm.setAviatorEval(null);
         return ruleRemoved;
     }
@@ -758,7 +755,7 @@ public class ManagementEnforcer extends InternalEnforcer {
      */
     public void addFunction(String name, CustomFunction function) {
         fm.addFunction(name, function);
-        aviatorEval = null;
+
         fm.setAviatorEval(null);
     }
 

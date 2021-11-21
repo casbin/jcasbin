@@ -25,6 +25,12 @@ public interface Effector {
      * @param effects the effects of all matched rules.
      * @param results the matcher results of all matched rules.
      * @return the final effect.
+     *
+     * @deprecated use newStreamEffector instead of this.
      */
     boolean mergeEffects(String expr, Effect[] effects, float[] results);
+
+    default StreamEffector newStreamEffector(String expr) {
+       throw new UnsupportedOperationException("Not implemented");
+    }
 }

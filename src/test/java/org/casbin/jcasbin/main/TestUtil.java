@@ -16,6 +16,7 @@ package org.casbin.jcasbin.main;
 
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import org.casbin.jcasbin.util.BuiltInFunctions;
+import org.casbin.jcasbin.util.EnforceContext;
 import org.casbin.jcasbin.util.Util;
 
 import java.util.List;
@@ -35,6 +36,10 @@ public class TestUtil {
 
     static void testEnforceWithoutUsers(Enforcer e, String obj, String act, boolean res) {
         assertEquals(res, e.enforce(obj, act));
+    }
+
+    static void testEnforceWithContext(Enforcer e, EnforceContext enforceContext, Object sub, Object obj, String act, boolean res) {
+        assertEquals(res, e.enforce(enforceContext, sub, obj, act));
     }
 
     static void testDomainEnforce(Enforcer e, Object sub, Object dom, Object obj, Object act, boolean res) {

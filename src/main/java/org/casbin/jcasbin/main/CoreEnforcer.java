@@ -18,6 +18,8 @@ import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
+
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +42,7 @@ import org.casbin.jcasbin.persist.WatcherEx;
 import org.casbin.jcasbin.rbac.DefaultRoleManager;
 import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.BuiltInFunctions;
+import org.casbin.jcasbin.util.EnforceContext;
 import org.casbin.jcasbin.util.Util;
 
 /**
@@ -422,9 +425,21 @@ public class CoreEnforcer {
         }
         fm.setAviatorEval(aviatorEval);
 
+        String rType = "r", pType = "p", eType = "e", mType = "m";
+        if (rvals.length != 0) {
+            if (rvals[0] instanceof EnforceContext) {
+                EnforceContext enforceContext = (EnforceContext) rvals[0];
+                rType = enforceContext.getrType();
+                pType = enforceContext.getpType();
+                eType = enforceContext.geteType();
+                mType = enforceContext.getmType();
+                rvals = Arrays.copyOfRange(rvals, 1, rvals.length);
+            }
+        }
+
         String expString;
         if (matcher == null || "".equals(matcher)) {
-            expString = model.model.get("m").get("m").value;
+            expString = model.model.get("m").get(mType).value;
         } else {
             expString = Util.removeComments(Util.escapeAssertion(matcher));
         }
@@ -434,7 +449,7 @@ public class CoreEnforcer {
 
         StreamEffector streamEffector = null;
         try {
-            streamEffector = this.eft.newStreamEffector(model.model.get("e").get("e").value);
+            streamEffector = this.eft.newStreamEffector(model.model.get("e").get(eType).value);
         } catch (Exception e) {
             if (!(e instanceof UnsupportedOperationException)) {
                 throw new CasbinEffectorException(e);
@@ -444,19 +459,19 @@ public class CoreEnforcer {
         Effect[] policyEffects;
         float[] matcherResults;
         int policyLen;
-        if ((policyLen = model.model.get("p").get("p").policy.size()) != 0) {
+        if ((policyLen = model.model.get("p").get(pType).policy.size()) != 0) {
             policyEffects = new Effect[policyLen];
             matcherResults = new float[policyLen];
 
-            for (int i = 0; i < model.model.get("p").get("p").policy.size(); i++) {
-                List<String> pvals = model.model.get("p").get("p").policy.get(i);
+            for (int i = 0; i < model.model.get("p").get(pType).policy.size(); i++) {
+                List<String> pvals = model.model.get("p").get(pType).policy.get(i);
 
                 // Util.logPrint("Policy Rule: " + pvals);
                 // Select the rule based on request size
                 Map<String, Object> parameters = new HashMap<>();
                 getRTokens(parameters, rvals);
-                for (int j = 0; j < model.model.get("p").get("p").tokens.length; j++) {
-                    String token = model.model.get("p").get("p").tokens[j];
+                for (int j = 0; j < model.model.get("p").get(pType).tokens.length; j++) {
+                    String token = model.model.get("p").get(pType).tokens[j];
                     parameters.put(token, pvals.get(j));
                 }
 
@@ -485,8 +500,8 @@ public class CoreEnforcer {
                 } else {
                     throw new CasbinMatcherException("matcher result should be bool, int or float");
                 }
-                if (policyEffects[i] == Effect.Allow && parameters.containsKey("p_eft")) {
-                    String eft = (String) parameters.get("p_eft");
+                if (policyEffects[i] == Effect.Allow && parameters.containsKey(pType + "_eft")) {
+                    String eft = (String) parameters.get(pType + "_eft");
                     if ("allow".equals(eft)) {
                         policyEffects[i] = Effect.Allow;
                     } else if ("deny".equals(eft)) {
@@ -502,7 +517,7 @@ public class CoreEnforcer {
                         break;
                     }
                 } else {
-                    if ("priority(p_eft) || deny".equals(model.model.get("e").get("e").value)) {
+                    if ("priority(p_eft) || deny".equals(model.model.get("e").get(eType).value)) {
                         break;
                     }
                 }
@@ -512,12 +527,12 @@ public class CoreEnforcer {
             matcherResults = new float[1];
 
             Map<String, Object> parameters = new HashMap<>();
-            for (int j = 0; j < model.model.get("r").get("r").tokens.length; j++) {
-                String token = model.model.get("r").get("r").tokens[j];
+            for (int j = 0; j < model.model.get("r").get(rType).tokens.length; j++) {
+                String token = model.model.get("r").get(rType).tokens[j];
                 parameters.put(token, rvals[j]);
             }
-            for (int j = 0; j < model.model.get("p").get("p").tokens.length; j++) {
-                String token = model.model.get("p").get("p").tokens[j];
+            for (int j = 0; j < model.model.get("p").get(pType).tokens.length; j++) {
+                String token = model.model.get("p").get(pType).tokens[j];
                 parameters.put(token, "");
             }
 
@@ -544,7 +559,7 @@ public class CoreEnforcer {
         if (streamEffector != null && streamEffector.current() != null) {
             result = streamEffector.current().hasEffect();
         } else {
-            result = eft.mergeEffects(model.model.get("e").get("e").value, policyEffects, matcherResults);
+            result = eft.mergeEffects(model.model.get("e").get(eType).value, policyEffects, matcherResults);
         }
 
         StringBuilder reqStr = new StringBuilder("Request: ");

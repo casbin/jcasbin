@@ -19,6 +19,7 @@ import com.googlecode.aviator.Expression;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
+import org.casbin.jcasbin.util.EnforceContext;
 import org.casbin.jcasbin.util.Util;
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,9 +33,7 @@ import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static org.casbin.jcasbin.main.CoreEnforcer.newModel;
-import static org.casbin.jcasbin.main.TestUtil.testDomainEnforce;
-import static org.casbin.jcasbin.main.TestUtil.testEnforce;
-import static org.casbin.jcasbin.main.TestUtil.testGetPolicy;
+import static org.casbin.jcasbin.main.TestUtil.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -586,6 +585,16 @@ public class EnforcerUnitTest {
             asList("bob", "data2", "write"), asList("root", "data2", "read"),
             asList("root", "data3", "read"), asList("jack", "data3", "read")));
         Assert.assertArrayEquals(myResults.toArray(new Boolean[0]), results.toArray(new Boolean[0]));
+    }
+
+    @Test
+    public void testMultiplePolicyDefinitions() {
+        Enforcer e = new Enforcer("examples/multiple_policy_definitions_model.conf", "examples/multiple_policy_definitions_policy.csv");
+        EnforceContext enforceContext = new EnforceContext("2");
+        enforceContext.seteType("e");
+        testEnforce(e, "alice", "data2", "read", true);
+        testEnforceWithContext(e, enforceContext, new AbacAPIUnitTest.TestEvalRule("alice", 70), "/data1", "read", false);
+        testEnforceWithContext(e, enforceContext, new AbacAPIUnitTest.TestEvalRule("alice", 30), "/data1", "read", true);
     }
 
     public static class TestSub{

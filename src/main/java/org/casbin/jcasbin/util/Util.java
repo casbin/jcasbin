@@ -232,7 +232,7 @@ public class Util {
         String[] records = null;
         if (s != null) {
             try {
-                CSVParser csvParser = CSVFormat.DEFAULT.parse(new StringReader(s));
+                CSVParser csvParser = CSVFormat.DEFAULT.withEscape('\\').parse(new StringReader(s));
                 List<CSVRecord> csvRecords = csvParser.getRecords();
                 records = new String[csvRecords.get(0).size()];
                 for (int i = 0; i < csvRecords.get(0).size(); i++) {

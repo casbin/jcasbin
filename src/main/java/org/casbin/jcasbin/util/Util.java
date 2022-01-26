@@ -117,12 +117,13 @@ public class Util {
         String reg = "([a-zA-Z0-9_.()\"]*) +in +([a-zA-Z0-9_.()\"]*)";
         Matcher m1 = Pattern.compile(reg).matcher(expString);
         StringBuffer sb = new StringBuffer();
-        boolean flag=false;
+        boolean flag = false;
         while (m1.find()) {
-            flag=true;
-            m1.appendReplacement(sb,"include($2, $1)");
+            flag = true;
+            m1.appendReplacement(sb, "include($2, $1)");
         }
-        return flag?sb.toString():expString;
+        m1.appendTail(sb);
+        return flag ? sb.toString() : expString;
     }
     /**
      * removeComments removes the comments starting with # in the text.

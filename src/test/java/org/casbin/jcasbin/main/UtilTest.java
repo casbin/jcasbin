@@ -45,6 +45,7 @@ public class UtilTest {
         assertEquals("include(r_obj, r_sub)", Util.convertInSyntax("r_sub in r_obj"));
         assertEquals("include(r_obj, r_sub.name)", Util.convertInSyntax("r_sub.name in r_obj"));
         assertEquals("include(r_obj.name, r_sub.name)", Util.convertInSyntax("r_sub.name in r_obj.name"));
+        assertEquals("include(r_obj, r_sub) && r.obj == p.obj", Util.convertInSyntax("r_sub in r_obj && r.obj == p.obj"));
     }
 
   @Test

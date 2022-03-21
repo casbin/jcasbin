@@ -27,7 +27,6 @@ import org.casbin.jcasbin.effect.DefaultEffector;
 import org.casbin.jcasbin.effect.Effect;
 import org.casbin.jcasbin.effect.Effector;
 import org.casbin.jcasbin.effect.StreamEffector;
-import org.casbin.jcasbin.effect.StreamEffectorResult;
 import org.casbin.jcasbin.exception.CasbinAdapterException;
 import org.casbin.jcasbin.exception.CasbinEffectorException;
 import org.casbin.jcasbin.exception.CasbinMatcherException;
@@ -65,6 +64,8 @@ public class CoreEnforcer {
     boolean autoNotifyWatcher = true;
     boolean autoNotifyDispatcher = true;
 
+    private AviatorEvaluatorInstance aviatorEval;
+
     void initialize() {
         rmMap = new HashMap<>();
         eft = new DefaultEffector();
@@ -74,7 +75,9 @@ public class CoreEnforcer {
         autoSave = true;
         autoBuildRoleLinks = true;
         dispatcher = null;
+        aviatorEval = AviatorEvaluator.newInstance();
         initRmMap();
+        initBuiltInFunction();
     }
 
     /**
@@ -323,6 +326,17 @@ public class CoreEnforcer {
         }
     }
 
+    private void initBuiltInFunction(){
+        for (Map.Entry<String, AviatorFunction> entry : fm.fm.entrySet()) {
+            AviatorFunction function = entry.getValue();
+
+            if(aviatorEval.containsFunction(function.getName())){
+                aviatorEval.removeFunction(function.getName());
+            }
+            aviatorEval.addFunction(function);
+        }
+    }
+
     /**
      * clearRmMap clears rmMap.
      */
@@ -400,28 +414,30 @@ public class CoreEnforcer {
             return true;
         }
 
-        Map<String, AviatorFunction> functions = new HashMap<>();
-        for (Map.Entry<String, AviatorFunction> entry : fm.fm.entrySet()) {
-            String key = entry.getKey();
-            AviatorFunction function = entry.getValue();
-
-            functions.put(key, function);
+        boolean compileCached = true;
+        if(fm.isModify){
+            compileCached = false;
+            initBuiltInFunction();
+            fm.isModify=false;
         }
+        Map<String, AviatorFunction> gFunctions = new HashMap<>();
         if (model.model.containsKey("g")) {
             for (Map.Entry<String, Assertion> entry : model.model.get("g").entrySet()) {
                 String key = entry.getKey();
                 Assertion ast = entry.getValue();
 
                 RoleManager rm = ast.rm;
-                functions.put(key, BuiltInFunctions.generateGFunction(key, rm));
+                AviatorFunction aviatorFunction = BuiltInFunctions.generateGFunctionClass.generateGFunction(key, rm);
+                gFunctions.put(key, aviatorFunction);
+
+                BuiltInFunctions.generateGFunctionClass.updateGFunctionCache(key);
             }
         }
-        AviatorEvaluatorInstance aviatorEval = AviatorEvaluator.newInstance();
-        for (AviatorFunction f : functions.values()) {
-            if (aviatorEval.containsFunction(f.getName())) {
-                aviatorEval.removeFunction(f.getName());
+        for (AviatorFunction f : gFunctions.values()) {
+            if (!aviatorEval.containsFunction(f.getName())) {
+                aviatorEval.addFunction(f);
+                compileCached = false;
             }
-            aviatorEval.addFunction(f);
         }
         fm.setAviatorEval(aviatorEval);
 
@@ -445,7 +461,8 @@ public class CoreEnforcer {
         }
 
         expString = Util.convertInSyntax(expString);
-        Expression expression = aviatorEval.compile(expString, true);
+        // Use md5 encryption as cacheKey to prevent expString from being too long
+        Expression expression = aviatorEval.compile(Util.md5(expString),expString, compileCached);
 
         StreamEffector streamEffector = null;
         try {

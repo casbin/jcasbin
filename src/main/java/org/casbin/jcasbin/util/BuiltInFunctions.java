@@ -333,98 +333,108 @@ public class BuiltInFunctions {
         return key1.equals(key2);
     }
 
-    /**
-     * generateGFunction is the factory method of the g(_, _) function.
-     *
-     * @param name the name of the g(_, _) function, can be "g", "g2", ..
-     * @param rm the role manager used by the function.
-     * @return the function.
-     */
-    public static AviatorFunction generateGFunction(String name, RoleManager rm) {
 
-        Map<String, AviatorBoolean> memorized = new HashMap<>();
+    public static class generateGFunctionClass{
+        // key:name such as g,g2  value:user-role mapping
+        private static Map<String, Map<String, AviatorBoolean>> memorizedMap = new HashMap<>();
 
-        return new AbstractVariadicFunction() {
-            @Override
-            public AviatorObject variadicCall(Map<String, Object> env, AviatorObject... args) {
-                int len = args.length;
-                if(len < 2){
-                    return AviatorBoolean.valueOf(false);
-                }
-                Object name1Obj = FunctionUtils.getJavaObject(args[0], env);
-                String name2 = FunctionUtils.getStringValue(args[1], env);
-                Sequence name1List = null;
-                String name1 = null;
-                if (name1Obj instanceof java.util.List) {
-                    name1List = RuntimeUtils.seq(name1Obj,env);
-                } else{
-                    name1 = (String) name1Obj;
-                }
+        public static void updateGFunctionCache(String name){
+            Map<String, AviatorBoolean> memorized = memorizedMap.get(name);
+            memorized = new HashMap<>();
+        }
 
-                String key = "";
-                for (int i = 0; i < len; i++) {
-                    Object nameObj = FunctionUtils.getJavaObject(args[i], env);
-                    if (nameObj instanceof java.util.List) {
-                        Sequence nameList = RuntimeUtils.seq(name, env);
-                        for (Object obj : nameList) {
-                            key += ";" + obj;
-                        }
-                    } else {
-                        key += ";" + nameObj;
+        /**
+         * generateGFunction is the factory method of the g(_, _) function.
+         *
+         * @param name the name of the g(_, _) function, can be "g", "g2", ..
+         * @param rm the role manager used by the function.
+         * @return the function.
+         */
+        public static AviatorFunction generateGFunction(String name, RoleManager rm) {
+            memorizedMap.put(name,new HashMap<>());
+
+            return new AbstractVariadicFunction() {
+                @Override
+                public AviatorObject variadicCall(Map<String, Object> env, AviatorObject... args) {
+                    Map<String, AviatorBoolean> memorized = memorizedMap.get(name);
+                    int len = args.length;
+                    if(len < 2){
+                        return AviatorBoolean.valueOf(false);
                     }
-                }
+                    Object name1Obj = FunctionUtils.getJavaObject(args[0], env);
+                    String name2 = FunctionUtils.getStringValue(args[1], env);
+                    Sequence name1List = null;
+                    String name1 = null;
+                    if (name1Obj instanceof java.util.List) {
+                        name1List = RuntimeUtils.seq(name1Obj,env);
+                    } else{
+                        name1 = (String) name1Obj;
+                    }
 
-                AviatorBoolean value = memorized.get(key);
-                if (value != null) {
-                    return value;
-                }
+                    String key = "";
+                    for (int i = 0; i < len; i++) {
+                        Object nameObj = FunctionUtils.getJavaObject(args[i], env);
+                        if (nameObj instanceof java.util.List) {
+                            Sequence nameList = RuntimeUtils.seq(name, env);
+                            for (Object obj : nameList) {
+                                key += ";" + obj;
+                            }
+                        } else {
+                            key += ";" + nameObj;
+                        }
+                    }
 
-                if (rm == null) {
-                    value = AviatorBoolean.valueOf(name1.equals(name2));
-                } else if (len == 2) {
-                    if (name1List!=null) {
+                    AviatorBoolean value = memorized.get(key);
+                    if (value != null) {
+                        return value;
+                    }
+
+                    if (rm == null) {
+                        value = AviatorBoolean.valueOf(name1.equals(name2));
+                    } else if (len == 2) {
+                        if (name1List!=null) {
+                            boolean res = false;
+                            for (Object obj : name1List) {
+                                if (rm.hasLink((String) obj, name2)){
+                                    res = true;
+                                    break;
+                                }
+                            }
+                            value = AviatorBoolean.valueOf(res);
+                        }
+                        value = AviatorBoolean.valueOf(rm.hasLink(name1, name2));
+                    } else if (len == 3) {
+                        String domain = FunctionUtils.getStringValue(args[2], env);
+                        value = AviatorBoolean.valueOf(rm.hasLink(name1, name2, domain));
+                    } else if (len == 4) {
+                        String p_dom = FunctionUtils.getStringValue(args[3], env);
+                        Object domainObj = FunctionUtils.getJavaObject(args[2], env);
+
                         boolean res = false;
-                        for (Object obj : name1List) {
-                            if (rm.hasLink((String) obj, name2)){
-                                res = true;
-                                break;
+                        if (domainObj instanceof java.util.List){
+                            Sequence domainSeq = RuntimeUtils.seq(domainObj,env);
+                            for (Object r_dom : domainSeq) {
+                                if (r_dom.equals(p_dom) && rm.hasLink(name1, name2, (String) r_dom)){
+                                    res = true;
+                                    break;
+                                }
                             }
                         }
                         value = AviatorBoolean.valueOf(res);
+                    } else {
+                        value = AviatorBoolean.valueOf(false);
                     }
-                    value = AviatorBoolean.valueOf(rm.hasLink(name1, name2));
-                } else if (len == 3) {
-                    String domain = FunctionUtils.getStringValue(args[2], env);
-                    value = AviatorBoolean.valueOf(rm.hasLink(name1, name2, domain));
-                } else if (len == 4) {
-                    String p_dom = FunctionUtils.getStringValue(args[3], env);
-                    Object domainObj = FunctionUtils.getJavaObject(args[2], env);
-
-                    boolean res = false;
-                    if (domainObj instanceof java.util.List){
-                        Sequence domainSeq = RuntimeUtils.seq(domainObj,env);
-                        for (Object r_dom : domainSeq) {
-                            if (r_dom.equals(p_dom) && rm.hasLink(name1, name2, (String) r_dom)){
-                                res = true;
-                                break;
-                            }
-                        }
-                    }
-                    value = AviatorBoolean.valueOf(res);
-                } else {
-                    value = AviatorBoolean.valueOf(false);
+                    memorized.put(key, value);
+                    return value;
                 }
-                memorized.put(key, value);
-                return value;
-            }
 
-            @Override
-            public String getName() {
-                return name;
-            }
-        };
+                @Override
+                public String getName() {
+                    return name;
+                }
+            };
+        }
     }
-
     /**
      * eval calculates the stringified boolean expression and return its result.
      *

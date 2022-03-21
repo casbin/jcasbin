@@ -30,6 +30,8 @@ public class FunctionMap {
      */
     public Map<String, AviatorFunction> fm;
 
+    public boolean isModify = false;
+
     /**
      * addFunction adds an expression function.
      *
@@ -38,6 +40,7 @@ public class FunctionMap {
      */
     public void addFunction(String name, AviatorFunction function) {
         fm.put(name, function);
+        isModify=true;
     }
 
     /**

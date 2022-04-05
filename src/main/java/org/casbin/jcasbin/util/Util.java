@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.LinkedHashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -169,13 +171,14 @@ public class Util {
     }
 
     /**
-     * arrayRemoveDuplicates removes any duplicated elements in a string array.
+     * arrayRemoveDuplicates removes any duplicated elements in a string array preserving the order.
      *
      * @param s the array.
      * @return the array without duplicates.
      */
-    public static boolean arrayRemoveDuplicates(List<String> s) {
-        return true;
+    public static List<String> arrayRemoveDuplicates(List<String> s) {
+        Set<String> set = new LinkedHashSet<>(s);
+        return new ArrayList<String>(set);
     }
 
     /**

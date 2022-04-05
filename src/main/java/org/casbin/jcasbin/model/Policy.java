@@ -311,7 +311,7 @@ public class Policy {
             values.add(rule.get(fieldIndex));
         }
 
-        Util.arrayRemoveDuplicates(values);
+        values = Util.arrayRemoveDuplicates(values);
 
         return values;
     }

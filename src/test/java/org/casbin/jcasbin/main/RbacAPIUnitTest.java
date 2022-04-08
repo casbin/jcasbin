@@ -17,6 +17,7 @@ package org.casbin.jcasbin.main;
 import org.casbin.jcasbin.util.Util;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -84,6 +85,16 @@ public class RbacAPIUnitTest {
         testEnforce(e, "bob", "data1", "write", false);
         testEnforce(e, "bob", "data2", "read", false);
         testEnforce(e, "bob", "data2", "write", true);
+    }
+
+    @Test
+    public void testGFunctionCache() {
+        Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
+
+        testEnforce(e, "alice", "data2", "read", true);
+        e.removeGroupingPolicy(Arrays.asList("alice","data2_admin"));
+        // Ensure that the gFunction cache is different for each enforce
+        testEnforce(e, "alice", "data2", "read", false);
     }
 
     @Test

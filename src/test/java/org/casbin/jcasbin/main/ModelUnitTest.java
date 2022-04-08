@@ -152,15 +152,6 @@ public class ModelUnitTest {
     }
 
     @Test
-    public void testRBACModelWithMultiDomains() {
-        Enforcer e = new Enforcer("examples/rbac_with_multiple_domains_model.conf", "examples/rbac_with_multiple_domains_policy.csv");
-
-        testDomainEnforce(e, "alice", "data1", "edit", Arrays.asList("dom1","dom2","dom3"),false);
-        testDomainEnforce(e, "alice", "data1", "read", Arrays.asList("dom1","dom2","dom3"),true);
-        testDomainEnforce(e, "alice", "data1", "write", Arrays.asList("dom1","dom2","dom3"),true);
-    }
-
-    @Test
     public void testRBACModelWithDomainsAtRuntime() {
         Enforcer e = new Enforcer("examples/rbac_with_domains_model.conf");
 

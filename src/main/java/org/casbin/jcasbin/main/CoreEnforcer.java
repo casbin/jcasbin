@@ -427,10 +427,8 @@ public class CoreEnforcer {
                 Assertion ast = entry.getValue();
 
                 RoleManager rm = ast.rm;
-                AviatorFunction aviatorFunction = BuiltInFunctions.generateGFunctionClass.generateGFunction(key, rm);
+                AviatorFunction aviatorFunction = BuiltInFunctions.GenerateGFunctionClass.generateGFunction(key, rm);
                 gFunctions.put(key, aviatorFunction);
-
-                BuiltInFunctions.generateGFunctionClass.updateGFunctionCache(key);
             }
         }
         for (AviatorFunction f : gFunctions.values()) {

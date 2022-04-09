@@ -14,10 +14,9 @@
 
 package org.casbin.jcasbin.main;
 
-import com.googlecode.aviator.AviatorEvaluator;
-import com.googlecode.aviator.Expression;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
+import org.casbin.jcasbin.persist.StringAdapter;
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
 import org.casbin.jcasbin.util.EnforceContext;
 import org.casbin.jcasbin.util.Util;
@@ -26,9 +25,9 @@ import org.junit.Test;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
@@ -360,6 +359,23 @@ public class EnforcerUnitTest {
     }
 
     @Test
+    public void testInitWithStringAdapter() throws IOException {
+        String policy = Files.readString(Path.of("examples/basic_policy.csv"));
+
+        Adapter adapter = new StringAdapter(policy);
+        Enforcer e = new Enforcer("examples/basic_model.conf", adapter);
+
+        testEnforce(e, "alice", "data1", "read", true);
+        testEnforce(e, "alice", "data1", "write", false);
+        testEnforce(e, "alice", "data2", "read", false);
+        testEnforce(e, "alice", "data2", "write", false);
+        testEnforce(e, "bob", "data1", "read", false);
+        testEnforce(e, "bob", "data1", "write", false);
+        testEnforce(e, "bob", "data2", "read", false);
+        testEnforce(e, "bob", "data2", "write", true);
+    }
+
+    @Test
     public void testRoleLinks() {
         Enforcer e = new Enforcer("examples/rbac_model.conf");
         e.enableAutoBuildRoleLinks(false);
@@ -402,6 +418,21 @@ public class EnforcerUnitTest {
         testEnforce(e, "alice", "data1", "read", false);
 
         Adapter a = new FileAdapter("examples/basic_policy.csv");
+        e.setAdapter(a);
+        e.loadPolicy();
+
+        testEnforce(e, "alice", "data1", "read", true);
+    }
+
+    @Test
+    public void testSetAdapterFromString() throws IOException {
+        Enforcer e = new Enforcer("examples/basic_model.conf");
+
+        testEnforce(e, "alice", "data1", "read", false);
+
+        String policy = Files.readString(Path.of("examples/basic_policy.csv"));
+
+        Adapter a = new StringAdapter(policy);
         e.setAdapter(a);
         e.loadPolicy();
 

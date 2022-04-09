@@ -14,6 +14,7 @@
 
 package org.casbin.jcasbin.main;
 
+import org.apache.commons.io.FileUtils;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.StringAdapter;
@@ -23,10 +24,9 @@ import org.casbin.jcasbin.util.Util;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
@@ -360,7 +360,7 @@ public class EnforcerUnitTest {
 
     @Test
     public void testInitWithStringAdapter() throws IOException {
-        String policy = Files.readString(Path.of("examples/basic_policy.csv"));
+        String policy = FileUtils.readFileToString(new File("examples/basic_policy.csv"), "UTF-8");
 
         Adapter adapter = new StringAdapter(policy);
         Enforcer e = new Enforcer("examples/basic_model.conf", adapter);
@@ -430,7 +430,7 @@ public class EnforcerUnitTest {
 
         testEnforce(e, "alice", "data1", "read", false);
 
-        String policy = Files.readString(Path.of("examples/basic_policy.csv"));
+        String policy = FileUtils.readFileToString(new File("examples/basic_policy.csv"), "UTF-8");
 
         Adapter a = new StringAdapter(policy);
         e.setAdapter(a);

@@ -25,19 +25,23 @@ public class UtilTest {
 
   @Test
   public void testEscapeAssertion(){
-    assertEquals("r_attr.value == p_attr", Util.escapeAssertion("r.attr.value == p.attr"));
-    assertEquals("r_attp.value || p_attr", Util.escapeAssertion("r.attp.value || p.attr"));
-    assertEquals("r_attp.value &&p_attr", Util.escapeAssertion("r.attp.value &&p.attr"));
-    assertEquals("r_attp.value >p_attr", Util.escapeAssertion("r.attp.value >p.attr"));
-    assertEquals("r_attp.value <p_attr", Util.escapeAssertion("r.attp.value <p.attr"));
-    assertEquals("r_attp.value -p_attr", Util.escapeAssertion("r.attp.value -p.attr"));
-    assertEquals("r_attp.value +p_attr", Util.escapeAssertion("r.attp.value +p.attr"));
-    assertEquals("r_attp.value *p_attr", Util.escapeAssertion("r.attp.value *p.attr"));
-    assertEquals("r_attp.value /p_attr", Util.escapeAssertion("r.attp.value /p.attr"));
-    assertEquals("!r_attp.value /p_attr", Util.escapeAssertion("!r.attp.value /p.attr"));
-    assertEquals("g(r_sub, p_sub) == p_attr", Util.escapeAssertion("g(r.sub, p.sub) == p.attr"));
-    assertEquals("g(r_sub,p_sub) == p_attr", Util.escapeAssertion("g(r.sub,p.sub) == p.attr"));
-    assertEquals("(r_attp.value || p_attr)p_u", Util.escapeAssertion("(r.attp.value || p.attr)p.u"));
+      assertEquals("r_sub == r_obj.value", Util.escapeAssertion("r_sub == r_obj.value"));
+      assertEquals("p_sub == r_sub.value", Util.escapeAssertion("p_sub == r_sub.value"));
+      assertEquals("r_attr.value == p_attr", Util.escapeAssertion("r.attr.value == p.attr"));
+      assertEquals("r2_attr.value == p2_attr", Util.escapeAssertion("r2.attr.value == p2.attr"));
+      assertEquals("r_attr.value == p_attr", Util.escapeAssertion("r.attr.value == p.attr"));
+      assertEquals("r_attp.value || p_attr", Util.escapeAssertion("r.attp.value || p.attr"));
+      assertEquals("r_attp.value &&p_attr", Util.escapeAssertion("r.attp.value &&p.attr"));
+      assertEquals("r_attp.value >p_attr", Util.escapeAssertion("r.attp.value >p.attr"));
+      assertEquals("r_attp.value <p_attr", Util.escapeAssertion("r.attp.value <p.attr"));
+      assertEquals("r_attp.value -p_attr", Util.escapeAssertion("r.attp.value -p.attr"));
+      assertEquals("r_attp.value +p_attr", Util.escapeAssertion("r.attp.value +p.attr"));
+      assertEquals("r_attp.value *p_attr", Util.escapeAssertion("r.attp.value *p.attr"));
+      assertEquals("r_attp.value /p_attr", Util.escapeAssertion("r.attp.value /p.attr"));
+      assertEquals("!r_attp.value /p_attr", Util.escapeAssertion("!r.attp.value /p.attr"));
+      assertEquals("g(r_sub, p_sub) == p_attr", Util.escapeAssertion("g(r.sub, p.sub) == p.attr"));
+      assertEquals("g(r_sub,p_sub) == p_attr", Util.escapeAssertion("g(r.sub,p.sub) == p.attr"));
+      assertEquals("(r_attp.value || p_attr)p_u", Util.escapeAssertion("(r.attp.value || p.attr)p.u"));
   }
 
     @Test

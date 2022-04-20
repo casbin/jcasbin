@@ -38,6 +38,8 @@ public class Util {
     public static boolean enableLog = true;
     private static Pattern evalReg = Pattern.compile("\\beval\\(([^),]*)\\)");
 
+    private static Pattern escapeAssertionRegex = Pattern.compile("\\b(r|p)[0-9]*\\.");
+
     private static Logger LOGGER = LoggerFactory.getLogger("org.casbin.jcasbin");
 
     private static HashFunction hf = Hashing.md5();
@@ -98,14 +100,7 @@ public class Util {
      * @return the escaped value.
      */
     public static String escapeAssertion(String s) {
-        //Replace the first dot, because the string doesn't start with "m="
-        // and is not covered by the regex.
-        if (s.startsWith("r") || s.startsWith("p")) {
-            s = s.replaceFirst("\\.", "_");
-        }
-        String regex = "(\\|| |=|\\)|\\(|&|<|>|,|\\+|-|!|\\*|\\/)(r|p)[0-9]*\\.";
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(s);
+        Matcher m = escapeAssertionRegex.matcher(s);
         StringBuffer sb = new StringBuffer();
 
         while (m.find()) {

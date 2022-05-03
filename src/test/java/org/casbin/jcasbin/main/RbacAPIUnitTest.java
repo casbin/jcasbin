@@ -141,6 +141,14 @@ public class RbacAPIUnitTest {
         testEnforceWithoutUsers(e, "alice", "write", false);
         testEnforceWithoutUsers(e, "bob", "read", false);
         testEnforceWithoutUsers(e, "bob", "write", false);
+
+        e = new Enforcer("examples/rbac_with_multiple_policy_model.conf", "examples/rbac_with_multiple_policy_policy.csv");
+        testGetNamedPermissionsForUser(e, "p", "user", asList(
+            asList("user", "/data", "GET")
+        ));
+        testGetNamedPermissionsForUser(e, "p2", "user", asList(
+            asList("user", "view")
+        ));
     }
 
     @Test
@@ -162,7 +170,15 @@ public class RbacAPIUnitTest {
                         asList("data2_admin", "data2", "write")
                 )
         );
-
+        e = new Enforcer("examples/rbac_with_multiple_policy_model.conf", "examples/rbac_with_multiple_policy_policy.csv");
+        testGetNamedImplicitPermissions(e, "p", "alice", asList(
+            asList("admin", "/data", "POST"),
+            asList("user", "/data", "GET")
+            ));
+        testGetNamedImplicitPermissions(e, "p2", "alice", asList(
+            asList("admin", "create"),
+            asList("user", "view")
+        ));
     }
 
     private void testGetImplicitUsersForRole(Enforcer e, String name, List<String> res) {

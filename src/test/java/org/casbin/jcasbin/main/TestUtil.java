@@ -136,6 +136,15 @@ public class TestUtil {
         }
     }
 
+    static void testGetNamedPermissionsForUser(Enforcer e, String pType, String name, List<List<String>> res, String... domain) {
+        List<List<String>> myRes = e.getNamedPermissionsForUser(pType, name, domain);
+        Util.logPrint("Named permissions for " + name + ": " + myRes);
+
+        if (!Util.array2DEquals(res, myRes)) {
+            fail("Named permissions for " + name + ": " + myRes + ", supposed to be " + res);
+        }
+    }
+
     static void testHasPermission(Enforcer e, String name, List<String> permission, boolean res) {
         boolean myRes = e.hasPermissionForUser(name, permission);
         Util.logPrint(name + " has permission " + Util.arrayToString(permission) + ": " + myRes);
@@ -169,6 +178,15 @@ public class TestUtil {
 
         if (!Util.array2DEquals(res, myRes)) {
             fail("Permissions for " + name + " under " + domain + ": " + myRes + ", supposed to be " + res);
+        }
+    }
+
+    static void testGetNamedImplicitPermissions(Enforcer e, String pType, String name, List<List<String>> res, String... domain) {
+        List<List<String>> myRes = e.getNamedImplicitPermissionsForUser(pType, name, domain);
+        Util.logPrint("Named implicit permissions for " + name + ": " + myRes);
+
+        if (!Util.array2DEquals(res, myRes)) {
+            fail("Named implicit permissions for " + name + ": " + myRes + ", supposed to be " + res);
         }
     }
 

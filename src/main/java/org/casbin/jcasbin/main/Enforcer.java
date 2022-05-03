@@ -350,9 +350,24 @@ public class Enforcer extends ManagementEnforcer {
      * @return the permissions, a permission is usually like (obj, act). It is actually the rule without the subject.
      */
     public List<List<String>> getPermissionsForUser(String user, String... domain) {
+        return getNamedPermissionsForUser("p", user, domain);
+    }
+
+    /**
+     * getNamedPermissionsForUser gets permissions for a user or role by named policy
+     * @param pType     the name policy.
+     * @param user      the user.
+     * @param domain    domain.
+     * @return the permissions.
+     */
+    List<List<String>> getNamedPermissionsForUser(String pType, String user, String... domain) {
         List<List<String>> permissions = new ArrayList<>();
+
         for (Map.Entry<String, Assertion> entry : model.model.get("p").entrySet()) {
             String ptype = entry.getKey();
+            if (!ptype.equals(pType)) {
+                continue;
+            }
             Assertion ast = entry.getValue();
             String[] args = new String[ast.tokens.length];
             args[0] = user;
@@ -363,7 +378,7 @@ public class Enforcer extends ManagementEnforcer {
                     args[index] = domain[0];
                 }
             }
-            permissions.addAll(getFilteredPolicy(0, args));
+            permissions.addAll(getFilteredNamedPolicy(pType, 0, args));
         }
 
         return permissions;
@@ -472,7 +487,9 @@ public class Enforcer extends ManagementEnforcer {
             for (RoleManager rm : rmMap.values()) {
                 List<String> roles = rm.getRoles(name, domain);
                 for (String role : roles) {
-                    if (res.contains(role)) continue;
+                    if (res.contains(role)) {
+                        continue;
+                    }
                     res.add(role);
                     queue.offerLast(role);
                 }
@@ -500,7 +517,9 @@ public class Enforcer extends ManagementEnforcer {
                 try {
                     List<String> users = rm.getUsers(name, domain);
                     for (String user : users) {
-                        if (res.contains(user)) continue;
+                        if (res.contains(user)) {
+                            continue;
+                        }
                         res.add(user);
                         queue.offerLast(user);
                     }
@@ -528,15 +547,36 @@ public class Enforcer extends ManagementEnforcer {
      * @return implicit permissions for a user or role.
      */
     public List<List<String>> getImplicitPermissionsForUser(String user, String... domain) {
+        return getNamedImplicitPermissionsForUser("p", user, domain);
+    }
+
+    /**
+     * GetNamedImplicitPermissionsForUser gets implicit permissions for a user or role by named policy.
+     * Compared to GetNamedPermissionsForUser(), this function retrieves permissions for inherited roles.
+     * For example:
+     * p, admin, data1, read
+     * p2, admin, create
+     * g, alice, admin
+     * <p>
+     * GetImplicitPermissionsForUser("alice") can only get: [["admin", "data1", "read"]], whose policy is default policy "p".
+     * But you can specify the named policy "p2" to get: [["admin", "create"]] by GetNamedImplicitPermissionsForUser("p2","alice").
+     *
+     * @param pType     the name policy.
+     * @param user      the user.
+     * @param domain    the user's domain.
+     * @return implicit permissions for a user or role by named policy.
+     */
+    public List<List<String>> getNamedImplicitPermissionsForUser(String pType, String user, String... domain) {
         List<String> roles = new ArrayList<>();
         roles.add(user);
         roles.addAll(getImplicitRolesForUser(user, domain));
         List<List<String>> res = new ArrayList<>();
         for (String role : roles) {
-            res.addAll(this.getPermissionsForUser(role, domain));
+            res.addAll(this.getNamedPermissionsForUser(pType, role, domain));
         }
         return res;
     }
+
 
     /**
      * getImplicitPermissionsForUserInDomain gets implicit permissions for a user or role in domain.

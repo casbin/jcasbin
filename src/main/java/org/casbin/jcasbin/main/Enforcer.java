@@ -354,7 +354,7 @@ public class Enforcer extends ManagementEnforcer {
     }
 
     /**
-     * getNamedPermissionsForUser gets permissions for a user or role by named policy
+     * getNamedPermissionsForUser gets permissions for a user or role by named policy.
      * @param pType     the name policy.
      * @param user      the user.
      * @param domain    domain.
@@ -365,23 +365,30 @@ public class Enforcer extends ManagementEnforcer {
 
         for (Map.Entry<String, Assertion> entry : model.model.get("p").entrySet()) {
             String ptype = entry.getKey();
-            if (!ptype.equals(pType)) {
-                continue;
-            }
-            Assertion ast = entry.getValue();
-            String[] args = new String[ast.tokens.length];
-            args[0] = user;
-
-            if (domain.length > 0) {
-                int index = getDomainIndex(ptype);
-                if (index < ast.tokens.length) {
-                    args[index] = domain[0];
-                }
-            }
-            permissions.addAll(getFilteredNamedPolicy(pType, 0, args));
+            if (!ptype.equals(pType)) continue;
+            permissions.addAll(getFilteredNamedPolicy(pType, 0, getPermissionsPackFunc(entry, ptype, user, domain)));
         }
 
         return permissions;
+    }
+
+    /**
+     * get the match field value, used to field filters.
+     * @param entry  the entry of pType:assertion.
+     * @param pType  the named policy
+     * @param user   the user.
+     * @param domain domain.
+     * @return the match field.
+     */
+    private String[] getPermissionsPackFunc(Map.Entry<String, Assertion> entry, String pType, String user, String... domain) {
+        Assertion ast = entry.getValue();
+        String[] args = new String[ast.tokens.length];
+        args[0] = user;
+
+        if (domain.length > 0 && getDomainIndex(pType) < ast.tokens.length) {
+            args[ast.tokens.length] = domain[0];
+        }
+        return args;
     }
 
     /**
@@ -487,9 +494,7 @@ public class Enforcer extends ManagementEnforcer {
             for (RoleManager rm : rmMap.values()) {
                 List<String> roles = rm.getRoles(name, domain);
                 for (String role : roles) {
-                    if (res.contains(role)) {
-                        continue;
-                    }
+                    if (res.contains(role)) continue;
                     res.add(role);
                     queue.offerLast(role);
                 }
@@ -517,9 +522,7 @@ public class Enforcer extends ManagementEnforcer {
                 try {
                     List<String> users = rm.getUsers(name, domain);
                     for (String user : users) {
-                        if (res.contains(user)) {
-                            continue;
-                        }
+                        if (res.contains(user)) continue;
                         res.add(user);
                         queue.offerLast(user);
                     }

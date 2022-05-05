@@ -384,9 +384,9 @@ public class Enforcer extends ManagementEnforcer {
         Assertion ast = entry.getValue();
         String[] args = new String[ast.tokens.length];
         args[0] = user;
-
-        if (domain.length > 0 && getDomainIndex(pType) < ast.tokens.length) {
-            args[ast.tokens.length] = domain[0];
+        int index = getDomainIndex(pType);
+        if (domain.length > 0 && index < ast.tokens.length) {
+            args[index] = domain[0];
         }
         return args;
     }

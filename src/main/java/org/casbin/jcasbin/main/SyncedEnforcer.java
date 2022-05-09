@@ -1271,6 +1271,23 @@ public class SyncedEnforcer extends Enforcer {
     }
 
     /**
+     * GetNamedPermissionsForUser gets permissions for a user or role by named policy.
+     * @param pType     the name policy.
+     * @param user      the user.
+     * @param domain    domain.
+     * @return the permissions.
+     */
+    @Override
+    public List<List<String>> getNamedPermissionsForUser(String pType, String user, String... domain) {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.getNamedPermissionsForUser(pType, user, domain);
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
      * hasPermissionForUser determines whether a user has a permission.
      *
      * @param user       the user.
@@ -1437,6 +1454,32 @@ public class SyncedEnforcer extends Enforcer {
         try {
             READ_WRITE_LOCK.readLock().lock();
             return super.getImplicitPermissionsForUser(user, domain);
+        } finally {
+            READ_WRITE_LOCK.readLock().unlock();
+        }
+    }
+
+    /**
+     * GetNamedImplicitPermissionsForUser gets implicit permissions for a user or role by named policy.
+     * Compared to GetNamedPermissionsForUser(), this function retrieves permissions for inherited roles.
+     * For example:
+     * p, admin, data1, read
+     * p2, admin, create
+     * g, alice, admin
+     * <p>
+     * GetImplicitPermissionsForUser("alice") can only get: [["admin", "data1", "read"]], whose policy is default policy "p"
+     * But you can specify the named policy "p2" to get: [["admin", "create"]] by GetNamedImplicitPermissionsForUser("p2","alice")
+     *
+     * @param pType     the name policy.
+     * @param user      the user.
+     * @param domain    the user's domain.
+     * @return implicit permissions for a user or role by named policy.
+     */
+    @Override
+    public List<List<String>> getNamedImplicitPermissionsForUser(String pType, String user, String... domain) {
+        try {
+            READ_WRITE_LOCK.readLock().lock();
+            return super.getNamedImplicitPermissionsForUser(pType, user, domain);
         } finally {
             READ_WRITE_LOCK.readLock().unlock();
         }

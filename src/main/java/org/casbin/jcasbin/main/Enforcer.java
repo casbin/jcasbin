@@ -350,23 +350,45 @@ public class Enforcer extends ManagementEnforcer {
      * @return the permissions, a permission is usually like (obj, act). It is actually the rule without the subject.
      */
     public List<List<String>> getPermissionsForUser(String user, String... domain) {
+        return getNamedPermissionsForUser("p", user, domain);
+    }
+
+    /**
+     * getNamedPermissionsForUser gets permissions for a user or role by named policy.
+     * @param pType     the name policy.
+     * @param user      the user.
+     * @param domain    domain.
+     * @return the permissions.
+     */
+    List<List<String>> getNamedPermissionsForUser(String pType, String user, String... domain) {
         List<List<String>> permissions = new ArrayList<>();
+
         for (Map.Entry<String, Assertion> entry : model.model.get("p").entrySet()) {
             String ptype = entry.getKey();
-            Assertion ast = entry.getValue();
-            String[] args = new String[ast.tokens.length];
-            args[0] = user;
-
-            if (domain.length > 0) {
-                int index = getDomainIndex(ptype);
-                if (index < ast.tokens.length) {
-                    args[index] = domain[0];
-                }
-            }
-            permissions.addAll(getFilteredPolicy(0, args));
+            if (!ptype.equals(pType)) continue;
+            permissions.addAll(getFilteredNamedPolicy(pType, 0, getPermissionsPackFunc(entry, ptype, user, domain)));
         }
 
         return permissions;
+    }
+
+    /**
+     * get the match field value, used to field filters.
+     * @param entry  the entry of pType:assertion.
+     * @param pType  the named policy
+     * @param user   the user.
+     * @param domain domain.
+     * @return the match field.
+     */
+    private String[] getPermissionsPackFunc(Map.Entry<String, Assertion> entry, String pType, String user, String... domain) {
+        Assertion ast = entry.getValue();
+        String[] args = new String[ast.tokens.length];
+        args[0] = user;
+        int index = getDomainIndex(pType);
+        if (domain.length > 0 && index < ast.tokens.length) {
+            args[index] = domain[0];
+        }
+        return args;
     }
 
     /**
@@ -528,15 +550,36 @@ public class Enforcer extends ManagementEnforcer {
      * @return implicit permissions for a user or role.
      */
     public List<List<String>> getImplicitPermissionsForUser(String user, String... domain) {
+        return getNamedImplicitPermissionsForUser("p", user, domain);
+    }
+
+    /**
+     * GetNamedImplicitPermissionsForUser gets implicit permissions for a user or role by named policy.
+     * Compared to GetNamedPermissionsForUser(), this function retrieves permissions for inherited roles.
+     * For example:
+     * p, admin, data1, read
+     * p2, admin, create
+     * g, alice, admin
+     * <p>
+     * GetImplicitPermissionsForUser("alice") can only get: [["admin", "data1", "read"]], whose policy is default policy "p".
+     * But you can specify the named policy "p2" to get: [["admin", "create"]] by GetNamedImplicitPermissionsForUser("p2","alice").
+     *
+     * @param pType     the name policy.
+     * @param user      the user.
+     * @param domain    the user's domain.
+     * @return implicit permissions for a user or role by named policy.
+     */
+    public List<List<String>> getNamedImplicitPermissionsForUser(String pType, String user, String... domain) {
         List<String> roles = new ArrayList<>();
         roles.add(user);
         roles.addAll(getImplicitRolesForUser(user, domain));
         List<List<String>> res = new ArrayList<>();
         for (String role : roles) {
-            res.addAll(this.getPermissionsForUser(role, domain));
+            res.addAll(this.getNamedPermissionsForUser(pType, role, domain));
         }
         return res;
     }
+
 
     /**
      * getImplicitPermissionsForUserInDomain gets implicit permissions for a user or role in domain.

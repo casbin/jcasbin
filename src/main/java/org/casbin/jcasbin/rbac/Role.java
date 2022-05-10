@@ -23,7 +23,7 @@ import java.util.List;
 class Role {
     private String name;
     private List<Role> roles;
-
+    private List<Role> roless;
     protected Role(String name) {
         this.name = name;
         roles = new ArrayList<>();

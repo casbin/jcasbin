@@ -44,13 +44,12 @@ class Role {
     }
 
     void deleteRole(Role role) {
-        List<Role> toRemove = new ArrayList<>();
         for (Role r : roles) {
             if (r.name.equals(role.name)) {
-                toRemove.add(r);
+                roles.remove(r);
+                return;
             }
         }
-        roles.removeAll(toRemove);
     }
 
     boolean hasRole(String name, int hierarchyLevel) {
@@ -83,7 +82,7 @@ class Role {
             if (i == 0) {
                 names.append(role.name);
             } else {
-                names.append(", " + role.name);
+                names.append(", ").append(role.name);
             }
         }
         return name + " < " + names;

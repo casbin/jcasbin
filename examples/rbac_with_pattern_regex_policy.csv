@@ -1,0 +1,6 @@
+p, employee, data1, read
+p, admin, data1, read
+p, admin, data1, write
+
+g, ^E\d+$, employee
+g, root, admin

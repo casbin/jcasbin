@@ -36,7 +36,7 @@ class DomainRoles {
 
     public boolean hasRole(final String name, BiPredicate<String, String> matchingFunc) {
         if (matchingFunc != null) {
-            return roles.keySet().stream().anyMatch(r -> matchingFunc.test(name, r));
+            return roles.keySet().stream().anyMatch(r -> matchingFunc.test(name, r) || r.equals(name));
         } else {
             return roles.containsKey(name);
         }

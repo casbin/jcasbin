@@ -14,6 +14,9 @@
 
 package org.casbin.jcasbin.main;
 
+import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
+import org.casbin.jcasbin.rbac.DefaultRoleManager;
+import org.casbin.jcasbin.util.BuiltInFunctions;
 import org.casbin.jcasbin.util.Util;
 import org.junit.Test;
 
@@ -85,6 +88,40 @@ public class RbacAPIUnitTest {
         testEnforce(e, "bob", "data1", "write", false);
         testEnforce(e, "bob", "data2", "read", false);
         testEnforce(e, "bob", "data2", "write", true);
+    }
+
+    @Test
+    public void testRoleAPIWithRegex() {
+        Enforcer e = new Enforcer("examples/rbac_model.conf");
+        e.setAdapter(new FileAdapter("examples/rbac_with_pattern_regex_policy.csv"));
+        e.setRoleManager("g", new DefaultRoleManager(10, BuiltInFunctions::regexMatch, null));
+        e.loadPolicy();
+
+        testGetRoles(e, "root", asList("admin"));
+        testGetRoles(e, "^E\\d+$", asList("employee"));
+        testGetRoles(e, "E101", asList("^E\\d+$"));
+        assertEquals(e.getImplicitRolesForUser("E101"), asList("^E\\d+$", "employee"));
+
+        testEnforce(e, "E101", "data1", "read", true);
+        testEnforce(e, "E101", "data1", "write", false);
+
+        e.addRoleForUser("^E\\d+$", "admin");
+
+        testGetRoles(e, "^E\\d+$", asList("employee","admin"));
+        testGetRoles(e, "E101", asList("^E\\d+$"));
+        assertEquals(e.getImplicitRolesForUser("E101"), asList("^E\\d+$", "employee", "admin"));
+
+        testEnforce(e, "E101", "data1", "read", true);
+        testEnforce(e, "E101", "data1", "write", true);
+
+        e.deleteRoleForUser("^E\\d+$", "admin");
+
+        testGetRoles(e, "^E\\d+$", asList("employee"));
+        testGetRoles(e, "E101", asList("^E\\d+$"));
+        assertEquals(e.getImplicitRolesForUser("E101"), asList("^E\\d+$", "employee"));
+
+        testEnforce(e, "E101", "data1", "read", true);
+        testEnforce(e, "E101", "data1", "write", false);
     }
 
     @Test

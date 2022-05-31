@@ -68,7 +68,7 @@ public class DefaultRoleManager implements RoleManager {
      *
      * @param matchingFunc the matching function.
      */
-    public void addMatchingFunc(BiPredicate<String, String> matchingFunc) {
+    public void addMatchingFunc(String name, BiPredicate<String, String> matchingFunc) {
         this.matchingFunc = matchingFunc;
     }
 
@@ -77,7 +77,7 @@ public class DefaultRoleManager implements RoleManager {
      *
      * @param domainMatchingFunc the domain matching function.
      */
-    public void addDomainMatchingFunc(BiPredicate<String, String> domainMatchingFunc) {
+    public void addDomainMatchingFunc(String name, BiPredicate<String, String> domainMatchingFunc) {
         this.domainMatchingFunc = domainMatchingFunc;
     }
 

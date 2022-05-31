@@ -97,10 +97,9 @@ public class RbacAPIWithPatternMatchUnitTest {
 
     @Test
     public void testEnforceAPIWithAllMatchPatterns() {
-        final Enforcer e = new Enforcer("examples/rbac_with_all_pattern_model.conf");
-        e.setAdapter(new FileAdapter("examples/rbac_with_all_pattern_policy.csv"));
-        e.setRoleManager(new DefaultRoleManager(10, BuiltInFunctions::keyMatch2, BuiltInFunctions::allMatch));
-        e.loadPolicy();
+        final Enforcer e = new Enforcer("examples/rbac_with_all_pattern_model.conf", "examples/rbac_with_all_pattern_policy.csv");
+        e.addNamedMatchingFunc("g", "KeyMatch2", BuiltInFunctions::keyMatch2);
+        e.addNamedDomainMatchingFunc("g", "AllMatch", BuiltInFunctions::allMatch);
 
         testDomainEnforce(e, "alice", "domain1", "/book/1", "read", true);
         testDomainEnforce(e, "alice", "domain1", "/book/1", "write", false);

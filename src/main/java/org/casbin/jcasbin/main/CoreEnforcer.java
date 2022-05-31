@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiPredicate;
+
 import org.casbin.jcasbin.effect.DefaultEffector;
 import org.casbin.jcasbin.effect.Effect;
 import org.casbin.jcasbin.effect.Effector;
@@ -616,6 +618,38 @@ public class CoreEnforcer {
      */
     public boolean enforceWithMatcher(String matcher, Object... rvals) {
         return enforce(matcher, rvals);
+    }
+
+    /**
+     * addNamedMatchingFunc add MatchingFunc by ptype RoleManager
+     */
+    public boolean addNamedMatchingFunc(String ptype, String name, BiPredicate<String, String> fn){
+        if(rmMap.containsKey(ptype)){
+            DefaultRoleManager rm = (DefaultRoleManager) rmMap.get(ptype);
+            rm.addMatchingFunc(name, fn);
+            clearRmMap();
+            if(autoBuildRoleLinks){
+                buildRoleLinks();
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * addNamedMatchingFunc add MatchingFunc by ptype RoleManager
+     */
+    public boolean addNamedDomainMatchingFunc(String ptype, String name, BiPredicate<String, String> fn){
+        if(rmMap.containsKey(ptype)){
+            DefaultRoleManager rm = (DefaultRoleManager) rmMap.get(ptype);
+            rm.addDomainMatchingFunc(name, fn);
+            clearRmMap();
+            if(autoBuildRoleLinks){
+                buildRoleLinks();
+            }
+            return true;
+        }
+        return false;
     }
 
     private void getRTokens(Map<String, Object> parameters, Object... rvals) {

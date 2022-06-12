@@ -14,9 +14,6 @@
 
 package org.casbin.jcasbin.util;
 
-import com.google.common.hash.HashCode;
-import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hashing;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -25,7 +22,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,8 +41,7 @@ public class Util {
 
     private static Logger LOGGER = LoggerFactory.getLogger("org.casbin.jcasbin");
 
-    private static HashFunction hf = Hashing.md5();
-    private static Charset defaultCharset = Charset.forName("UTF-8");
+    private static final String md5AlgorithmName = "MD5";
 
     /**
      * logPrint prints the log.
@@ -290,7 +288,14 @@ public class Util {
     }
 
     public static String md5(String data) {
-        HashCode hash = hf.newHasher().putString(data, defaultCharset).hash();
-        return hash.toString();
+        return new String(getDigest(md5AlgorithmName).digest(data.getBytes(StandardCharsets.UTF_8)));
+    }
+
+    private static MessageDigest getDigest(String algorithm) {
+        try {
+            return MessageDigest.getInstance(algorithm);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 }

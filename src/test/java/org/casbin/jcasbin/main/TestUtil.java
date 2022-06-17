@@ -15,6 +15,7 @@
 package org.casbin.jcasbin.main;
 
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.BuiltInFunctions;
 import org.casbin.jcasbin.util.EnforceContext;
 import org.casbin.jcasbin.util.Util;
@@ -109,6 +110,15 @@ public class TestUtil {
         }
     }
 
+    static void testGetRoles(RoleManager rm, String name, List<String> res) {
+        List<String> myRes = rm.getRoles(name);
+        Util.logPrint("Roles for " + name + ": " + myRes);
+
+        if (!Util.setEquals(res, myRes)) {
+            fail("Roles for " + name + ": " + myRes + ", supposed to be " + res);
+        }
+    }
+
     static void testGetUsers(Enforcer e, String name, List<String> res) {
         List<String> myRes = e.getUsersForRole(name);
         Util.logPrint("Users for " + name + ": " + myRes);
@@ -124,6 +134,24 @@ public class TestUtil {
 
         if (res != myRes) {
             fail(name + " has role " + role + ": " + myRes + ", supposed to be " + res);
+        }
+    }
+
+    static void testHasRole(RoleManager rm, String name, String role, boolean res) {
+        boolean myRes = rm.hasLink(name, role);
+        Util.logPrint(name + " has role " + role + ": " + myRes);
+
+        if (res != myRes) {
+            fail(name + " has role " + role + ": " + myRes + ", supposed to be " + res);
+        }
+    }
+
+    static void testHasRole(RoleManager rm, String name, String role, String domain, boolean res) {
+        boolean myRes = rm.hasLink(name, role, domain);
+        Util.logPrint(domain + " :: " + name + " has role " + role + ": " + myRes);
+
+        if (res != myRes) {
+            fail(domain + " :: " + name + " has role " + role + ": " + myRes + ", supposed to be " + res);
         }
     }
 

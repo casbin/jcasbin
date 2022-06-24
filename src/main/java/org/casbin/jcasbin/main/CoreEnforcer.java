@@ -709,4 +709,8 @@ public class CoreEnforcer {
     public void setAutoNotifyDispatcher(boolean autoNotifyDispatcher) {
         this.autoNotifyDispatcher = autoNotifyDispatcher;
     }
+
+    public boolean mustUseDispatcher() {
+       return this.dispatcher != null && this.autoNotifyDispatcher;
+    }
 }

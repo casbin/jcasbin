@@ -33,6 +33,13 @@ class InternalEnforcer extends CoreEnforcer {
      * addPolicy adds a rule to the current policy.
      */
     boolean addPolicy(String sec, String ptype, List<String> rule) {
+        if (mustUseDispatcher()) {
+            List<List<String>> rules = new ArrayList<>();
+            rules.add(rule);
+            dispatcher.addPolicies(sec, ptype, rules);
+            return true;
+        }
+
         if (model.hasPolicy(sec, ptype, rule)) {
             return false;
         }
@@ -71,6 +78,11 @@ class InternalEnforcer extends CoreEnforcer {
      * addPolicies adds rules to the current policy.
      */
     boolean addPolicies(String sec, String ptype, List<List<String>> rules) {
+        if (mustUseDispatcher()) {
+            dispatcher.addPolicies(sec, ptype, rules);
+            return true;
+        }
+
         if (model.hasPolicies(sec, ptype, rules)) {
             return false;
         }
@@ -115,6 +127,13 @@ class InternalEnforcer extends CoreEnforcer {
      * removePolicy removes a rule from the current policy.
      */
     boolean removePolicy(String sec, String ptype, List<String> rule) {
+        if (mustUseDispatcher()) {
+            List<List<String>> rules = new ArrayList<>();
+            rules.add(rule);
+            dispatcher.removePolicies(sec, ptype, rules);
+            return true;
+        }
+
         if (adapter != null && autoSave) {
             try {
                 adapter.removePolicy(sec, ptype, rule);
@@ -159,7 +178,7 @@ class InternalEnforcer extends CoreEnforcer {
      * @return succeeds or not.
      */
     boolean updatePolicy(String sec, String ptype, List<String> oldRule, List<String> newRule) {
-        if (dispatcher != null && autoNotifyDispatcher) {
+        if (mustUseDispatcher()) {
             dispatcher.updatePolicy(sec, ptype, oldRule, newRule);
             return true;
         }
@@ -225,6 +244,11 @@ class InternalEnforcer extends CoreEnforcer {
      * removePolicies removes rules from the current policy.
      */
     boolean removePolicies(String sec, String ptype, List<List<String>> rules) {
+        if (mustUseDispatcher()) {
+            dispatcher.removePolicies(sec, ptype, rules);
+            return true;
+        }
+
         if (!model.hasPolicies(sec, ptype, rules)) {
             return false;
         }
@@ -264,8 +288,13 @@ class InternalEnforcer extends CoreEnforcer {
      * removeFilteredPolicy removes rules based on field filters from the current policy.
      */
     boolean removeFilteredPolicy(String sec, String ptype, int fieldIndex, String... fieldValues) {
+        if (mustUseDispatcher()) {
+            dispatcher.removeFilteredPolicy(sec, ptype, fieldIndex, fieldValues);
+            return true;
+        }
+
         if (fieldValues == null || fieldValues.length == 0) {
-            Util.logPrint("Invaild fieldValues parameter");
+            Util.logPrint("Invalid fieldValues parameter");
             return false;
         }
 

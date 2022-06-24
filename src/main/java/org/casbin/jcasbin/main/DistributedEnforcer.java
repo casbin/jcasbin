@@ -110,7 +110,7 @@ public class DistributedEnforcer extends SyncedEnforcer {
     public List<List<String>> addPolicySelf(BooleanSupplier shouldPersist, String sec, String ptype, List<List<String>> rules) {
         List<List<String>> noExistsPolicy = new ArrayList<>();
         for (List<String> rule : rules) {
-            if (this.model.hasPolicy(sec, ptype, rule)) {
+            if (!this.model.hasPolicy(sec, ptype, rule)) {
                 noExistsPolicy.add(rule);
             }
         }

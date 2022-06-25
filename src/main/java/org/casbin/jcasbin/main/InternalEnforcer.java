@@ -25,6 +25,8 @@ import org.casbin.jcasbin.util.Util;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Collections.singletonList;
+
 /**
  * InternalEnforcer = CoreEnforcer + Internal API.
  */
@@ -33,6 +35,11 @@ class InternalEnforcer extends CoreEnforcer {
      * addPolicy adds a rule to the current policy.
      */
     boolean addPolicy(String sec, String ptype, List<String> rule) {
+        if (mustUseDispatcher()) {
+            dispatcher.addPolicies(sec, ptype, singletonList(rule));
+            return true;
+        }
+
         if (model.hasPolicy(sec, ptype, rule)) {
             return false;
         }
@@ -50,11 +57,7 @@ class InternalEnforcer extends CoreEnforcer {
 
         model.addPolicy(sec, ptype, rule);
 
-        if (sec.equals("g")) {
-            List<List<String>> rules = new ArrayList<>();
-            rules.add(rule);
-            buildIncrementalRoleLinks(Model.PolicyOperations.POLICY_ADD, ptype, rules);
-        }
+        buildIncrementalRoleLinks(sec, ptype, singletonList(rule), Model.PolicyOperations.POLICY_ADD);
 
         if (watcher != null && autoNotifyWatcher) {
             if (watcher instanceof WatcherEx) {
@@ -71,6 +74,11 @@ class InternalEnforcer extends CoreEnforcer {
      * addPolicies adds rules to the current policy.
      */
     boolean addPolicies(String sec, String ptype, List<List<String>> rules) {
+        if (mustUseDispatcher()) {
+            dispatcher.addPolicies(sec, ptype, rules);
+            return true;
+        }
+
         if (model.hasPolicies(sec, ptype, rules)) {
             return false;
         }
@@ -90,9 +98,7 @@ class InternalEnforcer extends CoreEnforcer {
 
         model.addPolicies(sec, ptype, rules);
 
-        if (sec.equals("g")) {
-            buildIncrementalRoleLinks(Model.PolicyOperations.POLICY_ADD, ptype, rules);
-        }
+        buildIncrementalRoleLinks(sec, ptype, rules, Model.PolicyOperations.POLICY_ADD);
 
         if (watcher != null && autoNotifyWatcher) {
             watcher.update();
@@ -115,6 +121,11 @@ class InternalEnforcer extends CoreEnforcer {
      * removePolicy removes a rule from the current policy.
      */
     boolean removePolicy(String sec, String ptype, List<String> rule) {
+        if (mustUseDispatcher()) {
+            dispatcher.removePolicies(sec, ptype, singletonList(rule));
+            return true;
+        }
+
         if (adapter != null && autoSave) {
             try {
                 adapter.removePolicy(sec, ptype, rule);
@@ -132,11 +143,7 @@ class InternalEnforcer extends CoreEnforcer {
             return false;
         }
 
-        if (sec.equals("g")) {
-            List<List<String>> rules = new ArrayList<>();
-            rules.add(rule);
-            buildIncrementalRoleLinks(Model.PolicyOperations.POLICY_REMOVE, ptype, rules);
-        }
+        buildIncrementalRoleLinks(sec, ptype, singletonList(rule), Model.PolicyOperations.POLICY_REMOVE);
 
         if (watcher != null && autoNotifyWatcher) {
             if (watcher instanceof WatcherEx) {
@@ -159,7 +166,7 @@ class InternalEnforcer extends CoreEnforcer {
      * @return succeeds or not.
      */
     boolean updatePolicy(String sec, String ptype, List<String> oldRule, List<String> newRule) {
-        if (dispatcher != null && autoNotifyDispatcher) {
+        if (mustUseDispatcher()) {
             dispatcher.updatePolicy(sec, ptype, oldRule, newRule);
             return true;
         }
@@ -225,6 +232,11 @@ class InternalEnforcer extends CoreEnforcer {
      * removePolicies removes rules from the current policy.
      */
     boolean removePolicies(String sec, String ptype, List<List<String>> rules) {
+        if (mustUseDispatcher()) {
+            dispatcher.removePolicies(sec, ptype, rules);
+            return true;
+        }
+
         if (!model.hasPolicies(sec, ptype, rules)) {
             return false;
         }
@@ -248,9 +260,7 @@ class InternalEnforcer extends CoreEnforcer {
             return false;
         }
 
-        if (sec.equals("g")) {
-            buildIncrementalRoleLinks(Model.PolicyOperations.POLICY_REMOVE, ptype, rules);
-        }
+        buildIncrementalRoleLinks(sec, ptype, rules, Model.PolicyOperations.POLICY_REMOVE);
 
         if (watcher != null && autoNotifyWatcher) {
             // error intentionally ignored
@@ -264,8 +274,13 @@ class InternalEnforcer extends CoreEnforcer {
      * removeFilteredPolicy removes rules based on field filters from the current policy.
      */
     boolean removeFilteredPolicy(String sec, String ptype, int fieldIndex, String... fieldValues) {
+        if (mustUseDispatcher()) {
+            dispatcher.removeFilteredPolicy(sec, ptype, fieldIndex, fieldValues);
+            return true;
+        }
+
         if (fieldValues == null || fieldValues.length == 0) {
-            Util.logPrint("Invaild fieldValues parameter");
+            Util.logPrint("Invalid fieldValues parameter");
             return false;
         }
 
@@ -287,9 +302,7 @@ class InternalEnforcer extends CoreEnforcer {
             return false;
         }
 
-        if (sec.equals("g")) {
-            buildIncrementalRoleLinks(Model.PolicyOperations.POLICY_REMOVE, ptype, effects);
-        }
+        buildIncrementalRoleLinks(sec, ptype, effects, Model.PolicyOperations.POLICY_REMOVE);
 
         if (watcher != null && autoNotifyWatcher) {
             // error intentionally ignored
@@ -315,4 +328,16 @@ class InternalEnforcer extends CoreEnforcer {
         }
         return index;
     }
+
+    private void buildIncrementalRoleLinks(
+        final String sec,
+        final String ptype,
+        final List<List<String>> rules,
+        final Model.PolicyOperations operation
+    ) {
+        if ("g".equals(sec)) {
+            buildIncrementalRoleLinks(operation, ptype, rules);
+        }
+    }
+
 }

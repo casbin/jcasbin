@@ -30,7 +30,10 @@ public class SyncedDistributedAPIUnitTest {
             asList("bob", "data2", "write"),
             asList("data2_admin", "data2", "read"),
             asList("data2_admin", "data2", "write")));
-        de.addPolicySelf(() -> false, "g", "g", asList(asList("alice", "data2_admin")));
+        de.addPolicySelf(() -> false, "g", "g", asList(
+            asList("alice", "data2_admin"),
+            asList("new_user", "data2_admin")
+        ));
 
         testEnforce(de, "alice", "data1", "read", true);
         testEnforce(de, "alice", "data1", "write", false);
@@ -40,6 +43,8 @@ public class SyncedDistributedAPIUnitTest {
         testEnforce(de, "data2_admin", "data2", "write", true);
         testEnforce(de, "alice", "data2", "read", true);
         testEnforce(de, "alice", "data2", "write", true);
+        testEnforce(de, "new_user", "data2", "write", true);
+        testEnforce(de, "new_user", "data2", "read", true);
 
         de.updatePolicySelf(() -> false, "p", "p", asList("alice", "data1", "read"), asList("alice", "data1", "write"));
         de.updatePolicySelf(() -> false, "g", "g", asList("alice", "data2_admin"), asList("tom", "alice"));

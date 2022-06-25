@@ -36,9 +36,7 @@ class InternalEnforcer extends CoreEnforcer {
      */
     boolean addPolicy(String sec, String ptype, List<String> rule) {
         if (mustUseDispatcher()) {
-            List<List<String>> rules = new ArrayList<>();
-            rules.add(rule);
-            dispatcher.addPolicies(sec, ptype, rules);
+            dispatcher.addPolicies(sec, ptype, singletonList(rule));
             return true;
         }
 
@@ -124,9 +122,7 @@ class InternalEnforcer extends CoreEnforcer {
      */
     boolean removePolicy(String sec, String ptype, List<String> rule) {
         if (mustUseDispatcher()) {
-            List<List<String>> rules = new ArrayList<>();
-            rules.add(rule);
-            dispatcher.removePolicies(sec, ptype, rules);
+            dispatcher.removePolicies(sec, ptype, singletonList(rule));
             return true;
         }
 
@@ -339,7 +335,7 @@ class InternalEnforcer extends CoreEnforcer {
         final List<List<String>> rules,
         final Model.PolicyOperations operation
     ) {
-        if (sec.equals("g")) {
+        if ("g".equals(sec)) {
             buildIncrementalRoleLinks(operation, ptype, rules);
         }
     }

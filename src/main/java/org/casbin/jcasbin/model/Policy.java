@@ -18,6 +18,7 @@ import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.Util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -103,12 +104,14 @@ public class Policy {
         if (model.containsKey("p")) {
             for (Assertion ast : model.get("p").values()) {
                 ast.policy = new ArrayList<>();
+                ast.policyIndex = new HashMap<>();
             }
         }
 
         if (model.containsKey("g")) {
             for (Assertion ast : model.get("g").values()) {
                 ast.policy = new ArrayList<>();
+                ast.policyIndex = new HashMap<>();
             }
         }
     }
@@ -116,7 +119,7 @@ public class Policy {
     /**
      * getPolicy gets all rules in a policy.
      *
-     * @param sec the section, "p" or "g".
+     * @param sec   the section, "p" or "g".
      * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
      * @return the policy rules of section sec and policy type ptype.
      */
@@ -127,9 +130,9 @@ public class Policy {
     /**
      * getFilteredPolicy gets rules based on field filters from a policy.
      *
-     * @param sec the section, "p" or "g".
-     * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
-     * @param fieldIndex the policy rule's start index to be matched.
+     * @param sec         the section, "p" or "g".
+     * @param ptype       the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param fieldIndex  the policy rule's start index to be matched.
      * @param fieldValues the field values to be matched, value ""
      *                    means not to match this field.
      * @return the filtered policy rules of section sec and policy type ptype.
@@ -158,27 +161,21 @@ public class Policy {
     /**
      * hasPolicy determines whether a model has the specified policy rule.
      *
-     * @param sec the section, "p" or "g".
+     * @param sec   the section, "p" or "g".
      * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
-     * @param rule the policy rule.
+     * @param rule  the policy rule.
      * @return whether the rule exists.
      */
     public boolean hasPolicy(String sec, String ptype, List<String> rule) {
-        for (List<String> r : model.get(sec).get(ptype).policy) {
-            if (Util.arrayEquals(rule, r)) {
-                return true;
-            }
-        }
-
-        return false;
+        return model.get(sec).get(ptype).policyIndex.containsKey(rule.toString());
     }
 
     /**
      * addPolicy adds a policy rule to the model.
      *
-     * @param sec the section, "p" or "g".
+     * @param sec   the section, "p" or "g".
      * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
-     * @param rule the policy rule.
+     * @param rule  the policy rule.
      * @return succeeds or not.
      */
     public boolean addPolicy(String sec, String ptype, List<String> rule) {
@@ -201,8 +198,12 @@ public class Policy {
                     }
                 }
                 policy.add(left, rule);
+                for (int i = left; i < assertion.policy.size(); ++i) {
+                    assertion.policyIndex.put(assertion.policy.get(i).toString(), i);
+                }
             } else {
                 policy.add(rule);
+                assertion.policyIndex.put(rule.toString(), policy.size() - 1);
             }
 
             return true;
@@ -213,7 +214,8 @@ public class Policy {
 
     /**
      * addPolicies adds policy rules to the model.
-     * @param sec the section, "p" or "g".
+     *
+     * @param sec   the section, "p" or "g".
      * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
      * @param rules the policy rules.
      * @return succeeds or not.
@@ -222,7 +224,7 @@ public class Policy {
         int size = model.get(sec).get(ptype).policy.size();
         for (List<String> rule : rules) {
             if (!hasPolicy(sec, ptype, rule)) {
-                model.get(sec).get(ptype).policy.add(rule);
+                addPolicy(sec, ptype, rule);
             }
         }
         return size < model.get(sec).get(ptype).policy.size();
@@ -231,8 +233,8 @@ public class Policy {
     /**
      * UpdatePolicy updates a policy rule from the model.
      *
-     * @param sec the section, "p" or "g".
-     * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param sec     the section, "p" or "g".
+     * @param ptype   the policy type, "p", "p2", .. or "g", "g2", ..
      * @param oldRule the old rule.
      * @param newRule the new rule.
      * @return succeeds or not.
@@ -241,26 +243,33 @@ public class Policy {
         if (!hasPolicy(sec, ptype, oldRule)) {
             return false;
         }
-        model.get(sec).get(ptype).policy.remove(oldRule);
-        model.get(sec).get(ptype).policy.add(newRule);
+        Assertion ast = model.get(sec).get(ptype);
+        int index = ast.policyIndex.get(oldRule.toString());
+        ast.policy.set(index, newRule);
+        ast.policyIndex.remove(oldRule.toString());
+        ast.policyIndex.put(newRule.toString(), index);
         return true;
     }
 
     /**
      * removePolicy removes a policy rule from the model.
      *
-     * @param sec the section, "p" or "g".
+     * @param sec   the section, "p" or "g".
      * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
-     * @param rule the policy rule.
+     * @param rule  the policy rule.
      * @return succeeds or not.
      */
     public boolean removePolicy(String sec, String ptype, List<String> rule) {
-        for (int i = 0; i < model.get(sec).get(ptype).policy.size(); i ++) {
-            List<String> r = model.get(sec).get(ptype).policy.get(i);
-            if (Util.arrayEquals(rule, r)) {
-                model.get(sec).get(ptype).policy.remove(i);
-                return true;
+        Assertion ast = model.get(sec).get(ptype);
+        if (ast.policyIndex.containsKey(rule.toString())) {
+            int index = ast.policyIndex.get(rule.toString());
+            ast.policy.remove(index);
+            ast.policyIndex.remove(rule.toString());
+            for (int i = index; i < ast.policy.size(); ++i) {
+                ast.policyIndex.put(ast.policy.get(i).toString(), i);
             }
+
+            return true;
         }
 
         return false;
@@ -268,7 +277,8 @@ public class Policy {
 
     /**
      * removePolicies removes rules from the current policy.
-     * @param sec the section, "p" or "g".
+     *
+     * @param sec   the section, "p" or "g".
      * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
      * @param rules the policy rules.
      * @return succeeds or not.
@@ -276,12 +286,7 @@ public class Policy {
     public boolean removePolicies(String sec, String ptype, List<List<String>> rules) {
         int size = model.get(sec).get(ptype).policy.size();
         for (List<String> rule : rules) {
-            for (int i = 0; i < model.get(sec).get(ptype).policy.size(); i ++) {
-                List<String> r = model.get(sec).get(ptype).policy.get(i);
-                if (Util.arrayEquals(rule, r)) {
-                    model.get(sec).get(ptype).policy.remove(i);
-                }
-            }
+            removePolicy(sec, ptype, rule);
         }
         return size > model.get(sec).get(ptype).policy.size();
     }
@@ -289,12 +294,12 @@ public class Policy {
     /**
      * removeFilteredPolicyReturnsEffects removes policy rules based on field filters from the model.
      *
-     * @param sec the section, "p" or "g".
-     * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
-     * @param fieldIndex the policy rule's start index to be matched.
+     * @param sec         the section, "p" or "g".
+     * @param ptype       the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param fieldIndex  the policy rule's start index to be matched.
      * @param fieldValues the field values to be matched, value ""
      *                    means not to match this field.
-     * @return succeeds(effects.size() &gt; 0) or not.
+     * @return succeeds(effects.size () &gt; 0) or not.
      */
     public List<List<String>> removeFilteredPolicyReturnsEffects(String sec, String ptype, int fieldIndex, String... fieldValues) {
         List<List<String>> tmp = new ArrayList<>();
@@ -303,9 +308,9 @@ public class Policy {
 
         for (List<String> rule : model.get(sec).get(ptype).policy) {
             boolean matched = true;
-            for (int i = 0; i < fieldValues.length; i ++) {
+            for (int i = 0; i < fieldValues.length; i++) {
                 String fieldValue = fieldValues[i];
-                if (!fieldValue.equals("") && !rule.get(fieldIndex + i).equals(fieldValue)) {
+                if (!"".equals(fieldValue) && !rule.get(fieldIndex + i).equals(fieldValue)) {
                     matched = false;
                     break;
                 }
@@ -322,7 +327,12 @@ public class Policy {
         }
 
         if (firstIndex != -1) {
-            model.get(sec).get(ptype).policy = tmp;
+            Assertion assertion = model.get(sec).get(ptype);
+            assertion.policy = tmp;
+            assertion.policyIndex.clear();
+            for (int i = 0; i < assertion.policy.size(); ++i) {
+                assertion.policyIndex.put(assertion.policy.get(i).toString(), i);
+            }
         }
 
         return effects;
@@ -331,9 +341,9 @@ public class Policy {
     /**
      * removeFilteredPolicy removes policy rules based on field filters from the model.
      *
-     * @param sec the section, "p" or "g".
-     * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
-     * @param fieldIndex the policy rule's start index to be matched.
+     * @param sec         the section, "p" or "g".
+     * @param ptype       the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param fieldIndex  the policy rule's start index to be matched.
      * @param fieldValues the field values to be matched, value ""
      *                    means not to match this field.
      * @return succeeds or not.
@@ -345,8 +355,8 @@ public class Policy {
     /**
      * getValuesForFieldInPolicy gets all values for a field for all rules in a policy, duplicated values are removed.
      *
-     * @param sec the section, "p" or "g".
-     * @param ptype the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param sec        the section, "p" or "g".
+     * @param ptype      the policy type, "p", "p2", .. or "g", "g2", ..
      * @param fieldIndex the policy rule's index.
      * @return the field values specified by fieldIndex.
      */

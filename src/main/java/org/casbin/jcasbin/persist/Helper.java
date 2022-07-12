@@ -14,6 +14,7 @@
 
 package org.casbin.jcasbin.persist;
 
+import org.casbin.jcasbin.model.Assertion;
 import org.casbin.jcasbin.model.Model;
 
 import java.util.Arrays;
@@ -26,7 +27,7 @@ public class Helper {
     }
 
     public static void loadPolicyLine(String line, Model model) {
-        if (line.equals("")) {
+        if ("".equals(line)) {
             return;
         }
 
@@ -38,6 +39,10 @@ public class Helper {
 
         String key = tokens[0];
         String sec = key.substring(0, 1);
-        model.model.get(sec).get(key).policy.add(Arrays.asList(Arrays.copyOfRange(tokens, 1, tokens.length)));
+        Assertion ast = model.model.get(sec).get(key);
+        ast.policy.add(Arrays.asList(Arrays.copyOfRange(tokens, 1, tokens.length)));
+        for (int i = 0; i < ast.policy.size(); ++i) {
+            ast.policyIndex.put(ast.policy.get(i).toString(), i);
+        }
     }
 }

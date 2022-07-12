@@ -18,7 +18,9 @@ import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.Util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Assertion represents an expression in a section of the model.
@@ -29,19 +31,21 @@ public class Assertion {
     public String value;
     public String[] tokens;
     public List<List<String>> policy;
+    public Map<String, Integer> policyIndex;
     public RoleManager rm;
     public int priorityIndex;
 
     public Assertion() {
         policy = new ArrayList<>();
+        policyIndex = new HashMap<>();
     }
 
     protected void buildRoleLinks(RoleManager rm) {
         this.rm = rm;
         int count = 0;
-        for (int i = 0; i < value.length(); i ++) {
+        for (int i = 0; i < value.length(); i++) {
             if (value.charAt(i) == '_') {
-                count ++;
+                count++;
             }
         }
         for (List<String> rule : policy) {
@@ -68,9 +72,9 @@ public class Assertion {
     public void buildIncrementalRoleLinks(RoleManager rm, Model.PolicyOperations op, List<List<String>> rules) {
         this.rm = rm;
         int count = 0;
-        for (int i = 0; i < value.length(); i ++) {
+        for (int i = 0; i < value.length(); i++) {
             if (value.charAt(i) == '_') {
-                count ++;
+                count++;
             }
         }
         for (List<String> rule : rules) {

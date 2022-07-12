@@ -14,14 +14,14 @@
 
 package org.casbin.jcasbin.model;
 
-import static org.casbin.jcasbin.util.Util.splitCommaDelimited;
-
 import org.casbin.jcasbin.config.Config;
 import org.casbin.jcasbin.util.Util;
 
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.casbin.jcasbin.util.Util.splitCommaDelimited;
 
 /**
  * Model represents the whole access control model.
@@ -57,8 +57,8 @@ public class Model extends Policy {
     /**
      * addDef adds an assertion to the model.
      *
-     * @param sec the section, "p" or "g".
-     * @param key the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param sec   the section, "p" or "g".
+     * @param key   the policy type, "p", "p2", .. or "g", "g2", ..
      * @param value the policy rule, separated by ", ".
      * @return succeeds or not.
      */
@@ -68,11 +68,11 @@ public class Model extends Policy {
         ast.value = value;
         ast.initPriorityIndex();
 
-        if (ast.value.equals("")) {
+        if ("".equals(ast.value)) {
             return false;
         }
 
-        if (sec.equals("r") || sec.equals("p")) {
+        if ("r".equals(sec) || "p".equals(sec)) {
             ast.tokens = splitCommaDelimited(ast.value);
             for (int i = 0; i < ast.tokens.length; i++) {
                 ast.tokens[i] = key + "_" + ast.tokens[i];
@@ -108,15 +108,15 @@ public class Model extends Policy {
             if (!loadAssertion(model, cfg, sec, sec + getKeySuffix(i))) {
                 break;
             } else {
-                i ++;
+                i++;
             }
         }
     }
 
-    /*
+    /**
      * Helper function for loadModel and loadModelFromText
-     * 
-     * @param config the configuration parser
+     *
+     * @param cfg the configuration parser
      */
     private void loadSections(Config cfg) {
         loadSection(this, cfg, "r");
@@ -126,7 +126,7 @@ public class Model extends Policy {
 
         loadSection(this, cfg, "g");
     }
-    
+
     /**
      * loadModel loads the model from model CONF file.
      *
@@ -185,7 +185,7 @@ public class Model extends Policy {
         String g = saveSectionToText("g");
         g = g.replace(".", "_");
         res.append(g);
-        if (!g.equals("")) {
+        if (!"".equals(g)) {
             res.append("\n");
         }
 
@@ -223,6 +223,9 @@ public class Model extends Policy {
                 continue;
             }
             assertion.policy.sort(Comparator.comparingInt(p -> Integer.parseInt(p.get(priorityIndex))));
+            for (int i = 0; i < assertion.policy.size(); ++i) {
+                assertion.policyIndex.put(assertion.policy.get(i).toString(), i);
+            }
         }
     }
 

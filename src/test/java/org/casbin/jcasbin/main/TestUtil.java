@@ -18,13 +18,13 @@ import com.googlecode.aviator.AviatorEvaluatorInstance;
 import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.BuiltInFunctions;
 import org.casbin.jcasbin.util.EnforceContext;
+import org.casbin.jcasbin.util.SyncedLRUCache;
 import org.casbin.jcasbin.util.Util;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class TestUtil {
     static void testEnforce(Enforcer e, Object sub, Object obj, String act, boolean res) {
@@ -119,8 +119,26 @@ public class TestUtil {
         }
     }
 
+    static void testGetRoles(RoleManager rm, String name, String domain, List<String> res) {
+        List<String> myRes = rm.getRoles(name, domain);
+        Util.logPrint("Roles for " + name + ": " + myRes);
+
+        if (!Util.setEquals(res, myRes)) {
+            fail("Roles for " + name + ": " + myRes + ", supposed to be " + res);
+        }
+    }
+
     static void testGetUsers(Enforcer e, String name, List<String> res) {
         List<String> myRes = e.getUsersForRole(name);
+        Util.logPrint("Users for " + name + ": " + myRes);
+
+        if (!Util.setEquals(res, myRes)) {
+            fail("Users for " + name + ": " + myRes + ", supposed to be " + res);
+        }
+    }
+
+    static void testGetUsers(RoleManager rm, String name, List<String> res) {
+        List<String> myRes = rm.getUsers(name);
         Util.logPrint("Users for " + name + ": " + myRes);
 
         if (!Util.setEquals(res, myRes)) {

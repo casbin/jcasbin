@@ -16,6 +16,7 @@ package org.casbin.jcasbin.main;
 
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
 import org.casbin.jcasbin.rbac.DefaultRoleManager;
+import org.casbin.jcasbin.rbac.DomainManager;
 import org.casbin.jcasbin.util.BuiltInFunctions;
 import org.junit.Test;
 
@@ -54,7 +55,7 @@ public class RbacAPIWithPatternMatchUnitTest {
     public void testEnforceAPIWithDomainMatch() {
         final Enforcer e = new Enforcer("examples/rbac_with_domain_pattern_model.conf");
         e.setAdapter(new FileAdapter("examples/rbac_with_domain_pattern_policy.csv"));
-        e.setRoleManager(new DefaultRoleManager(10, null, BuiltInFunctions::allMatch));
+        e.setRoleManager(new DomainManager(10, null, BuiltInFunctions::allMatch));
         e.loadPolicy();
 
         testDomainEnforce(e, "alice", "domain1", "data1", "read", true);
@@ -74,7 +75,7 @@ public class RbacAPIWithPatternMatchUnitTest {
     public void testRoleAPIWithDomainMatch() {
         final Enforcer e = new Enforcer("examples/rbac_with_domain_pattern_model.conf");
         e.setAdapter(new FileAdapter("examples/rbac_with_domain_pattern_policy.csv"));
-        e.setRoleManager(new DefaultRoleManager(10, null, BuiltInFunctions::allMatch));
+        e.setRoleManager(new DomainManager(10, null, BuiltInFunctions::allMatch));
         e.loadPolicy();
 
         testGetRolesInDomain(e, "alice", "domain1", asList("admin"));

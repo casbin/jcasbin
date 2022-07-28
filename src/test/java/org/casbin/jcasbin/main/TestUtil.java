@@ -279,4 +279,15 @@ public class TestUtil {
     static void testIpMatch(String ip1, String ip2, boolean res) {
         assertEquals(res, BuiltInFunctions.ipMatch(ip1, ip2));
     }
+
+    static void testCacheGet(SyncedLRUCache<String, Integer> cache, String key, Integer value, boolean res) {
+        assertEquals(res, value.equals(cache.get(key)));
+    }
+
+    static void testCachePut(SyncedLRUCache<String, Integer> cache, String key, Integer value) {
+        cache.put(key, value);
+        if (!value.equals(cache.get(key))) {
+            fail("Put(" + key + ", " + value + "): didn't add value");
+        }
+    }
 }

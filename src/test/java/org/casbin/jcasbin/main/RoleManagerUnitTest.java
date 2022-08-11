@@ -11,9 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 package org.casbin.jcasbin.main;
 
 import org.casbin.jcasbin.rbac.DefaultRoleManager;
+import org.casbin.jcasbin.rbac.DomainManager;
 import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.BuiltInFunctions;
 import org.junit.Test;
@@ -97,7 +99,7 @@ public class RoleManagerUnitTest {
 
     @Test
     public void testDomainRole() {
-        RoleManager rm = new DefaultRoleManager(3);
+        RoleManager rm = new DomainManager(3);
         rm.addLink("u1", "g1", "domain1");
         rm.addLink("u2", "g1", "domain1");
         rm.addLink("u3", "admin", "domain2");
@@ -197,5 +199,135 @@ public class RoleManagerUnitTest {
         TestUtil.testHasRole(rm, "u4", "g1", false);
         TestUtil.testHasRole(rm, "u4", "g2", false);
         TestUtil.testHasRole(rm, "u4", "g3", false);
+    }
+
+    @Test
+    public void testDomainPatternRole() {
+        DomainManager rm = new DomainManager(10);
+        rm.addDomainMatchingFunc("allMatch", BuiltInFunctions::allMatch);
+
+        rm.addLink("u1", "g1", "domain1");
+        rm.addLink("u2", "g1", "domain2");
+        rm.addLink("u3", "g1", "*");
+        rm.addLink("u4", "g2", "domain3");
+
+        // Current role inheritance tree after deleting the links:
+        //       domain1:g1    domain2:g1			domain3:g2
+        //		   /      \    /      \					|
+        //	 domain1:u1    *:g1     domain2:u2		domain3:u4
+        // 					|
+        // 				   *:u3
+
+        TestUtil.testHasRole(rm, "u1", "g1", "domain1", true);
+        TestUtil.testHasRole(rm, "u2", "g1", "domain1", false);
+        TestUtil.testHasRole(rm, "u2", "g1", "domain2", true);
+        TestUtil.testHasRole(rm, "u3", "g1", "domain1", true);
+        TestUtil.testHasRole(rm, "u3", "g1", "domain2", true);
+        TestUtil.testHasRole(rm, "u1", "g2", "domain1", false);
+        TestUtil.testHasRole(rm, "u4", "g2", "domain3", true);
+        TestUtil.testHasRole(rm, "u3", "g2", "domain3", false);
+
+        TestUtil.testGetRoles(rm, "u3", "domain1", Collections.singletonList("g1"));
+        TestUtil.testGetRoles(rm, "u1", "domain1", Collections.singletonList("g1"));
+        TestUtil.testGetRoles(rm, "u3", "domain2", Collections.singletonList("g1"));
+        TestUtil.testGetRoles(rm, "u1", "domain2", Collections.emptyList());
+        TestUtil.testGetRoles(rm, "u4", "domain3", Collections.singletonList("g2"));
+    }
+
+    @Test
+    public void testAllMatchingFunc() {
+        DefaultRoleManager rm = new DefaultRoleManager(10);
+        rm.addMatchingFunc("keyMatch2", BuiltInFunctions::keyMatch2);
+        rm.addDomainMatchingFunc("allMatch", BuiltInFunctions::allMatch);
+
+        rm.addLink("/book/:id", "book_group", "*");
+
+        TestUtil.testHasRole(rm, "/book/1", "book_group", "domain1", true);
+        TestUtil.testHasRole(rm, "/book/2", "book_group", "domain1", true);
+    }
+
+    @Test
+    public void testMatchingFuncOrder() {
+        DefaultRoleManager rm = new DefaultRoleManager(10);
+        rm.addMatchingFunc("regexMatch", BuiltInFunctions::regexMatch);
+
+        rm.addLink("u1", "g\\d+");
+        TestUtil.testHasRole(rm, "u1", "g1", true);
+        TestUtil.testHasRole(rm, "u1", "g2", true);
+
+        rm.clear();
+
+        rm.addLink("g\\d+", "root");
+        rm.addLink("u1", "g1");
+        TestUtil.testHasRole(rm, "u1", "root", true);
+
+        rm.clear();
+
+        rm.addLink("u1", "g1");
+        rm.addLink("g\\d+", "root");
+        TestUtil.testHasRole(rm, "u1", "root", true);
+    }
+
+    @Test
+    public void testDomainMatchingFuncWithDifferentDomain() {
+        DomainManager rm = new DomainManager(10);
+        rm.addDomainMatchingFunc("keyMatch", BuiltInFunctions::keyMatch);
+
+        rm.addLink("alice", "editor", "*");
+        rm.addLink("editor", "admin", "domain1");
+
+        TestUtil.testHasRole(rm, "alice", "admin", "domain1", true);
+        TestUtil.testHasRole(rm, "alice", "admin", "domain2", false);
+    }
+
+    @Test
+    public void testTemporaryRoles() {
+        DefaultRoleManager rm = new DefaultRoleManager(10);
+        rm.addMatchingFunc("regexMatch", BuiltInFunctions::regexMatch);
+
+        rm.addLink("u\\d+", "user");
+
+        for (int i = 0; i < 10; i++) {
+            TestUtil.testHasRole(rm, "u" + i, "user", true);
+        }
+
+        TestUtil.testGetUsers(rm, "user", Collections.singletonList("u\\d+"));
+        TestUtil.testGetRoles(rm, "u1", Collections.singletonList("user"));
+
+        rm.addLink("u1", "manager");
+
+        for (int i = 10; i < 20; i++) {
+            TestUtil.testHasRole(rm, "u" + i, "user", true);
+        }
+
+        TestUtil.testGetUsers(rm, "user", Arrays.asList("u\\d+", "u1"));
+        TestUtil.testGetRoles(rm, "u1", Arrays.asList("user", "manager"));
+    }
+
+    @Test
+    public void testMaxHierarchyLevel() {
+        DefaultRoleManager rm = new DefaultRoleManager(1);
+        rm.addLink("level0", "level1");
+        rm.addLink("level1", "level2");
+        rm.addLink("level2", "level3");
+
+        TestUtil.testHasRole(rm, "level0", "level0", true);
+        TestUtil.testHasRole(rm, "level0", "level1", true);
+        TestUtil.testHasRole(rm, "level0", "level2", false);
+        TestUtil.testHasRole(rm, "level0", "level3", false);
+        TestUtil.testHasRole(rm, "level1", "level2", true);
+        TestUtil.testHasRole(rm, "level1", "level3", false);
+
+        rm = new DefaultRoleManager(2);
+        rm.addLink("level0", "level1");
+        rm.addLink("level1", "level2");
+        rm.addLink("level2", "level3");
+
+        TestUtil.testHasRole(rm, "level0", "level0", true);
+        TestUtil.testHasRole(rm, "level0", "level1", true);
+        TestUtil.testHasRole(rm, "level0", "level2", true);
+        TestUtil.testHasRole(rm, "level0", "level3", false);
+        TestUtil.testHasRole(rm, "level1", "level2", true);
+        TestUtil.testHasRole(rm, "level1", "level3", true);
     }
 }

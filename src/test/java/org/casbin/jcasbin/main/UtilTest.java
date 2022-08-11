@@ -14,12 +14,11 @@
 
 package org.casbin.jcasbin.main;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
+import org.casbin.jcasbin.util.SyncedLRUCache;
 import org.casbin.jcasbin.util.Util;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class UtilTest {
 
@@ -73,5 +72,19 @@ public class UtilTest {
   @Test
   public void testReplaceEval() {
       Util.logPrint(Util.replaceEval("eval(test)", "testEval"));
+  }
+
+  @Test
+  public void testLruCache() {
+      SyncedLRUCache<String, Integer> cache = new SyncedLRUCache<>(3);
+      TestUtil.testCachePut(cache, "one", 1);
+      TestUtil.testCachePut(cache, "two", 2);
+      TestUtil.testCacheGet(cache, "one", 1, true);
+      TestUtil.testCachePut(cache, "three", 3);
+      TestUtil.testCachePut(cache, "four", 4);
+      TestUtil.testCacheGet(cache, "two", 2, false);
+      TestUtil.testCacheGet(cache, "one", 1, true);
+      TestUtil.testCacheGet(cache, "three", 3, true);
+      TestUtil.testCacheGet(cache, "four", 4, true);
   }
 }

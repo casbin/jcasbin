@@ -14,19 +14,24 @@
 
 package org.casbin.jcasbin.rbac;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Role represents the data structure for a role in RBAC.
  */
 class Role {
-    private String name;
-    private List<Role> roles;
+    private final String name;
+    final Map<String, Role> roles;
+    private final Map<String, Role> users;
+    private final Map<String, Role> matched;
+    private final Map<String, Role> matchedBy;
 
     protected Role(String name) {
         this.name = name;
-        roles = new ArrayList<>();
+        this.roles = new HashMap<>();
+        this.users = new HashMap<>();
+        this.matched = new HashMap<>();
+        this.matchedBy = new HashMap<>();
     }
 
     String getName() {
@@ -34,65 +39,93 @@ class Role {
     }
 
     void addRole(Role role) {
-        for (Role r : roles) {
-            if (r.name.equals(role.name)) {
-                return;
-            }
-        }
-
-        roles.add(role);
+        this.roles.put(role.name, role);
+        role.addUser(this);
     }
 
-    void deleteRole(Role role) {
-        for (Role r : roles) {
-            if (r.name.equals(role.name)) {
-                roles.remove(r);
-                return;
-            }
-        }
+    void removeRole(Role role) {
+        this.roles.remove(role.name);
+        role.removeUser(this);
     }
 
-    boolean hasRole(String name, int hierarchyLevel) {
-        if (this.name.equals(name)) {
-            return true;
-        }
-
-        if (hierarchyLevel <= 0) {
-            return false;
-        }
-
-        return roles.stream().anyMatch(r -> r.hasRole(name, hierarchyLevel - 1));
+    private void addUser(Role user) {
+        this.users.put(user.name, user);
     }
 
-    boolean hasDirectRole(String name) {
-        for (Role r : roles) {
-            if (r.name.equals(name)) {
-                return true;
-            }
-        }
+    private void removeUser(Role user) {
+        this.users.remove(user.name);
+    }
 
-        return false;
+    void addMatch(Role role) {
+        this.matched.put(role.name, role);
+        role.matchedBy.put(this.name, this);
+    }
+
+    void removeMatch(Role role) {
+        this.matched.remove(role.name);
+        role.matchedBy.remove(this.name);
+    }
+
+    void removeMatches() {
+        this.matched.values().forEach(this::removeMatch);
+        // https://stackoverflow.com/a/223929/10206831
+        for (Iterator<Role> iterator = this.matchedBy.values().iterator(); iterator.hasNext();) {
+            Role role = iterator.next();
+            role.matched.remove(this.name);
+            iterator.remove();
+        }
     }
 
     @Override
     public String toString() {
+        List<String> roles = getRoles();
+
+        if (roles.size() == 0) {
+            return "";
+        }
+
         StringBuilder names = new StringBuilder();
+        names.append(this.name).append(" < ");
+
+        if (roles.size() != 1) {
+            names.append("(");
+        }
+
         for (int i = 0; i < roles.size(); i++) {
-            Role role = roles.get(i);
+            String role = roles.get(i);
             if (i == 0) {
-                names.append(role.name);
+                names.append(role);
             } else {
-                names.append(", ").append(role.name);
+                names.append(", ").append(role);
             }
         }
-        return name + " < " + names;
+
+        if (roles.size() != 1) {
+            names.append(")");
+        }
+
+        return names.toString();
     }
 
     List<String> getRoles() {
-        List<String> names = new ArrayList<>();
-        for (Role r : roles) {
-            names.add(r.name);
-        }
-        return names;
+        return new ArrayList<>(getAllRoles().keySet());
+    }
+
+    List<String> getUsers() {
+        return new ArrayList<>(getAllUsers().keySet());
+    }
+
+    Map<String, Role> getAllRoles() {
+        Map<String, Role> allRoles = new HashMap<>(this.roles);
+        this.roles.values().forEach(role -> allRoles.putAll(role.matched));
+        this.matchedBy.values().forEach(role -> allRoles.putAll(role.roles));
+        return allRoles;
+    }
+
+    Map<String, Role> getAllUsers() {
+        Map<String, Role> allUsers = new HashMap<>(this.users);
+        this.users.values().forEach(role -> allUsers.putAll(role.matched));
+        this.matchedBy.values().forEach(role -> allUsers.putAll(role.users));
+        return allUsers;
     }
 }

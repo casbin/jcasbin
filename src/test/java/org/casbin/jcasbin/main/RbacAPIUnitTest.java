@@ -16,6 +16,7 @@ package org.casbin.jcasbin.main;
 
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
 import org.casbin.jcasbin.rbac.DefaultRoleManager;
+import org.casbin.jcasbin.rbac.DomainManager;
 import org.casbin.jcasbin.util.BuiltInFunctions;
 import org.casbin.jcasbin.util.Util;
 import org.junit.Test;
@@ -99,8 +100,8 @@ public class RbacAPIUnitTest {
 
         testGetRoles(e, "root", asList("admin"));
         testGetRoles(e, "^E\\d+$", asList("employee"));
-        testGetRoles(e, "E101", asList("^E\\d+$"));
-        assertEquals(e.getImplicitRolesForUser("E101"), asList("^E\\d+$", "employee"));
+        testGetRoles(e, "E101", asList("employee"));
+        assertEquals(e.getImplicitRolesForUser("E101"), asList("employee"));
 
         testEnforce(e, "E101", "data1", "read", true);
         testEnforce(e, "E101", "data1", "write", false);
@@ -108,8 +109,8 @@ public class RbacAPIUnitTest {
         e.addRoleForUser("^E\\d+$", "admin");
 
         testGetRoles(e, "^E\\d+$", asList("employee","admin"));
-        testGetRoles(e, "E101", asList("^E\\d+$"));
-        assertEquals(e.getImplicitRolesForUser("E101"), asList("^E\\d+$", "employee", "admin"));
+        testGetRoles(e, "E101", asList("employee", "admin"));
+        assertEquals(e.getImplicitRolesForUser("E101"), asList("employee", "admin"));
 
         testEnforce(e, "E101", "data1", "read", true);
         testEnforce(e, "E101", "data1", "write", true);
@@ -117,8 +118,8 @@ public class RbacAPIUnitTest {
         e.deleteRoleForUser("^E\\d+$", "admin");
 
         testGetRoles(e, "^E\\d+$", asList("employee"));
-        testGetRoles(e, "E101", asList("^E\\d+$"));
-        assertEquals(e.getImplicitRolesForUser("E101"), asList("^E\\d+$", "employee"));
+        testGetRoles(e, "E101", asList("employee"));
+        assertEquals(e.getImplicitRolesForUser("E101"), asList("employee"));
 
         testEnforce(e, "E101", "data1", "read", true);
         testEnforce(e, "E101", "data1", "write", false);

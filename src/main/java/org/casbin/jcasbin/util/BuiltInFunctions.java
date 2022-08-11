@@ -326,7 +326,7 @@ public class BuiltInFunctions {
      * @return whether key1 matches key2.
      */
     public static boolean allMatch(String key1, String key2) {
-        if ("*".equals(key1) || "*".equals(key2)) {
+        if ("*".equals(key2)) {
             return true;
         }
 

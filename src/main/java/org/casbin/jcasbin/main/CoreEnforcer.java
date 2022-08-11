@@ -18,13 +18,6 @@ import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiPredicate;
-
 import org.casbin.jcasbin.effect.DefaultEffector;
 import org.casbin.jcasbin.effect.Effect;
 import org.casbin.jcasbin.effect.Effector;
@@ -35,16 +28,18 @@ import org.casbin.jcasbin.exception.CasbinMatcherException;
 import org.casbin.jcasbin.model.Assertion;
 import org.casbin.jcasbin.model.FunctionMap;
 import org.casbin.jcasbin.model.Model;
-import org.casbin.jcasbin.persist.Adapter;
-import org.casbin.jcasbin.persist.Dispatcher;
-import org.casbin.jcasbin.persist.FilteredAdapter;
-import org.casbin.jcasbin.persist.Watcher;
-import org.casbin.jcasbin.persist.WatcherEx;
-import org.casbin.jcasbin.rbac.DefaultRoleManager;
+import org.casbin.jcasbin.persist.*;
+import org.casbin.jcasbin.rbac.DomainManager;
 import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.BuiltInFunctions;
 import org.casbin.jcasbin.util.EnforceContext;
 import org.casbin.jcasbin.util.Util;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiPredicate;
 
 /**
  * CoreEnforcer defines the core functionality of an enforcer.
@@ -323,7 +318,7 @@ public class CoreEnforcer {
             if (rmMap.containsKey(ptype)) {
                 rmMap.get(ptype).clear();
             } else {
-                rmMap.put(ptype, new DefaultRoleManager(10));
+                rmMap.put(ptype, new DomainManager(10));
             }
         }
     }
@@ -625,7 +620,7 @@ public class CoreEnforcer {
      */
     public boolean addNamedMatchingFunc(String ptype, String name, BiPredicate<String, String> fn){
         if(rmMap.containsKey(ptype)){
-            DefaultRoleManager rm = (DefaultRoleManager) rmMap.get(ptype);
+            DomainManager rm = (DomainManager) rmMap.get(ptype);
             rm.addMatchingFunc(name, fn);
             clearRmMap();
             if(autoBuildRoleLinks){
@@ -641,7 +636,7 @@ public class CoreEnforcer {
      */
     public boolean addNamedDomainMatchingFunc(String ptype, String name, BiPredicate<String, String> fn){
         if(rmMap.containsKey(ptype)){
-            DefaultRoleManager rm = (DefaultRoleManager) rmMap.get(ptype);
+            DomainManager rm = (DomainManager) rmMap.get(ptype);
             rm.addDomainMatchingFunc(name, fn);
             clearRmMap();
             if(autoBuildRoleLinks){

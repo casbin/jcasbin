@@ -199,12 +199,41 @@ public class CoreEnforcer {
     }
 
     /**
+     * getRoleManager gets the current role manager.
+     *
+     * @return the role manager.
+     */
+    public RoleManager getRoleManager() {
+        return rmMap.get("g");
+    }
+
+    /**
+     * getNamedRoleManager gets the role manager for the named policy.
+     *
+     * @param ptype the policy type.
+     * @return the role manager.
+     */
+    public RoleManager getNamedRoleManager(String ptype) {
+        return rmMap.get(ptype);
+    }
+
+    /**
      * setRoleManager sets the current role manager for g.
      *
      * @param rm the role manager.
      */
     public void setRoleManager(RoleManager rm) {
         setRoleManager("g", rm);
+    }
+
+    /**
+     * setNamedRoleManager sets the role manager for the named policy.
+     *
+     * @param ptype the policy type.
+     * @param rm the role manager.
+     */
+    public void setNamedRoleManager(String ptype, RoleManager rm) {
+        setRoleManager(ptype, rm);
     }
 
     /**

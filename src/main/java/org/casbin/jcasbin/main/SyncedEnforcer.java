@@ -211,7 +211,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<String> getAllSubjects() {
-        return runSynchronized(this::getAllSubjects);
+        return runSynchronized(super::getAllSubjects);
     }
 
     /**
@@ -224,7 +224,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<String> getAllObjects() {
-        return runSynchronized(this::getAllObjects);
+        return runSynchronized(super::getAllObjects);
     }
 
     /**
@@ -251,7 +251,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<String> getAllActions() {
-        return runSynchronized(this::getAllActions);
+        return runSynchronized(super::getAllActions);
     }
 
     /**
@@ -278,7 +278,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<String> getAllRoles() {
-        return runSynchronized(this::getAllRoles);
+        return runSynchronized(super::getAllRoles);
     }
 
     /**
@@ -302,7 +302,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<List<String>> getPolicy() {
-        return runSynchronized(this::getPolicy);
+        return runSynchronized(super::getPolicy);
     }
 
     /**
@@ -350,7 +350,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<List<String>> getGroupingPolicy() {
-        return runSynchronized(this::getGroupingPolicy);
+        return runSynchronized(super::getGroupingPolicy);
     }
 
     /**

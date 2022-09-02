@@ -1326,7 +1326,6 @@ public class SyncedEnforcer extends Enforcer {
     private <T> T runSynchronized(Supplier<T> action, Lock lock) {
         try {
             lock.lock();
-            READ_WRITE_LOCK.readLock().lock();
             return action.get();
         } finally {
             lock.unlock();

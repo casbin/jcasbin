@@ -18,6 +18,7 @@ import org.casbin.jcasbin.model.Assertion;
 import org.casbin.jcasbin.model.Model;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.casbin.jcasbin.util.Util.splitCommaDelimited;
 
@@ -40,9 +41,8 @@ public class Helper {
         String key = tokens[0];
         String sec = key.substring(0, 1);
         Assertion ast = model.model.get(sec).get(key);
-        ast.policy.add(Arrays.asList(Arrays.copyOfRange(tokens, 1, tokens.length)));
-        for (int i = 0; i < ast.policy.size(); ++i) {
-            ast.policyIndex.put(ast.policy.get(i).toString(), i);
-        }
+        List<String> policy = Arrays.asList(Arrays.copyOfRange(tokens, 1, tokens.length));
+        ast.policy.add(policy);
+        ast.policyIndex.put(policy.toString(), ast.policy.size() - 1);
     }
 }

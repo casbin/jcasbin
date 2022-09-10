@@ -16,8 +16,6 @@ package org.casbin.jcasbin.util;
 
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
-import com.googlecode.aviator.runtime.RuntimeUtils;
-import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.AbstractVariadicFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.*;
@@ -153,7 +151,7 @@ public class BuiltInFunctions {
         Map<String, String> params = new HashMap<>();
         for (String token : tokens) {
             if (p.matcher(token).matches()) {
-                while (i < values.length && values[i].equals("")) {
+                while (i < values.length && "".equals(values[i])) {
                     i++;
                 }
                 if (i == values.length) {
@@ -242,7 +240,7 @@ public class BuiltInFunctions {
         }
         for (int i = 0; i < keysList.size(); i++) {
             if (pathVar.equals(keysList.get(i).substring(1))) {
-                return valuesList.get(i+1);
+                return valuesList.get(i + 1);
             }
         }
         return "";
@@ -334,26 +332,26 @@ public class BuiltInFunctions {
     }
 
 
-    public static class GenerateGFunctionClass{
+    public static class GenerateGFunctionClass {
         // key:name such as g,g2  value:user-role mapping
-        private static Map<String, Map<String, AviatorBoolean>> memorizedMap = new HashMap<>();
+        private static Map<String, Map<String, AviatorBoolean>> memorizedMap = Collections.synchronizedMap(new HashMap<>());
 
         /**
          * generateGFunction is the factory method of the g(_, _) function.
          *
          * @param name the name of the g(_, _) function, can be "g", "g2", ..
-         * @param rm the role manager used by the function.
+         * @param rm   the role manager used by the function.
          * @return the function.
          */
         public static AviatorFunction generateGFunction(String name, RoleManager rm) {
-            memorizedMap.put(name,new HashMap<>());
+            memorizedMap.put(name, new HashMap<>());
 
             return new AbstractVariadicFunction() {
                 @Override
                 public AviatorObject variadicCall(Map<String, Object> env, AviatorObject... args) {
                     Map<String, AviatorBoolean> memorized = memorizedMap.get(name);
                     int len = args.length;
-                    if(len < 2){
+                    if (len < 2) {
                         return AviatorBoolean.valueOf(false);
                     }
                     String name1 = FunctionUtils.getStringValue(args[0], env);
@@ -364,11 +362,12 @@ public class BuiltInFunctions {
                         String name = FunctionUtils.getStringValue(arg, env);
                         key += ";" + name;
                     }
-                    if (memorized.containsKey(key)) {
-                        return memorized.get(key);
+
+                    AviatorBoolean value = memorized.get(key);
+                    if (value != null) {
+                        return value;
                     }
 
-                    AviatorBoolean value;
                     if (rm == null) {
                         value = AviatorBoolean.valueOf(name1.equals(name2));
                     } else if (len == 2) {
@@ -390,6 +389,7 @@ public class BuiltInFunctions {
             };
         }
     }
+
     /**
      * eval calculates the stringified boolean expression and return its result.
      *

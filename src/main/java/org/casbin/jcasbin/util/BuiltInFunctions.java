@@ -25,6 +25,7 @@ import inet.ipaddr.IPAddressString;
 import org.casbin.jcasbin.rbac.RoleManager;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -334,7 +335,7 @@ public class BuiltInFunctions {
 
     public static class GenerateGFunctionClass {
         // key:name such as g,g2  value:user-role mapping
-        private static Map<String, Map<String, AviatorBoolean>> memorizedMap = Collections.synchronizedMap(new HashMap<>());
+        private static Map<String, Map<String, AviatorBoolean>> memorizedMap = new ConcurrentHashMap<>();
 
         /**
          * generateGFunction is the factory method of the g(_, _) function.

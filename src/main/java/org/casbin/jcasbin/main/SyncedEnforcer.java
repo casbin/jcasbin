@@ -1195,21 +1195,16 @@ public class SyncedEnforcer extends Enforcer {
     }
 
     /**
-     * getUsersForRoleInDomain gets the users that has a role inside a domain.
+     * getUsersForRoleInDomain gets the users that a role has inside a domain.
      *
-     * @param name   the user.
+     * @param name   the role.
      * @param domain the domain.
-     * @return the users for role in a domain.
+     * @return the users that the role has in the domain.
      */
-//    @Override
-//    public List<String> getUsersForRoleInDomain(String name, String domain) {
-//        try {
-//            READ_WRITE_LOCK.readLock().lock();
-//            return super.getUsersForRoleInDomain(name, domain);
-//        } finally {
-//            READ_WRITE_LOCK.readLock().unlock();
-//        }
-//    }
+    @Override
+    public List<String> getUsersForRoleInDomain(String name, String domain) {
+        return runSynchronized(() -> super.getUsersForRoleInDomain(name, domain), READ_WRITE_LOCK.readLock());
+    }
 
     /**
      * getRolesForUserInDomain gets the roles that a user has inside a domain.

@@ -17,8 +17,7 @@ package org.casbin.jcasbin.main;
 import org.junit.Test;
 
 import static java.util.Arrays.asList;
-import static org.casbin.jcasbin.main.TestUtil.testGetPermissionsInDomain;
-import static org.casbin.jcasbin.main.TestUtil.testGetRolesInDomain;
+import static org.casbin.jcasbin.main.TestUtil.*;
 
 public class SyncedRbacAPIWithDomainsUnitTest {
     @Test
@@ -47,6 +46,35 @@ public class SyncedRbacAPIWithDomainsUnitTest {
         testGetRolesInDomain(e, "bob", "domain2", asList("admin"));
         testGetRolesInDomain(e, "admin", "domain2", asList());
         testGetRolesInDomain(e, "non_exist", "domain2", asList());
+    }
+
+    @Test
+    public void testUserAPIWithDomains() {
+        Enforcer e = new SyncedEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv");
+
+        testGetUsersInDomain(e, "alice", "domain1", asList());
+        testGetUsersInDomain(e, "bob", "domain1", asList());
+        testGetUsersInDomain(e, "admin", "domain1", asList("alice"));
+        testGetUsersInDomain(e, "non_exist", "domain1", asList());
+
+        testGetUsersInDomain(e, "alice", "domain2", asList());
+        testGetUsersInDomain(e, "bob", "domain2", asList());
+        testGetUsersInDomain(e, "admin", "domain2", asList("bob"));
+        testGetUsersInDomain(e, "non_exist", "domain2", asList());
+
+        e.deleteRoleForUserInDomain("alice", "admin", "domain1");
+        e.addRoleForUserInDomain("alice", "admin", "domain2");
+        e.addRoleForUserInDomain("bob", "admin", "domain1");
+
+        testGetUsersInDomain(e, "alice", "domain1", asList());
+        testGetUsersInDomain(e, "bob", "domain1", asList());
+        testGetUsersInDomain(e, "admin", "domain1", asList("bob"));
+        testGetUsersInDomain(e, "non_exist", "domain1", asList());
+
+        testGetUsersInDomain(e, "alice", "domain2", asList());
+        testGetUsersInDomain(e, "bob", "domain2", asList());
+        testGetUsersInDomain(e, "admin", "domain2", asList("bob", "alice"));
+        testGetUsersInDomain(e, "non_exist", "domain2", asList());
     }
 
     @Test

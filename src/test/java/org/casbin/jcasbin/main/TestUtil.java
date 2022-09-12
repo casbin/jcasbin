@@ -209,6 +209,15 @@ public class TestUtil {
         }
     }
 
+    static void testGetUsersInDomain(Enforcer e, String name, String domain, List<String> res) {
+        List<String> myRes = e.getUsersForRoleInDomain(name, domain);
+        Util.logPrint("Roles for " + name + " under " + domain + ": " + myRes);
+
+        if (!Util.setEquals(res, myRes)) {
+            fail("Roles for " + name + " under " + domain + ": " + myRes + ", supposed to be " + res);
+        }
+    }
+
     static void testGetPermissionsInDomain(Enforcer e, String name, String domain, List<List<String>> res) {
         List<List<String>> myRes = e.getPermissionsForUserInDomain(name, domain);
         Util.logPrint("Permissions for " + name + " under " + domain + ": " + myRes);

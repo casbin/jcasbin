@@ -86,6 +86,20 @@ public class RbacAPIWithPatternMatchUnitTest {
     }
 
     @Test
+    public void testUserAPIWithDomainMatch() {
+        final Enforcer e = new Enforcer("examples/rbac_with_domain_pattern_model.conf", "examples/rbac_with_domain_pattern_policy.csv");
+        e.setRoleManager(new DomainManager(10, null, BuiltInFunctions::allMatch));
+        e.loadPolicy();
+
+        testGetUsersInDomain(e, "admin", "domain1", asList("alice"));
+        testGetUsersInDomain(e, "admin", "domain2", asList("alice", "bob"));
+        testGetUsersInDomain(e, "admin", "any_domain", asList("alice"));
+
+        testGetUsersInDomain(e, "bob", "domain1", asList());
+        testGetUsersInDomain(e, "alice", "domain2", asList());
+    }
+
+    @Test
     public void testImplicitPermissionAPIWithDomainMatch() {
         final Enforcer e = new Enforcer("examples/rbac_with_domain_pattern_model.conf");
         e.setAdapter(new FileAdapter("examples/rbac_with_domain_pattern_policy.csv"));

@@ -419,6 +419,21 @@ public class Enforcer extends ManagementEnforcer {
     }
 
     /**
+     * getUsersForRoleInDomain gets the users that a role has inside a domain.
+     *
+     * @param name   the role.
+     * @param domain the domain.
+     * @return the users that the role has in the domain.
+     */
+    public List<String> getUsersForRoleInDomain(String name, String domain) {
+        try {
+            return model.model.get("g").get("g").rm.getUsers(name, domain);
+        } catch (CasbinNameNotExistException ignored) {
+        }
+        return Collections.emptyList();
+    }
+
+    /**
      * getRolesForUserInDomain gets the roles that a user has inside a domain.
      *
      * @param name the user.

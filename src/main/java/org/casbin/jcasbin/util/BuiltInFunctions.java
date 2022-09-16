@@ -345,7 +345,7 @@ public class BuiltInFunctions {
          * @return the function.
          */
         public static AviatorFunction generateGFunction(String name, RoleManager rm) {
-            memorizedMap.put(name, new HashMap<>());
+            memorizedMap.put(name, new ConcurrentHashMap<>());
 
             return new AbstractVariadicFunction() {
                 @Override

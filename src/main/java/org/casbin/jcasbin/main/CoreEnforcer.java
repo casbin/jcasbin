@@ -35,10 +35,7 @@ import org.casbin.jcasbin.util.BuiltInFunctions;
 import org.casbin.jcasbin.util.EnforceContext;
 import org.casbin.jcasbin.util.Util;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiPredicate;
 
 /**
@@ -428,14 +425,15 @@ public class CoreEnforcer {
 
     /**
      * enforce use a custom matcher to decide whether a "subject" can access a "object" with the operation "action",
-     * input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "" or null.
+     * input parameters are usually: (matcher, explain, sub, obj, act), use model matcher by default when matcher is "" or null.
      *
      * @param matcher the custom matcher.
+     * @param explain to explain enforcement by informing matched rules
      * @param rvals   the request needs to be mediated, usually an array
      *                of strings, can be class instances if ABAC is used.
      * @return whether to allow the request.
      */
-    private boolean enforce(String matcher, Object... rvals) {
+    private boolean enforce(String matcher, List<String> explain, Object... rvals) {
         if (!enabled) {
             return true;
         }
@@ -499,7 +497,7 @@ public class CoreEnforcer {
 
         Effect[] policyEffects;
         float[] matcherResults;
-        int policyLen;
+        int policyLen, explainIndex = -1;
         if ((policyLen = model.model.get("p").get(pType).policy.size()) != 0) {
             policyEffects = new Effect[policyLen];
             matcherResults = new float[policyLen];
@@ -555,6 +553,7 @@ public class CoreEnforcer {
                 if (streamEffector != null) {
                     boolean done = streamEffector.push(policyEffects[i], i, policyLen);
                     if (done) {
+                        explainIndex = i;
                         break;
                     }
                 } else {
@@ -603,19 +602,11 @@ public class CoreEnforcer {
             result = eft.mergeEffects(model.model.get("e").get(eType).value, policyEffects, matcherResults);
         }
 
-        StringBuilder reqStr = new StringBuilder("Request: ");
-        for (int i = 0; i < rvals.length; i++) {
-            String rval = rvals[i].toString();
-
-            if (i != rvals.length - 1) {
-                reqStr.append(String.format("%s, ", rval));
-            } else {
-                reqStr.append(String.format("%s", rval));
-            }
+        if (explain != null && explainIndex != -1) {
+            explain.addAll(model.model.get("p").get(pType).policy.get(explainIndex));
         }
-        reqStr.append(String.format(" ---> %s", result));
-        Util.logPrint(reqStr.toString());
 
+        Util.logEnforce(rvals, result, explain);
         return result;
     }
 
@@ -628,7 +619,7 @@ public class CoreEnforcer {
      * @return whether to allow the request.
      */
     public boolean enforce(Object... rvals) {
-        return enforce(null, rvals);
+        return enforce(null, null, rvals);
     }
 
     /**
@@ -641,7 +632,36 @@ public class CoreEnforcer {
      * @return whether to allow the request.
      */
     public boolean enforceWithMatcher(String matcher, Object... rvals) {
-        return enforce(matcher, rvals);
+        return enforce(matcher, null, rvals);
+    }
+
+    /**
+     * enforceEx decides whether a "subject" can access "object" with
+     * the operation "action", input parameters are usually: (sub, obj, act).
+     * the list explain, store matching rule.
+     *
+     * @param rvals the request needs to be mediated, usually an array
+     *              of strings, can be class instances if ABAC is used.
+     * @return whether to allow the request.
+     */
+    public boolean enforceEx(Object... rvals) {
+        List<String> explain = new ArrayList<>();
+        return enforce("", explain, rvals);
+    }
+
+    /**
+     * enforceExWithMatcher use a custom matcher to decide whether a "subject" can access a "object" with the operation "action",
+     * input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "" or null.
+     * the list explain, store matching rule.
+     *
+     * @param matcher the custom matcher.
+     * @param rvals   the request needs to be mediated, usually an array
+     *                of strings, can be class instances if ABAC is used.
+     * @return whether to allow the request.
+     */
+    public boolean enforceExWithMatcher(String matcher, Object... rvals) {
+        List<String> explain = new ArrayList<>();
+        return enforce(matcher, explain, rvals);
     }
 
     /**

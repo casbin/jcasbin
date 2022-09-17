@@ -25,11 +25,7 @@ import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.LinkedHashSet;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -88,6 +84,22 @@ public class Util {
     public static void logPrintfError(String format, Object... v) {
         if (enableLog) {
             LOGGER.error(format, v);
+        }
+    }
+
+    /**
+     * logEnforce prints the log of Enforce.
+     *
+     * @param request the Enforce request.
+     * @param result  the Enforce result.
+     * @param explain to explain enforcement by matched rules.
+     */
+    public static void logEnforce(Object[] request, boolean result, List<String> explain) {
+        if (enableLog) {
+            LOGGER.info("Request: " + Arrays.toString(request) + " ---> " + result);
+            if (explain != null) {
+                LOGGER.info("Hit Policy: " + explain);
+            }
         }
     }
 

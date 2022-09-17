@@ -181,6 +181,35 @@ public class SyncedEnforcer extends Enforcer {
     }
 
     /**
+     * enforceEx decides whether a "subject" can access "object" with
+     * the operation "action", input parameters are usually: (sub, obj, act).
+     * the list explain, store matching rule.
+     *
+     * @param rvals the request needs to be mediated, usually an array
+     *              of strings, can be class instances if ABAC is used.
+     * @return whether to allow the request.
+     */
+    @Override
+    public boolean enforceEx(Object... rvals) {
+        return runSynchronized(() -> super.enforceEx(rvals), READ_WRITE_LOCK.readLock());
+    }
+
+    /**
+     * enforceExWithMatcher use a custom matcher to decide whether a "subject" can access a "object" with the operation "action",
+     * input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "" or null.
+     * the list explain, store matching rule.
+     *
+     * @param matcher the custom matcher.
+     * @param rvals   the request needs to be mediated, usually an array
+     *                of strings, can be class instances if ABAC is used.
+     * @return whether to allow the request.
+     */
+    @Override
+    public boolean enforceExWithMatcher(String matcher, Object... rvals) {
+        return runSynchronized(() -> super.enforceExWithMatcher(matcher, rvals), READ_WRITE_LOCK.readLock());
+    }
+
+    /**
      * batchEnforce enforce in batches
      *
      * @param rules the rules.

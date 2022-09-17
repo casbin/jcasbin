@@ -24,8 +24,8 @@ import java.io.IOException;
 
 import static java.util.Arrays.asList;
 import static org.casbin.jcasbin.main.CoreEnforcer.newModel;
-import static org.casbin.jcasbin.main.TestUtil.testEnforce;
-import static org.casbin.jcasbin.main.TestUtil.testGetPolicy;
+import static org.casbin.jcasbin.main.TestUtil.*;
+import static org.casbin.jcasbin.main.TestUtil.testEnforceEx;
 
 public class SyncedEnforcerUnitTest {
     @Test
@@ -256,6 +256,36 @@ public class SyncedEnforcerUnitTest {
         testEnforce(e, "bob", "data1", "write", false);
         testEnforce(e, "bob", "data2", "read", false);
         testEnforce(e, "bob", "data2", "write", true);
+    }
+
+    @Test
+    public void testEnforceExLog() {
+        Enforcer e = new SyncedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv", true);
+
+        // the previous matcher is
+        // m = r.sub == p.sub && r.obj == p.obj && r.act == p.act
+        testEnforceEx(e, "alice", "data1", "read", true);
+        testEnforceEx(e, "bob", "data2", "write", true);
+        testEnforceEx(e, "root", "data2", "read", false);
+        testEnforceEx(e, "root", "data3", "read", false);
+        testEnforceEx(e, "jack", "data3", "read", false);
+
+        // custom matcher
+        String matcher = "m = r.sub == 'root' || r.sub == p.sub && r.obj == p.obj && r.act == p.act";
+        TestUtil.testEnforceExWithMatcher(e, matcher, "alice", "data1", "read", true);
+        TestUtil.testEnforceExWithMatcher(e, matcher, "bob", "data2", "write", true);
+        TestUtil.testEnforceExWithMatcher(e, matcher, "root", "data2", "read", true);
+        TestUtil.testEnforceExWithMatcher(e, matcher, "root", "data3", "read", true);
+        TestUtil.testEnforceExWithMatcher(e, matcher, "jack", "data3", "read", false);
+
+        // the previous matcher is
+        // m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
+        e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv", true);
+        testEnforceEx(e, "alice", "data1", "read", true);
+        testEnforceEx(e, "alice", "data2", "read", true);
+        testEnforceEx(e, "alice", "data2", "write", true);
+        testEnforceEx(e, "bob", "data1", "write", false);
+        testEnforceEx(e, "bob", "data2", "write", true);
     }
 
     @Test

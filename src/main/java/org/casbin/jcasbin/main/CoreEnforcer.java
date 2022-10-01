@@ -258,7 +258,9 @@ public class CoreEnforcer {
         model.sortPoliciesByPriority();
 
         clearRmMap();
-        model.printPolicy();
+        if (Util.enableLog) {
+            model.printPolicy();
+        }
         if (autoBuildRoleLinks) {
             buildRoleLinks();
         }
@@ -285,7 +287,9 @@ public class CoreEnforcer {
         model.sortPoliciesByPriority();
 
         initRmMap();
-        model.printPolicy();
+        if (Util.enableLog) {
+            model.printPolicy();
+        }
         if (autoBuildRoleLinks) {
             buildRoleLinks();
         }

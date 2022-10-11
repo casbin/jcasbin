@@ -56,7 +56,7 @@ public class DefaultEffector implements Effector {
                     break;
                 }
             }
-        } else if (expr.equals("priority(p_eft) || deny")) {
+        } else if (expr.equals("priority(p_eft) || deny") || expr.equals("subjectPriority(p_eft) || deny")) {
             result = false;
             for (Effect eft : effects) {
                 if (eft != Effect.Indeterminate) {

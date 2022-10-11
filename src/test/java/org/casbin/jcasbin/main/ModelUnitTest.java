@@ -422,10 +422,26 @@ public class ModelUnitTest {
     }
 
     @Test
+    public void testPriorityHierachyModel(){
+        Enforcer e = new Enforcer("examples/priority_hierachy_policy.conf", "examples/priority_hierachy_policy.csv");
+
+        testEnforce(e, "alice", "data1", "read", true);
+        testEnforce(e, "jane", "data1", "read", true);
+    }
+
+    @Test
     public void testPriorityModelIndeterminate() {
         Enforcer e = new Enforcer("examples/priority_model.conf", "examples/priority_indeterminate_policy.csv");
 
         testEnforce(e, "alice", "data1", "read", false);
+    }
+
+    @Test
+    public void testSubjectPriorityWithDomain() {
+        Enforcer e = new Enforcer("examples/subject_priority_model_with_domain.conf", "examples/subject_priority_policy_with_domain.csv");
+
+        testDomainEnforce(e, "alice", "domain1", "data1", "write", true);
+        testDomainEnforce(e, "bob", "domain2", "data2", "write", true);
     }
 
     @Test

@@ -17,8 +17,11 @@ package org.casbin.jcasbin.model;
 import org.casbin.jcasbin.config.Config;
 import org.casbin.jcasbin.util.Util;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.casbin.jcasbin.util.Util.splitCommaDelimited;
@@ -40,6 +43,9 @@ public class Model extends Policy {
 
     // used by CoreEnforcer to detect changes to Model
     protected int modCount;
+    private int domainIndex = -1;
+    private String defaultDomain = "";
+    private String defaultSeparator = "::";
 
     public Model() {
         model = new HashMap<>();
@@ -227,6 +233,79 @@ public class Model extends Policy {
                 assertion.policyIndex.put(assertion.policy.get(i).toString(), i);
             }
         }
+    }
+
+    /**
+     * sort policies by hieraichy map
+     */
+    public void sortPoliciesBySubjectHieraichy() {
+        if (model.get("e") == null || (!"subjectPriority(p_eft) || deny".equals(model.get("e").get("e").value))) {
+            return;
+        }
+        
+        for (Map.Entry<String, Assertion> entry : model.get("p").entrySet()) {
+            Map<String, Integer> subjectHierarchyMap = getSubjectHierarchyMap(model.get("g").get("g").policy);
+            Assertion assertion = entry.getValue();
+            domainIndex = -1;
+            for(int i=0; i<assertion.tokens.length; i++){
+                if(assertion.tokens[i].equals(assertion.key+"_dom")){
+                    domainIndex = i;
+                    break;
+                }
+            }
+            Collections.sort(assertion.policy, (o1, o2)->{
+                String domain1 = domainIndex!=-1 ? o1.get(domainIndex) : defaultDomain;
+                String domain2 = domainIndex!=-1 ? o2.get(domainIndex) : defaultDomain;
+                int priority1 = subjectHierarchyMap.get(getNameWithDomain(domain1, o1.get(0)));
+                int priority2 = subjectHierarchyMap.get(getNameWithDomain(domain2, o2.get(0)));
+                return priority2-priority1;
+            });
+        }
+
+    }
+
+    public Map<String, Integer> getSubjectHierarchyMap(List<List<String>> policies) {
+        Map<String, Integer> subjectHierarchyMap = new HashMap<>();
+        Map<String, String> policyMap = new HashMap<>();
+        String domain = defaultDomain;
+        
+        for(List<String> policy:policies) {
+            if(policy.size()!=2) {
+                domain = policy.get(2);
+            }
+            String child = getNameWithDomain(domain, policy.get(0));
+            String parent = getNameWithDomain(domain, policy.get(1));
+            policyMap.put(child, parent);
+            if(!subjectHierarchyMap.containsKey(child)) {
+                subjectHierarchyMap.put(child, 0);
+            }
+            if(!subjectHierarchyMap.containsKey(parent)) {
+                subjectHierarchyMap.put(parent, 0);
+            }
+            subjectHierarchyMap.replace(child, 1);
+        }
+        List<String> set = new ArrayList<>();
+        for (String key : subjectHierarchyMap.keySet()) {
+            if (subjectHierarchyMap.get(key) != 0) set.add(key);
+        }
+        while (!set.isEmpty()){
+            String child = set.get(0);
+            findHierarchy(policyMap, subjectHierarchyMap, set, child);
+        }
+        return subjectHierarchyMap;
+    }
+
+    private void findHierarchy(Map<String, String> policyMap, Map<String, Integer> subjectHierarchyMap, List<String> set, String child) {
+        set.remove(child);
+        String parent = policyMap.get(child);
+        if (set.contains(parent)) {
+            findHierarchy(policyMap, subjectHierarchyMap, set, parent);
+        }
+        subjectHierarchyMap.replace(child, subjectHierarchyMap.get(parent)+10);
+    }
+
+    public String getNameWithDomain(String domain, String name) {
+        return domain + defaultSeparator + name;
     }
 
     public enum PolicyOperations {

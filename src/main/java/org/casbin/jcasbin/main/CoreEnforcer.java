@@ -259,6 +259,7 @@ public class CoreEnforcer {
         model.clearPolicy();
         adapter.loadPolicy(model);
         model.sortPoliciesByPriority();
+        model.sortPoliciesBySubjectHieraichy();
 
         clearRmMap();
         if (Util.enableLog) {
@@ -288,6 +289,7 @@ public class CoreEnforcer {
             e.printStackTrace();
         }
         model.sortPoliciesByPriority();
+        model.sortPoliciesBySubjectHieraichy();
 
         initRmMap();
         if (Util.enableLog) {

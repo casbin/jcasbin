@@ -188,7 +188,7 @@ public class SyncedEnforcer extends Enforcer {
      *
      * @param rvals the request needs to be mediated, usually an array
      *              of strings, can be class instances if ABAC is used.
-     * @return whether to allow the request.
+     * @return EnforceEx explain enforcement by informing matched rules.
      */
     @Override
     public Logger enforceEx(Object... rvals) {

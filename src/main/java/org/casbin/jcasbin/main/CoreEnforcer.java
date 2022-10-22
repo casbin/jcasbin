@@ -651,7 +651,7 @@ public class CoreEnforcer {
      *
      * @param rvals the request needs to be mediated, usually an array
      *              of strings, can be class instances if ABAC is used.
-     * @return whether to allow the request.
+     * @return Logger which carry explain and result
      */
     public Logger enforceEx(Object... rvals) {
         List<String> explain = new ArrayList<>();

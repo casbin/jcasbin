@@ -36,7 +36,7 @@ public class TestUtil {
     }
 
     static void testEnforceEx(Enforcer e, Object sub, Object obj, String act, boolean res) {
-        assertEquals(res, e.enforceEx(sub, obj, act));
+        assertEquals(res, e.enforceEx(sub, obj, act).isResult());
     }
 
     static void testEnforceEx2(Enforcer e, Object sub, Object obj, String act ,String[] ans) {

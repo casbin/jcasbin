@@ -190,7 +190,7 @@ public class SyncedEnforcer extends Enforcer {
      * @return whether to allow the request.
      */
     @Override
-    public boolean enforceEx(Object... rvals) {
+    public EnforceResult enforceEx(Object... rvals) {
         return runSynchronized(() -> super.enforceEx(rvals), READ_WRITE_LOCK.readLock());
     }
 
@@ -205,7 +205,7 @@ public class SyncedEnforcer extends Enforcer {
      * @return whether to allow the request.
      */
     @Override
-    public boolean enforceExWithMatcher(String matcher, Object... rvals) {
+    public EnforceResult enforceExWithMatcher(String matcher, Object... rvals) {
         return runSynchronized(() -> super.enforceExWithMatcher(matcher, rvals), READ_WRITE_LOCK.readLock());
     }
 

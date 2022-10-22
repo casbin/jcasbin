@@ -337,6 +337,42 @@ public class EnforcerUnitTest {
     }
 
     @Test
+    public void TestEnforceEx(){
+        Enforcer e = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv", true);
+
+        testEnforceEx2(e, "alice", "data1", "read", new String[]{"alice", "data1", "read"});
+        testEnforceEx2(e, "alice", "data1", "write", new String[]{});
+        testEnforceEx2(e, "alice", "data2", "read",new String[]{});
+        testEnforceEx2(e, "alice", "data2", "write", new String[]{});
+        testEnforceEx2(e, "bob", "data1", "read", new String[]{});
+        testEnforceEx2(e, "bob", "data1", "write", new String[]{});
+        testEnforceEx2(e, "bob", "data2", "read", new String[]{});
+        testEnforceEx2(e, "bob", "data2", "write",  new String[]{"bob", "data2", "write"});
+
+        e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv", true);
+
+        testEnforceEx2(e, "alice", "data1", "read", new String[]{"alice", "data1", "read"});
+        testEnforceEx2(e, "alice", "data1", "write", new String[]{});
+        testEnforceEx2(e, "alice", "data2", "read", new String[]{"data2_admin", "data2", "read"});
+        testEnforceEx2(e, "alice", "data2", "write", new String[]{"data2_admin", "data2", "write"});
+        testEnforceEx2(e, "bob", "data1", "read", new String[]{});
+        testEnforceEx2(e, "bob", "data1", "write", new String[]{});
+        testEnforceEx2(e, "bob", "data2", "read", new String[]{});
+        testEnforceEx2(e, "bob", "data2", "write",new String[]{"bob", "data2", "write"});
+
+        e = new Enforcer("examples/priority_model.conf", "examples/priority_policy.csv", true);
+
+        testEnforceEx2(e, "alice", "data1", "read", new String[]{"alice", "data1", "read", "allow"});
+        testEnforceEx2(e, "alice", "data1", "write", new String[]{"data1_deny_group", "data1", "write", "deny"});
+        testEnforceEx2(e, "alice", "data2", "read", new String[]{});
+        testEnforceEx2(e, "alice", "data2", "write", new String[]{});
+        testEnforceEx2(e, "bob", "data1", "write", new String[]{});
+        testEnforceEx2(e, "bob", "data2", "read", new String[]{"data2_allow_group", "data2", "read", "allow"});
+        testEnforceEx2(e, "bob", "data2", "write", new String[]{"bob", "data2", "write", "deny"});
+
+    }
+
+    @Test
     public void testEnableAutoSave() {
         Enforcer e = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv");
 

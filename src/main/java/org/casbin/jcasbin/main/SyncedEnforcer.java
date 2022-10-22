@@ -14,6 +14,7 @@
 
 package org.casbin.jcasbin.main;
 
+import org.casbin.jcasbin.entity.Logger;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.Watcher;
@@ -190,7 +191,7 @@ public class SyncedEnforcer extends Enforcer {
      * @return whether to allow the request.
      */
     @Override
-    public boolean enforceEx(Object... rvals) {
+    public Logger enforceEx(Object... rvals) {
         return runSynchronized(() -> super.enforceEx(rvals), READ_WRITE_LOCK.readLock());
     }
 

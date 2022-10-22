@@ -22,6 +22,7 @@ import org.casbin.jcasbin.effect.DefaultEffector;
 import org.casbin.jcasbin.effect.Effect;
 import org.casbin.jcasbin.effect.Effector;
 import org.casbin.jcasbin.effect.StreamEffector;
+import org.casbin.jcasbin.entity.Logger;
 import org.casbin.jcasbin.exception.CasbinAdapterException;
 import org.casbin.jcasbin.exception.CasbinEffectorException;
 import org.casbin.jcasbin.exception.CasbinMatcherException;
@@ -57,6 +58,8 @@ public class CoreEnforcer {
     boolean autoBuildRoleLinks;
     boolean autoNotifyWatcher = true;
     boolean autoNotifyDispatcher = true;
+
+    Logger logger;
 
     private AviatorEvaluatorInstance aviatorEval;
 
@@ -648,9 +651,12 @@ public class CoreEnforcer {
      *              of strings, can be class instances if ABAC is used.
      * @return whether to allow the request.
      */
-    public boolean enforceEx(Object... rvals) {
+    public Logger enforceEx(Object... rvals) {
         List<String> explain = new ArrayList<>();
-        return enforce("", explain, rvals);
+        Logger logger = new Logger();
+        logger.setResult(enforce("", explain, rvals));
+        logger.setExplain(explain);
+        return logger;
     }
 
     /**

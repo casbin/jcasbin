@@ -39,6 +39,12 @@ public class TestUtil {
         assertEquals(res, e.enforceEx(sub, obj, act));
     }
 
+    static void testEnforceEx2(Enforcer e, Object sub, Object obj, String act ,String[] ans) {
+        List<String> explain = e.enforceEx(sub, obj, act).getExplain();
+        for(int i=0;i< ans.length;i++){
+            assertEquals(ans[i], explain.get(i));
+        }
+    }
     static void testEnforceExWithMatcher(Enforcer e, String matcher, Object sub, Object obj, String act, boolean res) {
         assertEquals(res, e.enforceExWithMatcher(matcher, sub, obj, act));
     }

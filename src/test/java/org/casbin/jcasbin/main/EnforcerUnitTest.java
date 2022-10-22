@@ -312,11 +312,11 @@ public class EnforcerUnitTest {
 
         // the previous matcher is
         // m = r.sub == p.sub && r.obj == p.obj && r.act == p.act
-        testEnforceEx(e, "alice", "data1", "read", true);
-        testEnforceEx(e, "bob", "data2", "write", true);
-        testEnforceEx(e, "root", "data2", "read", false);
-        testEnforceEx(e, "root", "data3", "read", false);
-        testEnforceEx(e, "jack", "data3", "read", false);
+        testEnforceExlog(e, "alice", "data1", "read", true);
+        testEnforceExlog(e, "bob", "data2", "write", true);
+        testEnforceExlog(e, "root", "data2", "read", false);
+        testEnforceExlog(e, "root", "data3", "read", false);
+        testEnforceExlog(e, "jack", "data3", "read", false);
 
         // custom matcher
         String matcher = "m = r.sub == 'root' || r.sub == p.sub && r.obj == p.obj && r.act == p.act";
@@ -329,46 +329,46 @@ public class EnforcerUnitTest {
         // the previous matcher is
         // m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
         e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv", true);
-        testEnforceEx(e, "alice", "data1", "read", true);
-        testEnforceEx(e, "alice", "data2", "read", true);
-        testEnforceEx(e, "alice", "data2", "write", true);
-        testEnforceEx(e, "bob", "data1", "write", false);
-        testEnforceEx(e, "bob", "data2", "write", true);
+        testEnforceExlog(e, "alice", "data1", "read", true);
+        testEnforceExlog(e, "alice", "data2", "read", true);
+        testEnforceExlog(e, "alice", "data2", "write", true);
+        testEnforceExlog(e, "bob", "data1", "write", false);
+        testEnforceExlog(e, "bob", "data2", "write", true);
     }
 
     @Test
     public void TestEnforceEx(){
         Enforcer e = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv", true);
 
-        testEnforceEx2(e, "alice", "data1", "read", new String[]{"alice", "data1", "read"});
-        testEnforceEx2(e, "alice", "data1", "write", new String[]{});
-        testEnforceEx2(e, "alice", "data2", "read",new String[]{});
-        testEnforceEx2(e, "alice", "data2", "write", new String[]{});
-        testEnforceEx2(e, "bob", "data1", "read", new String[]{});
-        testEnforceEx2(e, "bob", "data1", "write", new String[]{});
-        testEnforceEx2(e, "bob", "data2", "read", new String[]{});
-        testEnforceEx2(e, "bob", "data2", "write",  new String[]{"bob", "data2", "write"});
+        testEnforceEx(e, "alice", "data1", "read", new String[]{"alice", "data1", "read"});
+        testEnforceEx(e, "alice", "data1", "write", new String[]{});
+        testEnforceEx(e, "alice", "data2", "read",new String[]{});
+        testEnforceEx(e, "alice", "data2", "write", new String[]{});
+        testEnforceEx(e, "bob", "data1", "read", new String[]{});
+        testEnforceEx(e, "bob", "data1", "write", new String[]{});
+        testEnforceEx(e, "bob", "data2", "read", new String[]{});
+        testEnforceEx(e, "bob", "data2", "write",  new String[]{"bob", "data2", "write"});
 
         e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv", true);
 
-        testEnforceEx2(e, "alice", "data1", "read", new String[]{"alice", "data1", "read"});
-        testEnforceEx2(e, "alice", "data1", "write", new String[]{});
-        testEnforceEx2(e, "alice", "data2", "read", new String[]{"data2_admin", "data2", "read"});
-        testEnforceEx2(e, "alice", "data2", "write", new String[]{"data2_admin", "data2", "write"});
-        testEnforceEx2(e, "bob", "data1", "read", new String[]{});
-        testEnforceEx2(e, "bob", "data1", "write", new String[]{});
-        testEnforceEx2(e, "bob", "data2", "read", new String[]{});
-        testEnforceEx2(e, "bob", "data2", "write",new String[]{"bob", "data2", "write"});
+        testEnforceEx(e, "alice", "data1", "read", new String[]{"alice", "data1", "read"});
+        testEnforceEx(e, "alice", "data1", "write", new String[]{});
+        testEnforceEx(e, "alice", "data2", "read", new String[]{"data2_admin", "data2", "read"});
+        testEnforceEx(e, "alice", "data2", "write", new String[]{"data2_admin", "data2", "write"});
+        testEnforceEx(e, "bob", "data1", "read", new String[]{});
+        testEnforceEx(e, "bob", "data1", "write", new String[]{});
+        testEnforceEx(e, "bob", "data2", "read", new String[]{});
+        testEnforceEx(e, "bob", "data2", "write",new String[]{"bob", "data2", "write"});
 
         e = new Enforcer("examples/priority_model.conf", "examples/priority_policy.csv", true);
 
-        testEnforceEx2(e, "alice", "data1", "read", new String[]{"alice", "data1", "read", "allow"});
-        testEnforceEx2(e, "alice", "data1", "write", new String[]{"data1_deny_group", "data1", "write", "deny"});
-        testEnforceEx2(e, "alice", "data2", "read", new String[]{});
-        testEnforceEx2(e, "alice", "data2", "write", new String[]{});
-        testEnforceEx2(e, "bob", "data1", "write", new String[]{});
-        testEnforceEx2(e, "bob", "data2", "read", new String[]{"data2_allow_group", "data2", "read", "allow"});
-        testEnforceEx2(e, "bob", "data2", "write", new String[]{"bob", "data2", "write", "deny"});
+        testEnforceEx(e, "alice", "data1", "read", new String[]{"alice", "data1", "read", "allow"});
+        testEnforceEx(e, "alice", "data1", "write", new String[]{"data1_deny_group", "data1", "write", "deny"});
+        testEnforceEx(e, "alice", "data2", "read", new String[]{});
+        testEnforceEx(e, "alice", "data2", "write", new String[]{});
+        testEnforceEx(e, "bob", "data1", "write", new String[]{});
+        testEnforceEx(e, "bob", "data2", "read", new String[]{"data2_allow_group", "data2", "read", "allow"});
+        testEnforceEx(e, "bob", "data2", "write", new String[]{"bob", "data2", "write", "deny"});
 
     }
 

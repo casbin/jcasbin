@@ -35,11 +35,11 @@ public class TestUtil {
         assertEquals(res, e.enforceWithMatcher(matcher, sub, obj, act));
     }
 
-    static void testEnforceEx(Enforcer e, Object sub, Object obj, String act, boolean res) {
+    static void testEnforceExlog(Enforcer e, Object sub, Object obj, String act, boolean res) {
         assertEquals(res, e.enforceEx(sub, obj, act).isResult());
     }
 
-    static void testEnforceEx2(Enforcer e, Object sub, Object obj, String act ,String[] ans) {
+    static void testEnforceEx(Enforcer e, Object sub, Object obj, String act ,String[] ans) {
         List<String> explain = e.enforceEx(sub, obj, act).getExplain();
         for(int i=0;i< ans.length;i++){
             assertEquals(ans[i], explain.get(i));

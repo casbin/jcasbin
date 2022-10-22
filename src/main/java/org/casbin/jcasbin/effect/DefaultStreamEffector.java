@@ -53,6 +53,7 @@ public class DefaultStreamEffector implements StreamEffector {
                 }
                 break;
             case "priority(p_eft) || deny":
+            case "subjectPriority(p_eft) || deny":
                 if (eft != Effect.Indeterminate) {
                     this.effect = eft == Effect.Allow;
                     this.done = true;

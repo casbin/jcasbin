@@ -264,28 +264,28 @@ public class SyncedEnforcerUnitTest {
 
         // the previous matcher is
         // m = r.sub == p.sub && r.obj == p.obj && r.act == p.act
-        testEnforceEx(e, "alice", "data1", "read", true);
-        testEnforceEx(e, "bob", "data2", "write", true);
-        testEnforceEx(e, "root", "data2", "read", false);
-        testEnforceEx(e, "root", "data3", "read", false);
-        testEnforceEx(e, "jack", "data3", "read", false);
+        testEnforceEx(e, "alice", "data1", "read", true, new String[]{"alice", "data1", "read"});
+        testEnforceEx(e, "bob", "data2", "write", true, new String[]{"bob", "data2", "write"});
+        testEnforceEx(e, "root", "data2", "read", false, new String[]{});
+        testEnforceEx(e, "root", "data3", "read", false, new String[]{});
+        testEnforceEx(e, "jack", "data3", "read", false, new String[]{});
 
         // custom matcher
         String matcher = "m = r.sub == 'root' || r.sub == p.sub && r.obj == p.obj && r.act == p.act";
-        TestUtil.testEnforceExWithMatcher(e, matcher, "alice", "data1", "read", true);
-        TestUtil.testEnforceExWithMatcher(e, matcher, "bob", "data2", "write", true);
-        TestUtil.testEnforceExWithMatcher(e, matcher, "root", "data2", "read", true);
-        TestUtil.testEnforceExWithMatcher(e, matcher, "root", "data3", "read", true);
-        TestUtil.testEnforceExWithMatcher(e, matcher, "jack", "data3", "read", false);
+        TestUtil.testEnforceExWithMatcher(e, matcher, "alice", "data1", "read", true, new String[]{"alice", "data1", "read"});
+        TestUtil.testEnforceExWithMatcher(e, matcher, "bob", "data2", "write", true, new String[]{"bob", "data2", "write"});
+        TestUtil.testEnforceExWithMatcher(e, matcher, "root", "data2", "read", true, new String[]{});
+        TestUtil.testEnforceExWithMatcher(e, matcher, "root", "data3", "read", true, new String[]{});
+        TestUtil.testEnforceExWithMatcher(e, matcher, "jack", "data3", "read", false, new String[]{});
 
         // the previous matcher is
         // m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
-        e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv", true);
-        testEnforceEx(e, "alice", "data1", "read", true);
-        testEnforceEx(e, "alice", "data2", "read", true);
-        testEnforceEx(e, "alice", "data2", "write", true);
-        testEnforceEx(e, "bob", "data1", "write", false);
-        testEnforceEx(e, "bob", "data2", "write", true);
+        e = new SyncedEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv", true);
+        testEnforceEx(e, "alice", "data1", "read", true, new String[]{"alice", "data1", "read"});
+        testEnforceEx(e, "alice", "data2", "read", true, new String[]{"data2_admin", "data2", "read"});
+        testEnforceEx(e, "alice", "data2", "write", true, new String[]{"data2_admin", "data2", "write"});
+        testEnforceEx(e, "bob", "data1", "write", false, new String[]{});
+        testEnforceEx(e, "bob", "data2", "write", true, new String[]{"bob", "data2", "write"});
     }
 
     @Test

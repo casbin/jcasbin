@@ -35,12 +35,20 @@ public class TestUtil {
         assertEquals(res, e.enforceWithMatcher(matcher, sub, obj, act));
     }
 
-    static void testEnforceEx(Enforcer e, Object sub, Object obj, String act, boolean res) {
-        assertEquals(res, e.enforceEx(sub, obj, act));
+    static void testEnforceEx(Enforcer e, Object sub, Object obj, String act, boolean res, String[] explain) {
+        EnforceResult enforceResult = e.enforceEx(sub, obj, act);
+        assertEquals(res, enforceResult.isAllow());
+        for (int i = 0; i < explain.length; i++) {
+            assertEquals(explain[i], enforceResult.getExplain().get(i));
+        }
     }
 
-    static void testEnforceExWithMatcher(Enforcer e, String matcher, Object sub, Object obj, String act, boolean res) {
-        assertEquals(res, e.enforceExWithMatcher(matcher, sub, obj, act));
+    static void testEnforceExWithMatcher(Enforcer e, String matcher, Object sub, Object obj, String act, boolean res, String[] explain) {
+        EnforceResult enforceResult = e.enforceExWithMatcher(matcher, sub, obj, act);
+        assertEquals(res, enforceResult.isAllow());
+        for (int i = 0; i < explain.length; i++) {
+            assertEquals(explain[i], enforceResult.getExplain().get(i));
+        }
     }
 
     static void testEnforceWithoutUsers(Enforcer e, String obj, String act, boolean res) {

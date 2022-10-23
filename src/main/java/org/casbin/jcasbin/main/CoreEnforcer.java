@@ -434,14 +434,13 @@ public class CoreEnforcer {
      * input parameters are usually: (matcher, explain, sub, obj, act), use model matcher by default when matcher is "" or null.
      *
      * @param matcher the custom matcher.
-     * @param explain to explain enforcement by informing matched rules
      * @param rvals   the request needs to be mediated, usually an array
      *                of strings, can be class instances if ABAC is used.
      * @return whether to allow the request.
      */
-    private boolean enforce(String matcher, List<String> explain, Object... rvals) {
+    private EnforceResult enforce(String matcher, Object... rvals) {
         if (!enabled) {
-            return true;
+            return new EnforceResult(true, new ArrayList<>(Collections.singletonList("The enforcer is not enable, allow all request")));
         }
 
         boolean compileCached = true;
@@ -608,12 +607,13 @@ public class CoreEnforcer {
             result = eft.mergeEffects(model.model.get("e").get(eType).value, policyEffects, matcherResults);
         }
 
-        if (explain != null && explainIndex != -1) {
+        List<String> explain = new ArrayList<>();
+        if (explainIndex != -1) {
             explain.addAll(model.model.get("p").get(pType).policy.get(explainIndex));
         }
 
         Util.logEnforce(rvals, result, explain);
-        return result;
+        return new EnforceResult(result, explain);
     }
 
     /**
@@ -625,7 +625,7 @@ public class CoreEnforcer {
      * @return whether to allow the request.
      */
     public boolean enforce(Object... rvals) {
-        return enforce(null, null, rvals);
+        return enforce(null, rvals).isAllow();
     }
 
     /**
@@ -638,7 +638,7 @@ public class CoreEnforcer {
      * @return whether to allow the request.
      */
     public boolean enforceWithMatcher(String matcher, Object... rvals) {
-        return enforce(matcher, null, rvals);
+        return enforce(matcher, rvals).isAllow();
     }
 
     /**
@@ -650,9 +650,8 @@ public class CoreEnforcer {
      *              of strings, can be class instances if ABAC is used.
      * @return whether to allow the request.
      */
-    public boolean enforceEx(Object... rvals) {
-        List<String> explain = new ArrayList<>();
-        return enforce("", explain, rvals);
+    public EnforceResult enforceEx(Object... rvals) {
+        return enforce(null, rvals);
     }
 
     /**
@@ -665,9 +664,8 @@ public class CoreEnforcer {
      *                of strings, can be class instances if ABAC is used.
      * @return whether to allow the request.
      */
-    public boolean enforceExWithMatcher(String matcher, Object... rvals) {
-        List<String> explain = new ArrayList<>();
-        return enforce(matcher, explain, rvals);
+    public EnforceResult enforceExWithMatcher(String matcher, Object... rvals) {
+        return enforce(matcher, rvals);
     }
 
     /**

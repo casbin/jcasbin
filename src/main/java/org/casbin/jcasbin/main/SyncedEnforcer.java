@@ -391,7 +391,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<String> getRolesForUser(String name) {
-        return runSynchronized(() -> super.getRolesForUser(name), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.getRolesForUser(name), READ_WRITE_LOCK.writeLock());
     }
 
     /**

@@ -507,6 +507,14 @@ public class CoreEnforcer {
             policyEffects = new Effect[policyLen];
             matcherResults = new float[policyLen];
 
+            //check the invalid data
+            for (int i = 0; i < model.model.get("p").get(pType).policy.size(); i++) {
+                List<String> pvals = model.model.get("p").get(pType).policy.get(i);
+                if(pvals.size()!=model.model.get("p").get(pType).tokens.length) {
+                    Util.logPrintfError("policy: "+pvals + " is not valid. Please check the correspondence between policy and matchers!");
+                }
+            }
+
             for (int i = 0; i < model.model.get("p").get(pType).policy.size(); i++) {
                 List<String> pvals = model.model.get("p").get(pType).policy.get(i);
 
@@ -514,9 +522,14 @@ public class CoreEnforcer {
                 // Select the rule based on request size
                 Map<String, Object> parameters = new HashMap<>();
                 getRTokens(parameters, rvals);
-                for (int j = 0; j < model.model.get("p").get(pType).tokens.length; j++) {
-                    String token = model.model.get("p").get(pType).tokens[j];
-                    parameters.put(token, pvals.get(j));
+                if(pvals.size()!=model.model.get("p").get(pType).tokens.length) {
+                    //skip the invalid data
+                    continue;
+                }else {
+                    for (int j = 0; j < model.model.get("p").get(pType).tokens.length; j++) {
+                        String token = model.model.get("p").get(pType).tokens[j];
+                        parameters.put(token, pvals.get(j));
+                    }
                 }
 
                 Object result = expression.execute(parameters);

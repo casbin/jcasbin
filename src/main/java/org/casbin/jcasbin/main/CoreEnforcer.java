@@ -503,35 +503,28 @@ public class CoreEnforcer {
         Effect[] policyEffects;
         float[] matcherResults;
         int policyLen, explainIndex = -1;
-        if ((policyLen = model.model.get("p").get(pType).policy.size()) != 0) {
+        List<List<String>> policy = model.model.get("p").get(pType).policy;
+        String[] policyTokens = model.model.get("p").get(pType).tokens;
+        if ((policyLen = policy.size()) != 0) {
             policyEffects = new Effect[policyLen];
             matcherResults = new float[policyLen];
 
-            //check the invalid data
-            for (int i = 0; i < model.model.get("p").get(pType).policy.size(); i++) {
-                List<String> pvals = model.model.get("p").get(pType).policy.get(i);
-                if(pvals.size()!=model.model.get("p").get(pType).tokens.length) {
-                    Util.logPrintfError("policy: "+pvals + " is not valid. Please check the correspondence between policy and matchers!");
-                }
-            }
-
-            for (int i = 0; i < model.model.get("p").get(pType).policy.size(); i++) {
-                List<String> pvals = model.model.get("p").get(pType).policy.get(i);
+            for (int i = 0; i < policy.size(); i++) {
+                List<String> pvals = policy.get(i);
 
                 // Util.logPrint("Policy Rule: " + pvals);
                 // Select the rule based on request size
                 Map<String, Object> parameters = new HashMap<>();
                 getRTokens(parameters, rvals);
-                if(pvals.size()!=model.model.get("p").get(pType).tokens.length) {
+                if(pvals.size() != policyTokens.length) {
+                    Util.logPrintfError("policy: "+pvals + " is not valid. Please check the correspondence between policy and matchers!");
                     //skip the invalid data
                     continue;
-                }else {
-                    for (int j = 0; j < model.model.get("p").get(pType).tokens.length; j++) {
-                        String token = model.model.get("p").get(pType).tokens[j];
-                        parameters.put(token, pvals.get(j));
-                    }
                 }
-
+                for (int j = 0; j < policyTokens.length; j++) {
+                    String token = policyTokens[j];
+                    parameters.put(token, pvals.get(j));
+                }
                 Object result = expression.execute(parameters);
                 // Util.logPrint("Result: " + result);
 
@@ -589,8 +582,8 @@ public class CoreEnforcer {
                 String token = model.model.get("r").get(rType).tokens[j];
                 parameters.put(token, rvals[j]);
             }
-            for (int j = 0; j < model.model.get("p").get(pType).tokens.length; j++) {
-                String token = model.model.get("p").get(pType).tokens[j];
+            for (int j = 0; j < policyTokens.length; j++) {
+                String token = policyTokens[j];
                 parameters.put(token, "");
             }
 
@@ -617,12 +610,12 @@ public class CoreEnforcer {
         if (streamEffector != null && streamEffector.current() != null) {
             result = streamEffector.current().hasEffect();
         } else {
-            result = eft.mergeEffects(model.model.get("e").get(eType).value, policyEffects, matcherResults);
+            result = this.eft.mergeEffects(model.model.get("e").get(eType).value, policyEffects, matcherResults);
         }
 
         List<String> explain = new ArrayList<>();
         if (explainIndex != -1) {
-            explain.addAll(model.model.get("p").get(pType).policy.get(explainIndex));
+            explain.addAll(policy.get(explainIndex));
         }
 
         Util.logEnforce(rvals, result, explain);

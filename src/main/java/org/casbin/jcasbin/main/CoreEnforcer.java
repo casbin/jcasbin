@@ -509,6 +509,11 @@ public class CoreEnforcer {
 
             for (int i = 0; i < model.model.get("p").get(pType).policy.size(); i++) {
                 List<String> pvals = model.model.get("p").get(pType).policy.get(i);
+                if (model.model.get("p").get(pType).tokens.length != pvals.size()) {
+                    Util.logPrintfError("invalid request size: expected {}, got {}, rvals: {}",
+                        model.model.get("p").get(pType).tokens.length,pvals.size(),pvals);
+                    throw new CasbinMatcherException("invalid policy");
+                }
 
                 // Util.logPrint("Policy Rule: " + pvals);
                 // Select the rule based on request size

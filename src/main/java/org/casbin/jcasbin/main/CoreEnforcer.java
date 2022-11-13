@@ -18,6 +18,7 @@ import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
+import com.mysql.cj.util.StringUtils;
 import org.casbin.jcasbin.effect.DefaultEffector;
 import org.casbin.jcasbin.effect.Effect;
 import org.casbin.jcasbin.effect.Effector;
@@ -510,9 +511,8 @@ public class CoreEnforcer {
             for (int i = 0; i < model.model.get("p").get(pType).policy.size(); i++) {
                 List<String> pvals = model.model.get("p").get(pType).policy.get(i);
                 if (model.model.get("p").get(pType).tokens.length != pvals.size()) {
-                    Util.logPrintfError("invalid request size: expected {}, got {}, rvals: {}",
-                        model.model.get("p").get(pType).tokens.length,pvals.size(),pvals);
-                    throw new CasbinMatcherException("invalid policy");
+                    throw new CasbinMatcherException("invalid request size: expected "+model.model.get("p").get(pType).tokens.length+
+                        ", got "+pvals.size()+", rvals: "+ Arrays.toString(rvals));
                 }
 
                 // Util.logPrint("Policy Rule: " + pvals);

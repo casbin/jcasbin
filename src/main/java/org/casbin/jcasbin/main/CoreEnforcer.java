@@ -18,7 +18,6 @@ import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
-import com.mysql.cj.util.StringUtils;
 import org.casbin.jcasbin.effect.DefaultEffector;
 import org.casbin.jcasbin.effect.Effect;
 import org.casbin.jcasbin.effect.Effector;

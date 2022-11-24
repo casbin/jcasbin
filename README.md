@@ -140,7 +140,7 @@ https://casbin.org/docs/en/tutorials
 
 ## Get started
 
-1. New a jCasbin enforcer with a model file and a policy file:
+1. Create a jCasbin enforcer with a model file and a policy file:
 
     ```java
     Enforcer enforcer = new Enforcer("path/to/model.conf", "path/to/policy.csv");

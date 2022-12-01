@@ -535,7 +535,7 @@ public class CoreEnforcer {
                     if (streamEffector == null) {
                         continue;
                     }
-                } else if (result instanceof Float) {
+                } else if (result instanceof Double || result instanceof Long) {
                     if ((float) result == 0) {
                         policyEffects[i] = Effect.Indeterminate;
                     } else {
@@ -546,7 +546,7 @@ public class CoreEnforcer {
                         continue;
                     }
                 } else {
-                    throw new CasbinMatcherException("matcher result should be bool, int or float");
+                    throw new CasbinMatcherException("matcher result should be Boolean, Double or Long");
                 }
                 if (policyEffects[i] == Effect.Allow && parameters.containsKey(pType + "_eft")) {
                     String eft = (String) parameters.get(pType + "_eft");

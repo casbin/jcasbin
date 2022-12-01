@@ -103,8 +103,8 @@ public class CoreEnforcer {
      * newModel creates a model.
      *
      * @param modelPath the path of the model file.
-     * @param unused unused parameter, just for differentiating with
-     *               newModel(String text).
+     * @param unused    unused parameter, just for differentiating with
+     *                  newModel(String text).
      * @return the model.
      */
     public static Model newModel(String modelPath, String unused) {
@@ -227,7 +227,7 @@ public class CoreEnforcer {
      * setNamedRoleManager sets the role manager for the named policy.
      *
      * @param ptype the policy type.
-     * @param rm the role manager.
+     * @param rm    the role manager.
      */
     public void setNamedRoleManager(String ptype, RoleManager rm) {
         setRoleManager(ptype, rm);
@@ -355,11 +355,11 @@ public class CoreEnforcer {
         }
     }
 
-    private void initBuiltInFunction(){
+    private void initBuiltInFunction() {
         for (Map.Entry<String, AviatorFunction> entry : fm.fm.entrySet()) {
             AviatorFunction function = entry.getValue();
 
-            if(aviatorEval.containsFunction(function.getName())){
+            if (aviatorEval.containsFunction(function.getName())) {
                 aviatorEval.removeFunction(function.getName());
             }
             aviatorEval.addFunction(function);
@@ -444,10 +444,10 @@ public class CoreEnforcer {
         }
 
         boolean compileCached = true;
-        if(fm.isModify){
+        if (fm.isModify) {
             compileCached = false;
             initBuiltInFunction();
-            fm.isModify=false;
+            fm.isModify = false;
         }
         Map<String, AviatorFunction> gFunctions = new HashMap<>();
         if (model.model.containsKey("g")) {
@@ -489,7 +489,7 @@ public class CoreEnforcer {
 
         expString = Util.convertInSyntax(expString);
         // Use md5 encryption as cacheKey to prevent expString from being too long
-        Expression expression = aviatorEval.compile(Util.md5(expString),expString, compileCached);
+        Expression expression = aviatorEval.compile(Util.md5(expString), expString, compileCached);
 
         StreamEffector streamEffector = null;
         try {
@@ -510,8 +510,8 @@ public class CoreEnforcer {
             for (int i = 0; i < model.model.get("p").get(pType).policy.size(); i++) {
                 List<String> pvals = model.model.get("p").get(pType).policy.get(i);
                 if (model.model.get("p").get(pType).tokens.length != pvals.size()) {
-                    throw new CasbinMatcherException("invalid request size: expected "+model.model.get("p").get(pType).tokens.length+
-                        ", got "+pvals.size()+", rvals: "+ Arrays.toString(rvals));
+                    throw new CasbinMatcherException("invalid request size: expected " + model.model.get("p").get(pType).tokens.length +
+                        ", got " + pvals.size() + ", rvals: " + Arrays.toString(rvals));
                 }
 
                 // Util.logPrint("Policy Rule: " + pvals);
@@ -535,18 +535,18 @@ public class CoreEnforcer {
                     if (streamEffector == null) {
                         continue;
                     }
-                } else if (result instanceof Float) {
-                    if ((float) result == 0) {
+                } else if (result instanceof Double || result instanceof Long) {
+                    if (((Number) result).floatValue() == 0) {
                         policyEffects[i] = Effect.Indeterminate;
                     } else {
-                        matcherResults[i] = (float) result;
+                        matcherResults[i] = ((Number) result).floatValue();
                         policyEffects[i] = Effect.Allow;
                     }
                     if (streamEffector == null) {
                         continue;
                     }
                 } else {
-                    throw new CasbinMatcherException("matcher result should be bool, int or float");
+                    throw new CasbinMatcherException("matcher result should be Boolean, Double or Long");
                 }
                 if (policyEffects[i] == Effect.Allow && parameters.containsKey(pType + "_eft")) {
                     String eft = (String) parameters.get(pType + "_eft");
@@ -675,12 +675,12 @@ public class CoreEnforcer {
     /**
      * addNamedMatchingFunc add MatchingFunc by ptype RoleManager
      */
-    public boolean addNamedMatchingFunc(String ptype, String name, BiPredicate<String, String> fn){
-        if(rmMap.containsKey(ptype)){
+    public boolean addNamedMatchingFunc(String ptype, String name, BiPredicate<String, String> fn) {
+        if (rmMap.containsKey(ptype)) {
             DomainManager rm = (DomainManager) rmMap.get(ptype);
             rm.addMatchingFunc(name, fn);
             clearRmMap();
-            if(autoBuildRoleLinks){
+            if (autoBuildRoleLinks) {
                 buildRoleLinks();
             }
             return true;
@@ -691,12 +691,12 @@ public class CoreEnforcer {
     /**
      * addNamedMatchingFunc add MatchingFunc by ptype RoleManager
      */
-    public boolean addNamedDomainMatchingFunc(String ptype, String name, BiPredicate<String, String> fn){
-        if(rmMap.containsKey(ptype)){
+    public boolean addNamedDomainMatchingFunc(String ptype, String name, BiPredicate<String, String> fn) {
+        if (rmMap.containsKey(ptype)) {
             DomainManager rm = (DomainManager) rmMap.get(ptype);
             rm.addDomainMatchingFunc(name, fn);
             clearRmMap();
-            if(autoBuildRoleLinks){
+            if (autoBuildRoleLinks) {
                 buildRoleLinks();
             }
             return true;
@@ -763,6 +763,6 @@ public class CoreEnforcer {
     }
 
     protected boolean mustUseDispatcher() {
-       return this.dispatcher != null && this.autoNotifyDispatcher;
+        return this.dispatcher != null && this.autoNotifyDispatcher;
     }
 }

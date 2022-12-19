@@ -7,16 +7,18 @@
 [![Maven Central](https://img.shields.io/maven-central/v/org.casbin/jcasbin.svg)](https://mvnrepository.com/artifact/org.casbin/jcasbin/latest)
 [![Release](https://img.shields.io/github/release/casbin/jcasbin.svg)](https://github.com/casbin/jcasbin/releases/latest)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/casbin/lobby)
-
-💖 [**Looking for an open-source identity and access management solution like Okta, Auth0, Keycloak ? Learn more about: Casdoor**](https://casdoor.org/)
+💖 [**Looking for an open-source identity and access management solution like Okta, Auth0, Keycloak ? Learn more about:
+Casdoor**](https://casdoor.org/)
 
 <a href="https://casdoor.org/"><img src="https://user-images.githubusercontent.com/3787410/147868267-6ac74908-5654-4f9c-ac79-8852af9ff925.png" alt="casdoor" style="width: 50%; height: 50%"/></a>
 
-**News**: still worry about how to write the correct jCasbin policy? `Casbin online editor` is coming to help! Try it at: http://casbin.org/editor/
+**News**: still worry about how to write the correct jCasbin policy? `Casbin online editor` is coming to help! Try it
+at: http://casbin.org/editor/
 
 ![casbin Logo](casbin-logo.png)
 
-jCasbin is a powerful and efficient open-source access control library for Java projects. It provides support for enforcing authorization based on various [access control models](https://en.wikipedia.org/wiki/Computer_security_model).
+jCasbin is a powerful and efficient open-source access control library for Java projects. It provides support for
+enforcing authorization based on various [access control models](https://en.wikipedia.org/wiki/Computer_security_model).
 
 ## All the languages supported by Casbin:
 
@@ -53,18 +55,24 @@ jCasbin is a powerful and efficient open-source access control library for Java 
 1. [**ACL (Access Control List)**](https://en.wikipedia.org/wiki/Access_control_list)
 2. **ACL with [superuser](https://en.wikipedia.org/wiki/Superuser)**
 3. **ACL without users**: especially useful for systems that don't have authentication or user log-ins.
-4. **ACL without resources**: some scenarios may target for a type of resources instead of an individual resource by using permissions like `write-article`, `read-log`. It doesn't control the access to a specific article or log.
+4. **ACL without resources**: some scenarios may target for a type of resources instead of an individual resource by
+   using permissions like `write-article`, `read-log`. It doesn't control the access to a specific article or log.
 5. **[RBAC (Role-Based Access Control)](https://en.wikipedia.org/wiki/Role-based_access_control)**
 6. **RBAC with resource roles**: both users and resources can have roles (or groups) at the same time.
 7. **RBAC with domains/tenants**: users can have different role sets for different domains/tenants.
-8. **[ABAC (Attribute-Based Access Control)](https://en.wikipedia.org/wiki/Attribute-Based_Access_Control)**: syntax sugar like `resource.Owner` can be used to get the attribute for a resource.
-9. **[RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer)**: supports paths like `/res/*`, `/res/:id` and HTTP methods like `GET`, `POST`, `PUT`, `DELETE`.
+8. **[ABAC (Attribute-Based Access Control)](https://en.wikipedia.org/wiki/Attribute-Based_Access_Control)**: syntax
+   sugar like `resource.Owner` can be used to get the attribute for a resource.
+9. **[RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer)**: supports paths like `/res/*`
+   , `/res/:id` and HTTP methods like `GET`, `POST`, `PUT`, `DELETE`.
 10. **Deny-override**: both allow and deny authorizations are supported, deny overrides the allow.
 11. **Priority**: the policy rules can be prioritized like firewall rules.
 
 ## How it works?
 
-In jCasbin, an access control model is abstracted into a CONF file based on the **PERM metamodel (Policy, Effect, Request, Matchers)**. So switching or upgrading the authorization mechanism for a project is just as simple as modifying a configuration. You can customize your own access control model by combining the available models. For example, you can get RBAC roles and ABAC attributes together inside one model and share one set of policy rules.
+In jCasbin, an access control model is abstracted into a CONF file based on the **PERM metamodel (Policy, Effect,
+Request, Matchers)**. So switching or upgrading the authorization mechanism for a project is just as simple as modifying
+a configuration. You can customize your own access control model by combining the available models. For example, you can
+get RBAC roles and ABAC attributes together inside one model and share one set of policy rules.
 
 The most basic and simplest model in jCasbin is ACL. ACL's model CONF is:
 
@@ -102,16 +110,20 @@ It means:
 
 What jCasbin does:
 
-1. enforce the policy in the classic `{subject, object, action}` form or a customized form as you defined, both allow and deny authorizations are supported.
+1. enforce the policy in the classic `{subject, object, action}` form or a customized form as you defined, both allow
+   and deny authorizations are supported.
 2. handle the storage of the access control model and its policy.
 3. manage the role-user mappings and role-role mappings (aka role hierarchy in RBAC).
 4. support built-in superuser like `root` or `administrator`. A superuser can do anything without explict permissions.
-5. multiple built-in operators to support the rule matching. For example, `keyMatch` can map a resource key `/foo/bar` to the pattern `/foo*`.
+5. multiple built-in operators to support the rule matching. For example, `keyMatch` can map a resource key `/foo/bar`
+   to the pattern `/foo*`.
 
 What jCasbin does NOT do:
 
 1. authentication (aka verify `username` and `password` when a user logs in)
-2. manage the list of users or roles. I believe it's more convenient for the project itself to manage these entities. Users usually have their passwords, and jCasbin is not designed as a password container. However, jCasbin stores the user-role mapping for the RBAC scenario.
+2. manage the list of users or roles. I believe it's more convenient for the project itself to manage these entities.
+   Users usually have their passwords, and jCasbin is not designed as a password container. However, jCasbin stores the
+   user-role mapping for the RBAC scenario.
 
 ## Installation
 
@@ -131,7 +143,9 @@ https://casbin.org/docs/overview
 
 ## Online editor
 
-You can also use the online editor (http://casbin.org/editor/) to write your jCasbin model and policy in your web browser. It provides functionality such as `syntax highlighting` and `code completion`, just like an IDE for a programming language.
+You can also use the online editor (http://casbin.org/editor/) to write your jCasbin model and policy in your web
+browser. It provides functionality such as `syntax highlighting` and `code completion`, just like an IDE for a
+programming language.
 
 ## Tutorials
 
@@ -145,7 +159,8 @@ https://casbin.org/docs/tutorials
    Enforcer enforcer = new Enforcer("path/to/model.conf", "path/to/policy.csv");
    ```
 
-Note: you can also initialize an enforcer with policy in DB instead of file, see [Policy persistence](#policy-persistence) section for details.
+Note: you can also initialize an enforcer with policy in DB instead of file,
+see [Policy persistence](#policy-persistence) section for details.
 
 2. Add an enforcement hook into your code right before the access happens:
 
@@ -161,10 +176,11 @@ Note: you can also initialize an enforcer with policy in DB instead of file, see
    }
    ```
 
-3. Besides the static policy file, jCasbin also provides API for permission management at run-time. For example, You can get all the roles assigned to a user as below:
+3. Besides the static policy file, jCasbin also provides API for permission management at run-time. For example, You can
+   get all the roles assigned to a user as below:
 
    ```java
-   Roles roles = enforcer.getRoles("alice");
+    List<String> roles = enforcer.getRolesForUser("alice");
    ```
 
 See [Policy management APIs](#policy-management) for more usage.
@@ -175,8 +191,14 @@ See [Policy management APIs](#policy-management) for more usage.
 
 jCasbin provides two sets of APIs to manage permissions:
 
-- [Management API](https://github.com/casbin/jcasbin/blob/master/src/main/java/org/casbin/jcasbin/main/ManagementEnforcer.java): the primitive API that provides full support for jCasbin policy management. See [here](https://github.com/casbin/jcasbin/blob/master/src/test/java/org/casbin/jcasbin/main/ManagementAPIUnitTest.java) for examples.
-- [RBAC API](https://github.com/casbin/jcasbin/blob/master/src/main/java/org/casbin/jcasbin/main/Enforcer.java): a more friendly API for RBAC. This API is a subset of Management API. The RBAC users could use this API to simplify the code. See [here](https://github.com/casbin/jcasbin/blob/master/src/test/java/org/casbin/jcasbin/main/RbacAPIUnitTest.java) for examples.
+- [Management API](https://github.com/casbin/jcasbin/blob/master/src/main/java/org/casbin/jcasbin/main/ManagementEnforcer.java):
+  the primitive API that provides full support for jCasbin policy management.
+  See [here](https://github.com/casbin/jcasbin/blob/master/src/test/java/org/casbin/jcasbin/main/ManagementAPIUnitTest.java)
+  for examples.
+- [RBAC API](https://github.com/casbin/jcasbin/blob/master/src/main/java/org/casbin/jcasbin/main/Enforcer.java): a more
+  friendly API for RBAC. This API is a subset of Management API. The RBAC users could use this API to simplify the code.
+  See [here](https://github.com/casbin/jcasbin/blob/master/src/test/java/org/casbin/jcasbin/main/RbacAPIUnitTest.java)
+  for examples.
 
 We also provide a [web-based UI](https://github.com/casbin/web-ui) for model management and policy management:
 
@@ -218,7 +240,8 @@ https://casbin.org/docs/adopters
 
 ## Spring Boot support
 
-We provide Spring Boot support, you can use [casbin-spring-boot-starter](https://github.com/jcasbin/casbin-spring-boot-starter) to quickly develop in SpringBoot
+We provide Spring Boot support, you can
+use [casbin-spring-boot-starter](https://github.com/jcasbin/casbin-spring-boot-starter) to quickly develop in SpringBoot
 
 In casbin-spring-boot-starter, we made the following adjustments:
 
@@ -244,7 +267,8 @@ Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com
 
 ## Sponsors
 
-Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/casbin#sponsor)]
+Support this project by becoming a sponsor. Your logo will show up here with a link to your
+website. [[Become a sponsor](https://opencollective.com/casbin#sponsor)]
 
 <a href="https://opencollective.com/casbin/sponsor/0/website" target="_blank"><img src="https://opencollective.com/casbin/sponsor/0/avatar.svg"></a>
 <a href="https://opencollective.com/casbin/sponsor/1/website" target="_blank"><img src="https://opencollective.com/casbin/sponsor/1/avatar.svg"></a>
@@ -267,4 +291,5 @@ If you have any issues or feature requests, please contact us. PR is welcomed.
 
 - https://github.com/casbin/jcasbin/issues
 - hsluoyz@gmail.com
-- Tencent QQ group: [546057381](//shang.qq.com/wpa/qunwpa?idkey=8ac8b91fc97ace3d383d0035f7aa06f7d670fd8e8d4837347354a31c18fac885)
+- Tencent QQ
+  group: [546057381](//shang.qq.com/wpa/qunwpa?idkey=8ac8b91fc97ace3d383d0035f7aa06f7d670fd8e8d4837347354a31c18fac885)

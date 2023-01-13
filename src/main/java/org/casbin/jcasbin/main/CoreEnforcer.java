@@ -727,7 +727,7 @@ public class CoreEnforcer {
             .flatMap(stringMapEntry -> stringMapEntry.getValue().entrySet().stream())
             .filter(stringAssertionEntry -> stringAssertionEntry.getKey().equals(section))
             .findFirst().orElseThrow(
-                () -> new CasbinMatcherException("Could not find " + section + " definition in model"))
+                () -> new CasbinMatcherException("Could not find " + section + " definition in model."))
             .getValue().tokens.length;
 
         if (rvals.length != expectedParamSize) {

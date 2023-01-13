@@ -139,7 +139,7 @@ public class Enforcer extends ManagementEnforcer {
     }
 
     /**
-     * getUsersForRole gets the users that has a role.
+     * getUsersForRole gets the users that have a role.
      *
      * @param name the role.
      * @return the users that has the role.

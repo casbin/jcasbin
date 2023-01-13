@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * FilteredAdapter is the filtered file adapter for Casbin.
- * It can load policy from file or save policy to file and
+ * It can load policy from a file or save policy to a file and
  * supports loading of filtered policies.
  *
  * @author tldyl

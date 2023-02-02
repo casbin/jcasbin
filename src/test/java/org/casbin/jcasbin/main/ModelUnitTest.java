@@ -464,4 +464,27 @@ public class ModelUnitTest {
         testEnforce(e, "u4", "/foo", "read", false);
         testEnforce(e, "u4", "foo", "read", true);
     }
+
+    @Test
+    public void testRbacWithResourceRolesAndDomain() {
+        Enforcer e = new Enforcer("examples/rbac_with_resource_roles_and_domain_model.conf", "examples/rbac_with_resource_roles_and_domain_policy.csv");
+
+        testDomainEnforce(e, "alice", "domain1", "data1", "read", true);
+        testDomainEnforce(e, "alice", "domain1", "data1", "write", true);
+        testDomainEnforce(e, "alice", "domain1", "data2", "read", false);
+        testDomainEnforce(e, "alice", "domain1", "data2", "write", false);
+        testDomainEnforce(e, "alice", "domain2", "data1", "read", false);
+        testDomainEnforce(e, "alice", "domain2", "data1", "write", false);
+        testDomainEnforce(e, "alice", "domain2", "data2", "read", false);
+        testDomainEnforce(e, "alice", "domain2", "data2", "write", false);
+
+        testDomainEnforce(e, "bob", "domain1", "data2", "read", false);
+        testDomainEnforce(e, "bob", "domain1", "data2", "write", false);
+        testDomainEnforce(e, "bob", "domain1", "data1", "read", false);
+        testDomainEnforce(e, "bob", "domain1", "data1", "write", false);
+        testDomainEnforce(e, "bob", "domain2", "data1", "read", false);
+        testDomainEnforce(e, "bob", "domain2", "data1", "write", false);
+        testDomainEnforce(e, "bob", "domain2", "data2", "read", true);
+        testDomainEnforce(e, "bob", "domain2", "data2", "write", true);
+    }
 }

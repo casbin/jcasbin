@@ -402,7 +402,11 @@ public class BuiltInFunctions {
     public static boolean eval(String eval, Map<String, Object> env, AviatorEvaluatorInstance aviatorEval) {
         boolean res;
         if (aviatorEval != null) {
-            res = (boolean) aviatorEval.execute(eval, env);
+            try {
+                res = (boolean) aviatorEval.execute(eval, env);
+            } catch (Exception e) {
+                res = false;
+            }
         } else {
             res = (boolean) AviatorEvaluator.execute(eval, env);
         }

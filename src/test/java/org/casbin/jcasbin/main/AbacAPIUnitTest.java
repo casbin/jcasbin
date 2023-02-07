@@ -25,6 +25,8 @@ public class AbacAPIUnitTest {
     public void testEval() {
         Enforcer e = new Enforcer("examples/abac_rule_model.conf", "examples/abac_rule_policy.csv");
         TestEvalRule alice = new TestEvalRule("alice", 18);
+        // rule with attribute not exist in object will return false, then check the following policy of ACL
+        testEnforce(e, alice, "/data0", "read", false);
         testEnforce(e, alice, "/data1", "read", false);
         testEnforce(e, alice, "/data1", "write", false);
         alice.setAge(19);

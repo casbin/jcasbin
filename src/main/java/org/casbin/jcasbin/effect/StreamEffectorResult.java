@@ -17,4 +17,5 @@ package org.casbin.jcasbin.effect;
 public interface StreamEffectorResult {
     boolean hasEffect();
     boolean isDone();
+    int getExplainIndex();
 }

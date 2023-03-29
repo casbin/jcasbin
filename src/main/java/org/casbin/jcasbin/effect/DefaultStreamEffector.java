@@ -18,6 +18,7 @@ public class DefaultStreamEffector implements StreamEffector {
     private final String expr;
     private boolean done = false;
     private boolean effect = false;
+    private int explainIndex = -1;
 
     public DefaultStreamEffector(String expr) {
         this.expr = expr;
@@ -25,7 +26,7 @@ public class DefaultStreamEffector implements StreamEffector {
 
     @Override
     public StreamEffectorResult current() {
-        return new DefaultStreamEffectorResult(effect, done);
+        return new DefaultStreamEffectorResult(effect, done, explainIndex);
     }
 
     @Override
@@ -34,6 +35,7 @@ public class DefaultStreamEffector implements StreamEffector {
             case "some(where (p_eft == allow))":
                 if (eft == Effect.Allow) {
                     this.effect = true;
+                    explainIndex = currentIndex;
                     this.done = true;
                 }
                 break;
@@ -41,14 +43,17 @@ public class DefaultStreamEffector implements StreamEffector {
                 this.effect = true;
                 if (eft == Effect.Deny) {
                     this.effect = false;
+                    explainIndex = currentIndex;
                     this.done = true;
                 }
                 break;
             case "some(where (p_eft == allow)) && !some(where (p_eft == deny))":
                 if (eft == Effect.Allow) {
                     this.effect = true;
+                    explainIndex = explainIndex == -1 ? currentIndex : explainIndex;
                 } else if (eft == Effect.Deny) {
                     this.effect = false;
+                    explainIndex = currentIndex;
                     this.done = true;
                 }
                 break;
@@ -56,6 +61,7 @@ public class DefaultStreamEffector implements StreamEffector {
             case "subjectPriority(p_eft) || deny":
                 if (eft != Effect.Indeterminate) {
                     this.effect = eft == Effect.Allow;
+                    explainIndex = currentIndex;
                     this.done = true;
                 }
                 break;

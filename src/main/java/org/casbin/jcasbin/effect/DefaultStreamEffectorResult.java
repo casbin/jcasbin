@@ -17,14 +17,15 @@ package org.casbin.jcasbin.effect;
 public class DefaultStreamEffectorResult implements StreamEffectorResult {
     private  boolean done;
     private  boolean effect;
-
+    private int explainIndex;
     public DefaultStreamEffectorResult(){
 
 }
 
-    public DefaultStreamEffectorResult(boolean effect, boolean done) {
+    public DefaultStreamEffectorResult(boolean effect, boolean done, int explainIndex) {
         this.effect = effect;
         this.done = done;
+        this.explainIndex = explainIndex;
     }
 
     @Override
@@ -32,6 +33,7 @@ public class DefaultStreamEffectorResult implements StreamEffectorResult {
         return effect;
     }
 
+    @Override
     public boolean isDone() {
         return done;
     }
@@ -42,5 +44,14 @@ public class DefaultStreamEffectorResult implements StreamEffectorResult {
 
     public void setDone(boolean done) {
         this.done = done;
+    }
+
+    @Override
+    public int getExplainIndex() {
+        return explainIndex;
+    }
+
+    public void setExplainIndex(int explainIndex) {
+        this.explainIndex = explainIndex;
     }
 }

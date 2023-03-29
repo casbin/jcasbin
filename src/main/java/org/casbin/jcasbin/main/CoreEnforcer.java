@@ -562,7 +562,6 @@ public class CoreEnforcer {
                 if (streamEffector != null) {
                     boolean done = streamEffector.push(policyEffects[i], i, policyLen);
                     if (done) {
-                        explainIndex = i;
                         break;
                     }
                 } else {
@@ -571,6 +570,7 @@ public class CoreEnforcer {
                     }
                 }
             }
+            explainIndex = streamEffector.current().getExplainIndex();
         } else {
             policyEffects = new Effect[1];
             matcherResults = new float[1];

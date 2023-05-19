@@ -502,25 +502,28 @@ public class CoreEnforcer {
 
         Effect[] policyEffects;
         float[] matcherResults;
-        int policyLen, explainIndex = -1;
-        if ((policyLen = model.model.get("p").get(pType).policy.size()) != 0) {
+        final List<List<String>> policy = model.model.get("p").get(pType).policy;
+        final String[] pTokens = model.model.get("p").get(pType).tokens;
+        final int policyLen = policy.size();
+        int explainIndex = -1;
+
+        if (policyLen != 0) {
             policyEffects = new Effect[policyLen];
             matcherResults = new float[policyLen];
 
-            for (int i = 0; i < model.model.get("p").get(pType).policy.size(); i++) {
-                List<String> pvals = model.model.get("p").get(pType).policy.get(i);
-                if (model.model.get("p").get(pType).tokens.length != pvals.size()) {
-                    throw new CasbinMatcherException("invalid request size: expected " + model.model.get("p").get(pType).tokens.length +
+            for (int i = 0; i < policy.size(); i++) {
+                List<String> pvals = policy.get(i);
+                if (pTokens.length != pvals.size()) {
+                    throw new CasbinMatcherException("invalid request size: expected " + pTokens.length +
                         ", got " + pvals.size() + ", rvals: " + Arrays.toString(rvals));
                 }
 
                 // Util.logPrint("Policy Rule: " + pvals);
                 // Select the rule based on request size
-                Map<String, Object> parameters = new HashMap<>();
+                Map<String, Object> parameters = new HashMap<>(rvals.length + pTokens.length);
                 getRTokens(parameters, rvals);
-                for (int j = 0; j < model.model.get("p").get(pType).tokens.length; j++) {
-                    String token = model.model.get("p").get(pType).tokens[j];
-                    parameters.put(token, pvals.get(j));
+                for (int j = 0; j < pTokens.length; j++) {
+                    parameters.put(pTokens[j], pvals.get(j));
                 }
 
                 Object result = expression.execute(parameters);
@@ -575,13 +578,13 @@ public class CoreEnforcer {
             policyEffects = new Effect[1];
             matcherResults = new float[1];
 
-            Map<String, Object> parameters = new HashMap<>();
-            for (int j = 0; j < model.model.get("r").get(rType).tokens.length; j++) {
-                String token = model.model.get("r").get(rType).tokens[j];
-                parameters.put(token, rvals[j]);
+            String[] rTokens = model.model.get("r").get(rType).tokens;
+            Map<String, Object> parameters = new HashMap<>(rTokens.length + pTokens.length);
+
+            for (int j = 0; j < rTokens.length; j++) {
+                parameters.put(rTokens[j], rvals[j]);
             }
-            for (int j = 0; j < model.model.get("p").get(pType).tokens.length; j++) {
-                String token = model.model.get("p").get(pType).tokens[j];
+            for (String token : pTokens) {
                 parameters.put(token, "");
             }
 
@@ -613,7 +616,7 @@ public class CoreEnforcer {
 
         List<String> explain = new ArrayList<>();
         if (explainIndex != -1) {
-            explain.addAll(model.model.get("p").get(pType).policy.get(explainIndex));
+            explain.addAll(policy.get(explainIndex));
         }
 
         Util.logEnforce(rvals, result, explain);
@@ -705,15 +708,14 @@ public class CoreEnforcer {
     }
 
     private void getRTokens(Map<String, Object> parameters, Object... rvals) {
-        for (String rKey : model.model.get("r").keySet()) {
-            if (!(rvals.length == model.model.get("r").get(rKey).tokens.length)) {
+        for (Assertion assertion : model.model.get("r").values()) {
+            if (!(rvals.length == assertion.tokens.length)) {
                 continue;
             }
-            for (int j = 0; j < model.model.get("r").get(rKey).tokens.length; j++) {
-                String token = model.model.get("r").get(rKey).tokens[j];
+            for (int j = 0; j < assertion.tokens.length; j++) {
+                String token = assertion.tokens[j];
                 parameters.put(token, rvals[j]);
             }
-
         }
     }
 

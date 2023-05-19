@@ -3,7 +3,6 @@ package org.casbin.jcasbin.main;
 import org.casbin.jcasbin.persist.Dispatcher;
 import org.junit.Before;
 import org.junit.Test;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.List;
 
@@ -111,7 +110,7 @@ public class InternalEnforcerWithDispatcherTest {
 
         @Override
         public void clearPolicy() {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         @Override

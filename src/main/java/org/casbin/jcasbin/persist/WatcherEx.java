@@ -82,4 +82,21 @@ public interface WatcherEx extends Watcher {
      * @param rules       the policies
      */
     void updateForRemovePolicies(String sec, String ptype, List<List<String>> rules);
+
+    /**
+     *
+     */
+    enum UpdateType {
+        Update,
+        UpdateForAddPolicies,
+        UpdateForAddPolicy,
+        UpdateForRemoveFilteredPolicy,
+        UpdateForRemovePolicies,
+        UpdateForRemovePolicy,
+        UpdateForSavePolicy,
+        UpdateForUpdatePolicies,
+        UpdateForUpdatePolicy
+
+    }
+
 }

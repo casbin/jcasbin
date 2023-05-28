@@ -23,7 +23,6 @@ import org.casbin.jcasbin.persist.WatcherUpdatable;
 import org.casbin.jcasbin.util.Util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
@@ -39,41 +38,33 @@ class InternalEnforcer extends CoreEnforcer {
      * @param ptype       the policy type, "p", "p2", .. or "g", "g2", ..
      * @param rules       the policies
      * @param updateType  the UpdateType
-     * @param fieldIndex  the policy rule's start index to be matched.
-     *                    It is an optional parameter designed specifically for UpdateForRemoveFilteredPolicy
      * @return            indicate whether the notification to the Watcher is successful or not
      */
-    private boolean notifyWatcher(String sec, String ptype, List<List<String>> rules, WatcherEx.UpdateType updateType, int... fieldIndex) {
-        if (watcher != null && autoNotifyWatcher) {
-            try {
-                if (watcher instanceof WatcherEx) {
-                    switch (updateType) {
-                        case UpdateForAddPolicy:
-                            ((WatcherEx) watcher).updateForAddPolicy(sec, ptype, rules.get(0).toArray(new String[0]));
-                            break;
-                        case UpdateForRemovePolicy:
-                            ((WatcherEx) watcher).updateForRemovePolicy(sec, ptype, rules.get(0).toArray(new String[0]));
-                            break;
-                        case UpdateForAddPolicies:
-                            ((WatcherEx) watcher).updateForAddPolicies(sec, ptype, rules);
-                            break;
-                        case UpdateForRemovePolicies:
-                            ((WatcherEx) watcher).updateForRemovePolicies(sec, ptype, rules);
-                            break;
-                        case UpdateForRemoveFilteredPolicy:
-                            String[] fieldValues = rules.get(0).toArray(new String[0]);
-                            ((WatcherEx) watcher).updateForRemoveFilteredPolicy(sec, ptype, fieldIndex[0], fieldValues);
-                            break;
-                        default :
-                            return false;
-                    }
-                } else {
-                    watcher.update();
-                }
-            } catch (Exception e) {
-                Util.logPrint("An exception occurred:" + e.getMessage());
-                return false;
+    private boolean notifyWatcher(String sec, String ptype, List<List<String>> rules, WatcherEx.UpdateType updateType) {
+        if(watcher == null || !autoNotifyWatcher) return true;
+        try {
+            if (watcher instanceof WatcherEx) switch (updateType) {
+                case UpdateForAddPolicy:
+                    ((WatcherEx) watcher).updateForAddPolicy(sec, ptype, rules.get(0).toArray(new String[0]));
+                    break;
+                case UpdateForRemovePolicy:
+                    ((WatcherEx) watcher).updateForRemovePolicy(sec, ptype, rules.get(0).toArray(new String[0]));
+                    break;
+                case UpdateForAddPolicies:
+                    ((WatcherEx) watcher).updateForAddPolicies(sec, ptype, rules);
+                    break;
+                case UpdateForRemovePolicies:
+                    ((WatcherEx) watcher).updateForRemovePolicies(sec, ptype, rules);
+                    break;
+                default:
+                    Util.logPrint("UnsupportedUpdateType for notifyWatcher");
+                    break;
+            } else {
+                watcher.update();
             }
+        } catch (Exception e) {
+            Util.logPrint("An exception occurred:" + e.getMessage());
+            return false;
         }
         return true;
     }
@@ -327,8 +318,16 @@ class InternalEnforcer extends CoreEnforcer {
 
         buildIncrementalRoleLinks(sec, ptype, effects, Model.PolicyOperations.POLICY_REMOVE);
 
-        return notifyWatcher(sec, ptype, singletonList(Arrays.asList(fieldValues)),
-            WatcherEx.UpdateType.UpdateForRemoveFilteredPolicy);
+        if (watcher != null && autoNotifyWatcher) {
+            // error intentionally ignored
+            if (watcher instanceof WatcherEx) {
+                ((WatcherEx) watcher).updateForRemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues);
+            } else {
+                watcher.update();
+            }
+        }
+
+        return true;
     }
 
     int getDomainIndex(String ptype) {

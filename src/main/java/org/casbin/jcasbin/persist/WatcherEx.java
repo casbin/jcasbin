@@ -16,12 +16,70 @@ package org.casbin.jcasbin.persist;
 
 import org.casbin.jcasbin.model.Model;
 
+import java.util.List;
+
 public interface WatcherEx extends Watcher {
-    void updateForAddPolicy(String... params);
+    /**
+     * updateForAddPolicy calls the update callback of other instances to synchronize their policy.
+     * It is called after a policy is added via Enforcer.addPolicy(), Enforcer.addNamedPolicy(),
+     * Enforcer.addGroupingPolicy() and Enforcer.addNamedGroupingPolicy().
+     *
+     * @param sec         the section, "p" or "g".
+     * @param ptype       the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param params      the policy
+     */
+     void updateForAddPolicy(String sec, String ptype, String... params);
 
-    void updateForRemovePolicy(String... params);
+    /**
+     * updateForRemovePolicy calls the update callback of other instances to synchronize their policy.
+     * It is called after a policy is removed by Enforcer.removePolicy(), Enforcer.removeNamedPolicy(),
+     * Enforcer.removeGroupingPolicy() and Enforcer.removeNamedGroupingPolicy().
+     *
+     * @param sec         the section, "p" or "g".
+     * @param ptype       the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param params      the policy
+     */
+    void updateForRemovePolicy(String sec, String ptype, String... params);
 
-    void updateForRemoveFilteredPolicy(int fieldIndex, String... fieldValues);
+    /**
+     * updateForRemoveFilteredPolicy calls the update callback of other instances to synchronize their policy.
+     * It is called after Enforcer.RemoveFilteredPolicy(), Enforcer.RemoveFilteredNamedPolicy(),
+     * Enforcer.RemoveFilteredGroupingPolicy() and Enforcer.RemoveFilteredNamedGroupingPolicy().
+     *
+     * @param sec         the section, "p" or "g".
+     * @param ptype       the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param fieldIndex  the policy rule's start index to be matched.
+     * @param fieldValues the field values to be matched, value "" means not to match this field.
+     */
+    void updateForRemoveFilteredPolicy(String sec, String ptype, int fieldIndex, String... fieldValues);
 
+    /**
+     * updateForSavePolicy calls the update callback of other instances to synchronize their policy.
+     * It is called after Enforcer.savePolicy()
+     *
+     * @param model       represents the whole access control model.
+     */
     void updateForSavePolicy(Model model);
+
+    /**
+     * updateForAddPolicies calls the update callback of other instances to synchronize their policy.
+     * It is called after Enforcer.addPolicies(), Enforcer.addNamedPolicies(),
+     * Enforcer.addGroupingPolicies() and Enforcer.addNamedGroupingPolicies().
+     *
+     * @param sec         the section, "p" or "g".
+     * @param ptype       the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param rules       the policies
+     */
+    void updateForAddPolicies(String sec, String ptype, List<List<String>> rules);
+
+    /**
+     * updateForRemovePolicies calls the update callback of other instances to synchronize their policy.
+     * It is called after Enforcer.removePolicies(), Enforcer.removeNamedPolicies(),
+     * Enforcer.removeGroupingPolicies() and Enforcer.removeNamedGroupingPolicies().
+     *
+     * @param sec         the section, "p" or "g".
+     * @param ptype       the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param rules       the policies
+     */
+    void updateForRemovePolicies(String sec, String ptype, List<List<String>> rules);
 }

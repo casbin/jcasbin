@@ -31,6 +31,44 @@ import static java.util.Collections.singletonList;
  * InternalEnforcer = CoreEnforcer + Internal API.
  */
 class InternalEnforcer extends CoreEnforcer {
+
+    /**
+     *
+     * @param sec         the section, "p" or "g".
+     * @param ptype       the policy type, "p", "p2", .. or "g", "g2", ..
+     * @param rules       the policies
+     * @param updateType  the UpdateType
+     * @return            indicate whether the notification to the Watcher is successful or not
+     */
+    private boolean notifyWatcher(String sec, String ptype, List<List<String>> rules, WatcherEx.UpdateType updateType) {
+        if(watcher == null || !autoNotifyWatcher) return true;
+        try {
+            if (watcher instanceof WatcherEx) switch (updateType) {
+                case UpdateForAddPolicy:
+                    ((WatcherEx) watcher).updateForAddPolicy(sec, ptype, rules.get(0).toArray(new String[0]));
+                    break;
+                case UpdateForRemovePolicy:
+                    ((WatcherEx) watcher).updateForRemovePolicy(sec, ptype, rules.get(0).toArray(new String[0]));
+                    break;
+                case UpdateForAddPolicies:
+                    ((WatcherEx) watcher).updateForAddPolicies(sec, ptype, rules);
+                    break;
+                case UpdateForRemovePolicies:
+                    ((WatcherEx) watcher).updateForRemovePolicies(sec, ptype, rules);
+                    break;
+                default:
+                    Util.logPrint("UnsupportedUpdateType for notifyWatcher");
+                    break;
+            } else {
+                watcher.update();
+            }
+        } catch (Exception e) {
+            Util.logPrint("An exception occurred:" + e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
     /**
      * addPolicy adds a rule to the current policy.
      */
@@ -59,16 +97,9 @@ class InternalEnforcer extends CoreEnforcer {
 
         buildIncrementalRoleLinks(sec, ptype, singletonList(rule), Model.PolicyOperations.POLICY_ADD);
 
-        if (watcher != null && autoNotifyWatcher) {
-            if (watcher instanceof WatcherEx) {
-                ((WatcherEx) watcher).updateForAddPolicy(rule.toArray(new String[0]));
-            } else {
-                watcher.update();
-            }
-        }
-
-        return true;
+        return notifyWatcher(sec, ptype, singletonList(rule), WatcherEx.UpdateType.UpdateForAddPolicy);
     }
+
 
     /**
      * addPolicies adds rules to the current policy.
@@ -100,11 +131,7 @@ class InternalEnforcer extends CoreEnforcer {
 
         buildIncrementalRoleLinks(sec, ptype, rules, Model.PolicyOperations.POLICY_ADD);
 
-        if (watcher != null && autoNotifyWatcher) {
-            watcher.update();
-        }
-
-        return true;
+        return notifyWatcher(sec, ptype, rules, WatcherEx.UpdateType.UpdateForAddPolicies);
     }
 
     /**
@@ -145,15 +172,7 @@ class InternalEnforcer extends CoreEnforcer {
 
         buildIncrementalRoleLinks(sec, ptype, singletonList(rule), Model.PolicyOperations.POLICY_REMOVE);
 
-        if (watcher != null && autoNotifyWatcher) {
-            if (watcher instanceof WatcherEx) {
-                ((WatcherEx) watcher).updateForRemovePolicy(rule.toArray(new String[0]));
-            } else {
-                watcher.update();
-            }
-        }
-
-        return true;
+        return notifyWatcher(sec, ptype, singletonList(rule), WatcherEx.UpdateType.UpdateForRemovePolicy);
     }
 
     /**
@@ -262,12 +281,7 @@ class InternalEnforcer extends CoreEnforcer {
 
         buildIncrementalRoleLinks(sec, ptype, rules, Model.PolicyOperations.POLICY_REMOVE);
 
-        if (watcher != null && autoNotifyWatcher) {
-            // error intentionally ignored
-            watcher.update();
-        }
-
-        return true;
+        return notifyWatcher(sec, ptype, rules, WatcherEx.UpdateType.UpdateForRemovePolicies);
     }
 
     /**
@@ -307,7 +321,7 @@ class InternalEnforcer extends CoreEnforcer {
         if (watcher != null && autoNotifyWatcher) {
             // error intentionally ignored
             if (watcher instanceof WatcherEx) {
-                ((WatcherEx) watcher).updateForRemoveFilteredPolicy(fieldIndex, fieldValues);
+                ((WatcherEx) watcher).updateForRemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues);
             } else {
                 watcher.update();
             }
@@ -339,5 +353,4 @@ class InternalEnforcer extends CoreEnforcer {
             buildIncrementalRoleLinks(operation, ptype, rules);
         }
     }
-
 }

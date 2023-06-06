@@ -350,8 +350,19 @@ public class CoreEnforcer {
             if (rmMap.containsKey(ptype)) {
                 rmMap.get(ptype).clear();
             } else {
-                rmMap.put(ptype, new DomainManager(10));
+                addOrUpdateDomainManagerMatching(ptype);
             }
+        }
+    }
+
+    /**
+     * add or update the DomainManager object in rmMap and associate it with a specific domain matching function
+     */
+    private void addOrUpdateDomainManagerMatching(String ptype) {
+        rmMap.put(ptype, new DomainManager(10));
+        String matchFun = "keyMatch(r_dom, p_dom)";
+        if (model.model.get("m").get("m").value.contains(matchFun)) {
+            addNamedDomainMatchingFunc(ptype, "g", BuiltInFunctions::keyMatch);
         }
     }
 

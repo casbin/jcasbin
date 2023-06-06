@@ -222,6 +222,11 @@ public class EnforcerUnitTest {
     }
 
     @Test
+    public void testRBACModelInDomain(){
+        Enforcer e = new Enforcer("examples/keymatch_with_rbac_in_domain.conf","examples/keymatch_with_rbac_in_domain.csv");
+        testDomainEnforce(e,"Username==test2","engines/engine1","*","attach",true);
+    }
+    @Test
     public void testInOp() {
         Enforcer e = new Enforcer("examples/in_op_sytanx.conf", "examples/in_op_sytanx.csv");
 

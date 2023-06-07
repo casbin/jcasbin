@@ -68,6 +68,8 @@ public class BuiltInFunctionsUnitTest {
         testKeyMatch2("/alice/all", "/:id", false);
 
         testKeyMatch2("/alice/all", "/:/all", false);
+
+        testKeyMatch2("engines/engine1", "*", true);
     }
 
     @Test

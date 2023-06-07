@@ -73,8 +73,11 @@ public class BuiltInFunctions {
      */
     public static boolean keyMatch2(String key1, String key2) {
         key2 = key2.replace("/*", "/.*");
-        key2 = "^" + KEY_MATCH2_PATTERN.matcher(key2).replaceAll("[^/]+") + "$";
-        return regexMatch(key1, key2);
+        key2 = KEY_MATCH2_PATTERN.matcher(key2).replaceAll("[^/]+");
+        if(Objects.equals(key2, "*")) {
+            key2 = "(.*)";
+        }
+        return regexMatch(key1, "^" + key2 + "$");
     }
 
     /**

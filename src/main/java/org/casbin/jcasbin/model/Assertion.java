@@ -55,14 +55,7 @@ public class Assertion {
             if (rule.size() < count) {
                 throw new IllegalArgumentException("grouping policy elements do not meet role definition");
             }
-
-            if (count == 2) {
-                rm.addLink(rule.get(0), rule.get(1));
-            } else if (count == 3) {
-                rm.addLink(rule.get(0), rule.get(1), rule.get(2));
-            } else if (count == 4) {
-                rm.addLink(rule.get(0), rule.get(1), rule.get(2), rule.get(3));
-            }
+            rm.addLink(rule.get(0), rule.get(1), rule.subList(2, rule.size()).toArray(new String[0]));
         }
 
         Util.logPrint("Role links for: " + key);

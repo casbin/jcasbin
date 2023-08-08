@@ -119,58 +119,60 @@ public class BuiltInFunctions {
      * @return whether key1 matches key2.
      */
     public static boolean keyMatch4(String key1, String key2) {
-        String regEx = "\\{[^/]+\\}";
-        Pattern p = Pattern.compile(regEx);
-        Matcher m = p.matcher(key2);
+        key2 = key2.replace("/*", "/.*");
 
-        String[] tmp = p.split(key2);
-        List<String> tokens = new ArrayList<>();
-        if (tmp.length > 0) {
-            int count = 0;
-            while (count < tmp.length) {
-                tokens.add(tmp[count]);
-                if (m.find()) {
-                    tokens.add(m.group());
-                }
-                count++;
+        ArrayList<String> tokens = new ArrayList<>();
+
+        Pattern p = Pattern.compile("\\{[^{}]*\\}");
+        Matcher m = p.matcher(key2);
+        StringBuffer sb = new StringBuffer();
+        while(m.find()) {
+            String group = m.group();
+            tokens.add(group);
+            if(group.contains("/")) {
+                group = group.replace("{", "\\{")
+                            .replace("}", "\\}")
+                            .replace("/", "\\/");
+                m.appendReplacement(sb, Matcher.quoteReplacement(group));
+            } else {
+                m.appendReplacement(sb, "([^/]+)");
             }
         }
-        int off = 0;
-        for (String token : tokens) {
-            if (!p.matcher(token).matches()) {
-                while (off < key1.length() && key1.charAt(off) != token.charAt(0)) {
-                    off++;
-                }
-                if (key1.length() - (off + 1) < token.length()) {
-                    return false;
-                }
-                if (!key1.startsWith(token, off)) {
-                    return false;
-                }
-                key1 = key1.replaceFirst(token, ",");
+        m.appendTail(sb);
+        key2 = sb.toString();
+
+        p = Pattern.compile("^" + key2 + "$");
+        m = p.matcher(key1);
+
+        ArrayList<String> matches = new ArrayList<>();
+        if (m.find()) {
+            for (int i = 0; i <=  m.groupCount(); i++) {
+                matches.add(m.group(i));
             }
         }
-        String[] values = key1.split(",");
-        int i = 0;
-        Map<String, String> params = new HashMap<>();
-        for (String token : tokens) {
-            if (p.matcher(token).matches()) {
-                while (i < values.length && "".equals(values[i])) {
-                    i++;
-                }
-                if (i == values.length) {
-                    return false;
-                }
-                if (params.containsKey(token)) {
-                    if (!values[i].equals(params.get(token))) {
-                        return false;
-                    }
-                } else {
-                    params.put(token, values[i]);
-                }
-                i++;
+
+        if(matches.isEmpty()) {
+            return false;
+        }
+
+        matches.remove(0);
+
+        if(tokens.size() != matches.size()) {
+            throw new RuntimeException("KeyMatch4: number of tokens is not equal to number of values");
+        }
+
+        Map<String ,String> values = new HashMap<>();
+
+        for (int key = 0; key < tokens.size(); ++key) {
+            String token = tokens.get(key);
+            if(!values.containsKey(token)) {
+                values.put(token, matches.get(key));
+            }
+            if(!values.get(token).equals(matches.get(key))) {
+                return false;
             }
         }
+
         return true;
     }
 

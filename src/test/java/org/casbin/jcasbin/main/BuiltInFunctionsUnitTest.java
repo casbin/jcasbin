@@ -116,6 +116,8 @@ public class BuiltInFunctionsUnitTest {
         testKeyMatch4("/parent/123/child/456", "/parent/{id}/child/{id}/book/{id}", false);
 
         testKeyMatch4("/parent/123/child/123", "/parent/{i/d}/child/{i/d}", false);
+
+        testKeyMatch4("/pipeline/work-order/sit/deploy", "/pipeline/work-order/*/deploy", true);
     }
 
     @Test

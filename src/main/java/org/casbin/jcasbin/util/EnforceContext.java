@@ -32,6 +32,13 @@ public class EnforceContext {
         this.rType = "r" + suffix;
     }
 
+    public EnforceContext(String pSuffix, String eSuffix, String mSuffix, String rSuffix) {
+        this.pType = "p" + pSuffix;
+        this.eType = "e" + eSuffix;
+        this.mType = "m" + mSuffix;
+        this.rType = "r" + rSuffix;
+    }
+
     public String getpType() {
         return pType;
     }

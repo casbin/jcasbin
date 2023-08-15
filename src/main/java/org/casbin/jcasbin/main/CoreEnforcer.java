@@ -451,7 +451,7 @@ public class CoreEnforcer {
      */
     private EnforceResult enforce(String matcher, Object... rvals) {
         if (!enabled) {
-            return new EnforceResult(true, new ArrayList<>(Collections.singletonList("The enforcer is not enable, allow all request")));
+            return new EnforceResult(true, new ArrayList<>(Collections.singletonList("The enforcer is not enabled, allow all requests")));
         }
 
         boolean compileCached = true;
@@ -524,21 +524,11 @@ public class CoreEnforcer {
 
             for (int i = 0; i < policy.size(); i++) {
                 List<String> pvals = policy.get(i);
-                if (pTokens.length != pvals.size()) {
-                    throw new CasbinMatcherException("invalid request size: expected " + pTokens.length +
-                        ", got " + pvals.size() + ", rvals: " + Arrays.toString(rvals));
-                }
-
-                // Util.logPrint("Policy Rule: " + pvals);
-                // Select the rule based on request size
                 Map<String, Object> parameters = new HashMap<>(rvals.length + pTokens.length);
-                getRTokens(parameters, rvals);
-                for (int j = 0; j < pTokens.length; j++) {
-                    parameters.put(pTokens[j], pvals.get(j));
-                }
+                getPTokens(parameters, pType, pvals, pTokens);
+                getRTokens(parameters, rType, rvals);
 
                 Object result = expression.execute(parameters);
-                // Util.logPrint("Result: " + result);
 
                 if (result instanceof Boolean) {
                     if (!((boolean) result)) {
@@ -600,7 +590,6 @@ public class CoreEnforcer {
             }
 
             Object result = expression.execute(parameters);
-            // Util.logPrint("Result: " + result);
 
             if (streamEffector != null) {
                 if ((boolean) result) {
@@ -718,15 +707,24 @@ public class CoreEnforcer {
         return false;
     }
 
-    private void getRTokens(Map<String, Object> parameters, Object... rvals) {
-        for (Assertion assertion : model.model.get("r").values()) {
-            if (!(rvals.length == assertion.tokens.length)) {
-                continue;
-            }
-            for (int j = 0; j < assertion.tokens.length; j++) {
-                String token = assertion.tokens[j];
-                parameters.put(token, rvals[j]);
-            }
+    private void getRTokens(Map<String, Object> parameters, String rType, Object... rvals) {
+        String[] requestTokens = model.model.get("r").get(rType).tokens;
+        if(requestTokens.length != rvals.length) {
+            throw new CasbinMatcherException("invalid request size: expected " + requestTokens.length +
+                ", got " + rvals.length + ", rvals: " + Arrays.toString(rvals));
+        }
+        for(int i = 0; i < requestTokens.length; i++) {
+            parameters.put(requestTokens[i], rvals[i]);
+        }
+    }
+
+    private void getPTokens(Map<String, Object> parameters, String pType, List<String> pvals, String[] pTokens) {
+        if (pTokens.length != pvals.size()) {
+            throw new CasbinMatcherException("invalid policy size: expected " + pTokens.length +
+                ", got " + pvals.size() + ", pvals: " + pvals);
+        }
+        for (int i = 0; i < pTokens.length; i++) {
+            parameters.put(pTokens[i], pvals.get(i));
         }
     }
 

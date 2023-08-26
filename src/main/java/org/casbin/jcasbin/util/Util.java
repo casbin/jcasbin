@@ -54,7 +54,7 @@ public class Util {
      * logPrintf prints the log with the format.
      *
      * @param format the format of the log.
-     * @param v the log.
+     * @param v      the log.
      */
     public static void logPrintf(String format, String... v) {
         if (enableLog) {
@@ -67,7 +67,7 @@ public class Util {
      * logPrintf prints the log with the format as a warning.
      *
      * @param format the format of the log.
-     * @param v the log.
+     * @param v      the log.
      */
     public static void logPrintfWarn(String format, Object... v) {
         if (enableLog) {
@@ -79,7 +79,7 @@ public class Util {
      * logPrintf prints the log with the format as an error.
      *
      * @param format the format of the log.
-     * @param v the log.
+     * @param v      the log.
      */
     public static void logPrintfError(String format, Object... v) {
         if (enableLog) {
@@ -104,7 +104,8 @@ public class Util {
     }
 
     /**
-     * escapeAssertion escapes the dots in the assertion, because the expression evaluation doesn't support such variable names.
+     * escapeAssertion escapes the dots in the assertion, because the expression
+     * evaluation doesn't support such variable names.
      *
      * @param s the value of the matcher and effect assertions.
      * @return the escaped value.
@@ -114,7 +115,7 @@ public class Util {
         StringBuffer sb = new StringBuffer();
 
         while (m.find()) {
-            m.appendReplacement(sb, m.group().replace(".", "_") );
+            m.appendReplacement(sb, m.group().replace(".", "_"));
         }
 
         m.appendTail(sb);
@@ -122,7 +123,8 @@ public class Util {
     }
 
     /**
-     * convertInSyntax Convert 'in' to 'include' to fit aviatorscript,because aviatorscript don't support native 'in' syntax
+     * convertInSyntax Convert 'in' to 'include' to fit aviatorscript,because
+     * aviatorscript don't support native 'in' syntax
      *
      * @param expString the value of the matcher
      * @return the 'include' expression.
@@ -139,6 +141,7 @@ public class Util {
         m1.appendTail(sb);
         return flag ? sb.toString() : expString;
     }
+
     /**
      * removeComments removes the comments starting with # in the text.
      *
@@ -150,7 +153,7 @@ public class Util {
         if (pos == -1) {
             return s;
         }
-        return s.substring(0,pos).trim();
+        return s.substring(0, pos).trim();
     }
 
     /**
@@ -171,7 +174,7 @@ public class Util {
             return false;
         }
 
-        for (int i = 0; i < a.size(); i ++) {
+        for (int i = 0; i < a.size(); i++) {
             if (!a.get(i).equals(b.get(i))) {
                 return false;
             }
@@ -180,7 +183,8 @@ public class Util {
     }
 
     /**
-     * array2DEquals determines whether two 2-dimensional string arrays are identical.
+     * array2DEquals determines whether two 2-dimensional string arrays are
+     * identical.
      *
      * @param a the first 2-dimensional array.
      * @param b the second 2-dimensional array.
@@ -197,7 +201,7 @@ public class Util {
             return false;
         }
 
-        for (int i = 0; i < a.size(); i ++) {
+        for (int i = 0; i < a.size(); i++) {
             if (!arrayEquals(a.get(i), b.get(i))) {
                 return false;
             }
@@ -206,7 +210,8 @@ public class Util {
     }
 
     /**
-     * arrayRemoveDuplicates removes any duplicated elements in a string array preserving the order.
+     * arrayRemoveDuplicates removes any duplicated elements in a string array
+     * preserving the order.
      *
      * @param s the array.
      * @return the array without duplicates.
@@ -237,9 +242,12 @@ public class Util {
     }
 
     /**
-     * splitCommaDelimited splits a comma-delimited string according to the default processing method of the CSV file
-     * into a string array. It assumes that any number of whitespace might exist before or after the word and that tokens do not include
-     * whitespace as part of their value.
+     * splitCommaDelimited splits a comma-delimited string according to the default
+     * processing method of the CSV file
+     * into a string array. It assumes that any number of whitespace might exist
+     * before or after the token and that tokens do not include
+     * whitespace as part of their value unless they are enclosed by double
+     * quotes.
      *
      * @param s the string.
      * @return the array with the string tokens.
@@ -248,7 +256,8 @@ public class Util {
         String[] records = null;
         if (s != null) {
             try {
-                CSVParser csvParser = CSVFormat.DEFAULT.withEscape('\\').parse(new StringReader(s));
+                CSVFormat csvFormat = CSVFormat.Builder.create().setIgnoreSurroundingSpaces(true).build();
+                CSVParser csvParser = csvFormat.parse(new StringReader(s));
                 List<CSVRecord> csvRecords = csvParser.getRecords();
                 records = new String[csvRecords.get(0).size()];
                 for (int i = 0; i < csvRecords.get(0).size(); i++) {
@@ -283,7 +292,7 @@ public class Util {
         Collections.sort(a);
         Collections.sort(b);
 
-        for (int i = 0; i < a.size(); i ++) {
+        for (int i = 0; i < a.size(); i++) {
             if (!a.get(i).equals(b.get(i))) {
                 return false;
             }

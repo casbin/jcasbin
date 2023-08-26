@@ -67,6 +67,11 @@ public class UtilTest {
     assertArrayEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("a, b, c"));
     assertArrayEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("a ,b ,c"));
     assertArrayEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("  a,     b   ,c     "));
+    assertArrayEquals(new String[]{"a,b,c", "d,e", "f"}, Util.splitCommaDelimited("\"a,b,c\", \"d,e\", f"));
+    assertArrayEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("\"a\", \"b\", \"c\""));
+    assertArrayEquals(new String[]{"\"a", "\"b\"", "c\""}, Util.splitCommaDelimited("\"\"\"a\",\"\"\"b\"\"\",\"c\"\"\""));
+    assertArrayEquals(new String[]{"\"a", "\"b\"", "c\""}, Util.splitCommaDelimited("\"\"\"a\",\"\"\"b\"\"\",\"c\"\"\""));
+    assertArrayEquals(new String[]{"a b", "c", "d"}, Util.splitCommaDelimited("\"a b\", c, d"));
   }
 
   @Test

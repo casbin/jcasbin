@@ -88,6 +88,18 @@ public class Util {
     }
 
     /**
+     * logPrintf prints the log with the format as an error.
+     *
+     * @param message the message accompanying the exception
+     * @param t       the exception (throwable) to log
+     */
+    public static void logPrintfError(String message, Throwable t) {
+        if (enableLog) {
+            LOGGER.error(message, t);
+        }
+    }
+
+    /**
      * logEnforce prints the log of Enforce.
      *
      * @param request the Enforce request.
@@ -264,8 +276,7 @@ public class Util {
                     records[i] = csvRecords.get(0).get(i).trim();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
-                Util.logPrintfError("CSV parser failed to parse this line:", s);
+                Util.logPrintfError("CSV parser failed to parse this line: " + s, e);
             }
         }
         return records;

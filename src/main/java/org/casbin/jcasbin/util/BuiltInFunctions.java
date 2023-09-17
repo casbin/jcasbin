@@ -410,6 +410,7 @@ public class BuiltInFunctions {
             try {
                 res = (boolean) aviatorEval.execute(eval, env);
             } catch (Exception e) {
+                Util.logPrintfWarn("Execute 'eval' function error, nested exception is: {}", e.getMessage());
                 res = false;
             }
         } else {

@@ -16,12 +16,18 @@ package org.casbin.jcasbin.main;
 
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import org.casbin.jcasbin.util.BuiltInFunctions;
+import org.casbin.jcasbin.util.Util;
 import org.junit.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.casbin.jcasbin.main.TestUtil.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 
 public class BuiltInFunctionsUnitTest {
 
@@ -260,4 +266,21 @@ public class BuiltInFunctionsUnitTest {
         testGlobMatch("/prefix/subprefix/foobar", "*/foo*", false);
         testGlobMatch("/prefix/subprefix/foobar", "*/foo/*", false);
     }
+
+    @Test
+    public void should_logged_when_eval_given_errorExpression() {
+        // given
+        AviatorEvaluatorInstance instance = AviatorEvaluator.getInstance();
+        Map<String, Object> env = new HashMap<>();
+
+        try (MockedStatic<Util> utilMocked = Mockito.mockStatic(Util.class)) {
+            // when
+            BuiltInFunctions.eval("error", env, instance);
+            // then
+            utilMocked.verify(() -> Util.logPrintfWarn(
+                eq("Execute 'eval' function error, nested exception is: {}"),
+                anyString()));
+        }
+    }
+
 }

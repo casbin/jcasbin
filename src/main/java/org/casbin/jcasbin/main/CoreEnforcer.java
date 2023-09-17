@@ -150,6 +150,24 @@ public class CoreEnforcer {
     }
 
     /**
+     * set the aviator evaluator
+     *
+     * @param evaluator aviator evaluator
+     */
+    public void setAviatorEvaluator(AviatorEvaluatorInstance evaluator) {
+        this.aviatorEval = Objects.requireNonNull(evaluator, "The aviator evaluator cannot be null.");
+    }
+
+    /**
+     * gets the current Aviator Evaluator instance
+     *
+     * @return Aviator Evaluator instance of enforcer
+     */
+    public AviatorEvaluatorInstance getAviatorEval() {
+        return aviatorEval;
+    }
+
+    /**
      * getAdapter gets the current adapter.
      *
      * @return the adapter of the enforcer.

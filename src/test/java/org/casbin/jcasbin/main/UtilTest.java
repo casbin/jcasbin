@@ -14,11 +14,21 @@
 
 package org.casbin.jcasbin.main;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
 import org.casbin.jcasbin.util.SyncedLRUCache;
 import org.casbin.jcasbin.util.Util;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
+import org.mockito.BDDMockito;
+import org.mockito.MockedConstruction;
+import org.mockito.MockedStatic;
+
+import java.io.IOException;
+import java.io.StringReader;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.*;
 
 public class UtilTest {
 
@@ -92,4 +102,24 @@ public class UtilTest {
       TestUtil.testCacheGet(cache, "three", 3, true);
       TestUtil.testCacheGet(cache, "four", 4, true);
   }
+
+    @Test
+    public void should_logged_when_splitCommaDelimited_given_ioException() {
+        IOException ioEx = new IOException("Mock IOException");
+        try (
+            MockedStatic<Util> utilMocked = BDDMockito.mockStatic(Util.class);
+            MockedConstruction<CSVFormat> stringReaderMocked = BDDMockito.mockConstruction(CSVFormat.class, (mock, context) -> {
+                BDDMockito.given(mock.parse(any(StringReader.class))).willThrow(ioEx);
+            })) {
+            // given
+            utilMocked.when(() -> Util.splitCommaDelimited(anyString())).thenCallRealMethod();
+            String csv = "\n";
+
+            // when
+            Util.splitCommaDelimited(csv);
+
+            // then
+            utilMocked.verify(() -> Util.logPrintfError(eq("CSV parser failed to parse this line: " + csv), eq(ioEx)));
+        }
+    }
 }

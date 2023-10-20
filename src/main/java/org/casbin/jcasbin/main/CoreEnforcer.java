@@ -716,10 +716,10 @@ public class CoreEnforcer {
         if (rmMap.containsKey(ptype)) {
             DomainManager rm = (DomainManager) rmMap.get(ptype);
             rm.addDomainMatchingFunc(name, fn);
-            clearRmMap();
-            if (autoBuildRoleLinks) {
-                buildRoleLinks();
-            }
+//            clearRmMap();
+//            if (autoBuildRoleLinks) {
+//                buildRoleLinks();
+//            }
             return true;
         }
         return false;

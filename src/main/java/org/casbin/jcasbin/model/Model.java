@@ -33,7 +33,7 @@ public class Model extends Policy {
     private static final Map<String, String> sectionNameMap;
 
     static {
-        sectionNameMap = new HashMap<>();
+        sectionNameMap = new HashMap<>(16);
         sectionNameMap.put("r", "request_definition");
         sectionNameMap.put("p", "policy_definition");
         sectionNameMap.put("g", "role_definition");
@@ -48,7 +48,7 @@ public class Model extends Policy {
     private String defaultSeparator = "::";
 
     public Model() {
-        model = new HashMap<>();
+        model = new HashMap<>(16);
     }
 
     public int getModCount() {
@@ -92,7 +92,7 @@ public class Model extends Policy {
         }
 
         if (!model.containsKey(sec)) {
-            model.put(sec, new HashMap<>());
+            model.put(sec, new HashMap<>(16));
         }
 
         model.get(sec).put(key, ast);
@@ -242,7 +242,7 @@ public class Model extends Policy {
         if (model.get("e") == null || (!"subjectPriority(p_eft) || deny".equals(model.get("e").get("e").value))) {
             return;
         }
-        
+
         for (Map.Entry<String, Assertion> entry : model.get("p").entrySet()) {
             Map<String, Integer> subjectHierarchyMap = getSubjectHierarchyMap(model.get("g").get("g").policy);
             Assertion assertion = entry.getValue();
@@ -265,10 +265,10 @@ public class Model extends Policy {
     }
 
     public Map<String, Integer> getSubjectHierarchyMap(List<List<String>> policies) {
-        Map<String, Integer> subjectHierarchyMap = new HashMap<>();
-        Map<String, String> policyMap = new HashMap<>();
+        Map<String, Integer> subjectHierarchyMap = new HashMap<>(16);
+        Map<String, String> policyMap = new HashMap<>(16);
         String domain = defaultDomain;
-        
+
         for(List<String> policy:policies) {
             if(policy.size()!=2) {
                 domain = policy.get(2);

@@ -61,7 +61,7 @@ public class CoreEnforcer {
     private AviatorEvaluatorInstance aviatorEval;
 
     void initialize() {
-        rmMap = new HashMap<>();
+        rmMap = new HashMap<>(8);
         eft = new DefaultEffector();
         watcher = null;
 
@@ -478,7 +478,7 @@ public class CoreEnforcer {
             initBuiltInFunction();
             fm.isModify = false;
         }
-        Map<String, AviatorFunction> gFunctions = new HashMap<>();
+        Map<String, AviatorFunction> gFunctions = new HashMap<>(8);
         if (model.model.containsKey("g")) {
             for (Map.Entry<String, Assertion> entry : model.model.get("g").entrySet()) {
                 String key = entry.getKey();

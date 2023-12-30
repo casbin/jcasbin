@@ -17,8 +17,11 @@ package org.casbin.jcasbin.main;
 import org.casbin.jcasbin.util.Util;
 import org.junit.Test;
 
+import java.util.HashMap;
+
 import static org.casbin.jcasbin.main.TestUtil.testDomainEnforce;
 import static org.casbin.jcasbin.main.TestUtil.testEnforce;
+import static org.casbin.jcasbin.main.TestUtil.testMapEnforce;
 
 public class AbacAPIUnitTest {
     @Test
@@ -55,13 +58,48 @@ public class AbacAPIUnitTest {
         testDomainEnforce(e, "bob", "domain2", "data2", "read", true);
     }
 
+    @Test
+    public void testEvalMap(){
+        Enforcer e = new Enforcer("examples/abac_rule_model.conf", "examples/abac_rule_policy.csv");
+
+        TestEvalRule alice = new TestEvalRule("alice", 18, "/data1");
+        HashMap<String,String> data1 = new HashMap<String,String>();
+        data1.put("name", alice.getName());
+        data1.put("resource", alice.getResource());
+        testMapEnforce(e, alice, data1, "read", false);
+        testMapEnforce(e, alice, data1, "write", false);
+        alice.setAge(19);
+        testMapEnforce(e, alice, data1, "read", true);
+        testMapEnforce(e, alice, data1, "write", false);
+        alice.setAge(25);
+        testMapEnforce(e, alice, data1, "read", false);
+        testMapEnforce(e, alice, data1, "write", false);
+
+        TestEvalRule bob = new TestEvalRule("bob", 25, "/data2");
+        HashMap<String,String> data2 = new HashMap<String,String>();
+        data2.put("name", bob.getName());
+        data2.put("resource", bob.getResource());
+        testMapEnforce(e, bob, data2, "read", false);
+        testMapEnforce(e, bob, data2, "write", true);
+        bob.setAge(60);
+        testMapEnforce(e, bob, data2, "read", false);
+        testMapEnforce(e, bob, data2, "write", false);
+    }
+
     public static class TestEvalRule {
         private String name;
         private int age;
+        private String resource;
 
         TestEvalRule(String name, int age) {
             this.name = name;
             this.age = age;
+        }
+
+        TestEvalRule(String name, int age, String resource) {
+            this.name = name;
+            this.age = age;
+            this.resource = resource;
         }
 
         public String getName() {
@@ -79,5 +117,9 @@ public class AbacAPIUnitTest {
         public void setAge(int age) {
             this.age = age;
         }
+
+        public String getResource() { return resource; }
+
+        public void setResource(String resource) { this.resource = resource; }
     }
 }

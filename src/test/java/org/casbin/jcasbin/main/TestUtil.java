@@ -23,6 +23,7 @@ import org.casbin.jcasbin.util.Util;
 
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 import static org.junit.Assert.*;
 
@@ -61,6 +62,11 @@ public class TestUtil {
 
     static void testDomainEnforce(Enforcer e, Object sub, Object dom, Object obj, Object act, boolean res) {
         assertEquals(res, e.enforce(sub, dom, obj, act));
+    }
+
+    static void
+    testMapEnforce(Enforcer e, Object sub, Object obj, String act, boolean res) {
+        assertEquals(res, e.enforceMap(sub, obj, act));
     }
 
     static void testGetPolicy(Enforcer e, List<List<String>> res) {

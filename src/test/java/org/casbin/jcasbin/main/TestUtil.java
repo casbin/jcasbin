@@ -23,7 +23,6 @@ import org.casbin.jcasbin.util.Util;
 
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 import static org.junit.Assert.*;
 

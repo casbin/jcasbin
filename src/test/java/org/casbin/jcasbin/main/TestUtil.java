@@ -64,11 +64,6 @@ public class TestUtil {
         assertEquals(res, e.enforce(sub, dom, obj, act));
     }
 
-    static void
-    testMapEnforce(Enforcer e, Object sub, Object obj, String act, boolean res) {
-        assertEquals(res, e.enforceMap(sub, obj, act));
-    }
-
     static void testGetPolicy(Enforcer e, List<List<String>> res) {
         List<List<String>> myRes = e.getPolicy();
         Util.logPrint("Policy: " + myRes);

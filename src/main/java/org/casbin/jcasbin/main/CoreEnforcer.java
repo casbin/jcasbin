@@ -654,17 +654,6 @@ public class CoreEnforcer {
     }
 
     /**
-     * based on enforce, add map for Abac
-     */
-    public boolean enforceMap(Object... rvals) {
-        if (rvals[1] instanceof HashMap){
-            String obj = ((HashMap<String, String>) rvals[1]).get("resource");
-            rvals[1] = obj;
-        }
-        return enforce(null, rvals).isAllow();
-    }
-
-    /**
      * enforceWithMatcher use a custom matcher to decide whether a "subject" can access a "object" with the operation "action",
      * input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "" or null.
      *

@@ -15,6 +15,7 @@
 package org.casbin.jcasbin.model;
 
 import org.casbin.jcasbin.config.Config;
+import org.casbin.jcasbin.log.*;
 import org.casbin.jcasbin.util.Util;
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ import static org.casbin.jcasbin.util.Util.splitCommaDelimited;
  * Model represents the whole access control model.
  */
 public class Model extends Policy {
-    private static final Map<String, String> sectionNameMap;
+    public static final Map<String, String> sectionNameMap;
 
     static {
         sectionNameMap = new HashMap<>();
@@ -40,6 +41,8 @@ public class Model extends Policy {
         sectionNameMap.put("e", "policy_effect");
         sectionNameMap.put("m", "matchers");
     }
+
+    public static final String[] requiredSections = {"r", "p", "e", "m"};
 
     // used by CoreEnforcer to detect changes to Model
     protected int modCount;
@@ -134,6 +137,49 @@ public class Model extends Policy {
     }
 
     /**
+     * SetLogger sets the model's logger.
+     */
+    public void setLogger(Logger logger) {
+        for (Map<String, Assertion> astMap : model.values()) {
+            for (Assertion ast : astMap.values()) {
+                ast.setLogger(logger);
+            }
+        }
+        model.put("logger", Collections.singletonMap("logger", new Assertion(logger)));
+    }
+
+    /**
+     * NewModel creates an empty model.
+     */
+    public static Model newModel() {
+        Model model = new Model();
+        model.setLogger(new DefaultLogger());
+        return model;
+    }
+
+    /**
+     * NewModelFromString creates a model from a string which contains model text.
+     *
+     * @param path the path of the model file.
+     */
+    public static Model newModelFromFile(String path) {
+        Model model = new Model();
+        model.loadModel(path);
+        return model;
+    }
+
+    /**
+     * NewModelFromString creates a model from a string which contains model text.
+     *
+     * @param text the path of the file.
+     */
+    public static Model newModelFromString(String text) {
+        Model model = new Model();
+        model.loadModelFromText(text);
+        return model;
+    }
+
+    /**
      * loadModel loads the model from model CONF file.
      *
      * @param path the path of the model file.
@@ -156,6 +202,34 @@ public class Model extends Policy {
     }
 
     /**
+     * loadModelFromConfig loads the model from the configuration.
+     *
+     * @param cfg the model text.
+     */
+    public void loadModelFromConfig(Config cfg) {
+        for (String s : sectionNameMap.keySet()) {
+            loadSection(this, cfg, s);
+        }
+        List<String> ms = new ArrayList<>();
+        for (String rs : requiredSections) {
+            if (!hasSection(rs)) {
+                ms.add(sectionNameMap.get(rs));
+            }
+        }
+        if (!ms.isEmpty()) {
+            throw new RuntimeException("missing required sections: " + String.join(",", ms));
+        }
+    }
+
+    /**
+     * hasSection checks if the section exists in the model.
+     */
+    public boolean hasSection(String sec) {
+        Map<String, Assertion> section = model.get(sec);
+        return section != null;
+    }
+
+    /**
      * saveSectionToText saves the section to the text.
      *
      * @return the section text.
@@ -169,7 +243,7 @@ public class Model extends Policy {
         }
 
         for (Map.Entry<String, Assertion> entry : section.entrySet()) {
-            res.append(String.format("%s = %s\n", entry.getKey(), entry.getValue().value.replace("_", ".")));
+            res.append(String.format("%s = %s\n", entry.getKey(), entry.getValue().value));
         }
 
         return res.toString();
@@ -242,7 +316,7 @@ public class Model extends Policy {
         if (model.get("e") == null || (!"subjectPriority(p_eft) || deny".equals(model.get("e").get("e").value))) {
             return;
         }
-        
+
         for (Map.Entry<String, Assertion> entry : model.get("p").entrySet()) {
             Map<String, Integer> subjectHierarchyMap = getSubjectHierarchyMap(model.get("g").get("g").policy);
             Assertion assertion = entry.getValue();
@@ -268,7 +342,7 @@ public class Model extends Policy {
         Map<String, Integer> subjectHierarchyMap = new HashMap<>();
         Map<String, String> policyMap = new HashMap<>();
         String domain = defaultDomain;
-        
+
         for(List<String> policy:policies) {
             if(policy.size()!=2) {
                 domain = policy.get(2);

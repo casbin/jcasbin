@@ -18,6 +18,7 @@ import org.casbin.jcasbin.config.Config;
 import org.casbin.jcasbin.log.*;
 import org.casbin.jcasbin.util.Util;
 
+import java.util.regex.Pattern;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -243,7 +244,7 @@ public class Model extends Policy {
         }
 
         for (Map.Entry<String, Assertion> entry : section.entrySet()) {
-            res.append(String.format("%s = %s\n", entry.getKey(), entry.getValue().value));
+             res.append(String.format("%s = %s\n", entry.getKey(), entry.getValue().value.replace("_", ".")));
         }
 
         return res.toString();
@@ -385,5 +386,50 @@ public class Model extends Policy {
     public enum PolicyOperations {
         POLICY_ADD,
         POLICY_REMOVE
+    }
+
+    public String toText() {
+        Map<String, String> tokenPatterns = new HashMap<>();
+
+        Pattern pPattern = Pattern.compile("^p_");
+        Pattern rPattern = Pattern.compile("^r_");
+
+        for (String ptype : new String[]{"r", "p"}) {
+            for (String token : model.get(ptype).get(ptype).tokens) {
+                String newToken = rPattern.matcher(pPattern.matcher(token).replaceAll("p.")).replaceAll("r.");
+                tokenPatterns.put(token, newToken);
+            }
+        }
+
+        if (model.get("e").get("e").value.contains("p_eft")) {
+            tokenPatterns.put("p_eft", "p.eft");
+        }
+
+        StringBuilder s = new StringBuilder();
+        writeString(s, "r", tokenPatterns);
+        writeString(s, "p", tokenPatterns);
+
+        if (model.containsKey("g")) {
+            s.append("[role_definition]\n");
+            for (String ptype : model.get("g").keySet()) {
+                s.append(String.format("%s = %s\n", ptype, model.get("g").get(ptype).value));
+            }
+        }
+
+        writeString(s, "e", tokenPatterns);
+        writeString(s, "m", tokenPatterns);
+
+        return s.toString();
+    }
+
+    private void writeString(StringBuilder s, String sec, Map<String, String> tokenPatterns) {
+        s.append(String.format("[%s]\n", sectionNameMap.get(sec)));
+        for (String ptype : model.get(sec).keySet()) {
+            String value = model.get(sec).get(ptype).value;
+            for (Map.Entry<String, String> entry : tokenPatterns.entrySet()) {
+                value = value.replace(entry.getKey(), entry.getValue());
+            }
+            s.append(String.format("%s = %s\n", sec, value));
+        }
     }
 }

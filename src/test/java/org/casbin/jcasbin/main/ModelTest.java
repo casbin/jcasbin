@@ -145,8 +145,8 @@ public class ModelTest {
         }
 
         Model newM = new Model();
-        System.out.println(m.saveModelToText());
-        newM.loadModelFromText(m.saveModelToText());
+        System.out.println(m.toText());
+        newM.loadModelFromText(m.toText());
 
         for (int i = 0; i < ptypes.length; i++) {
             assertEquals(expectedValues[i], newM.model.get(ptypes[i]).get(ptypes[i]).value);

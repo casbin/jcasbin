@@ -14,6 +14,7 @@
 
 package org.casbin.jcasbin.model;
 
+import org.casbin.jcasbin.log.Logger;
 import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.Util;
 
@@ -34,10 +35,17 @@ public class Assertion {
     public Map<String, Integer> policyIndex;
     public RoleManager rm;
     public int priorityIndex;
+    private Logger logger;
 
     public Assertion() {
         policy = new ArrayList<>();
         policyIndex = new HashMap<>();
+    }
+
+    public Assertion(Logger logger) {
+        policy = new ArrayList<>();
+        policyIndex = new HashMap<>();
+        setLogger(logger);
     }
 
     protected void buildRoleLinks(RoleManager rm) {
@@ -95,5 +103,13 @@ public class Assertion {
 
     public void initPriorityIndex() {
         priorityIndex = -1;
+    }
+
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public void setLogger(Logger logger) {
+        this.logger = logger;
     }
 }

@@ -34,7 +34,7 @@ public class Config {
     /**
      * Config represents the configuration parser.
      */
-    private Config() {
+    public Config() {
         data = new HashMap<>();
     }
 

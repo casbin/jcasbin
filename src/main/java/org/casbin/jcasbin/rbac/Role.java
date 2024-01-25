@@ -67,10 +67,10 @@ class Role {
     }
 
     void removeMatches() {
-        this.matched.values().forEach(this::removeMatch);
-        // https://stackoverflow.com/a/223929/10206831
-        for (Iterator<Role> iterator = this.matchedBy.values().iterator(); iterator.hasNext();) {
-            Role role = iterator.next();
+        Iterator<Map.Entry<String, Role>> iterator = this.matchedBy.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, Role> entry = iterator.next();
+            Role role = entry.getValue();
             role.matched.remove(this.name);
             iterator.remove();
         }

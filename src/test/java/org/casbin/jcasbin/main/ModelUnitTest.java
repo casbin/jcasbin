@@ -14,10 +14,11 @@
 
 package org.casbin.jcasbin.main;
 
+import org.casbin.jcasbin.persist.file_adapter.AdapterMock;
 import org.casbin.jcasbin.rbac.RoleManager;
+import org.casbin.jcasbin.util.BuiltInFunctions;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.casbin.jcasbin.main.TestUtil.testDomainEnforce;
@@ -27,6 +28,20 @@ import static org.casbin.jcasbin.main.TestUtil.testEnforceWithoutUsers;
 public class ModelUnitTest {
     @Test
     public void testBasicModel() {
+        Enforcer e = new Enforcer("examples/basic_model_without_spaces.conf", "examples/basic_policy.csv");
+
+        testEnforce(e, "alice", "data1", "read", true);
+        testEnforce(e, "alice", "data1", "write", false);
+        testEnforce(e, "alice", "data2", "read", false);
+        testEnforce(e, "alice", "data2", "write", false);
+        testEnforce(e, "bob", "data1", "read", false);
+        testEnforce(e, "bob", "data1", "write", false);
+        testEnforce(e, "bob", "data2", "read", false);
+        testEnforce(e, "bob", "data2", "write", true);
+    }
+
+    @Test
+    public void testBasicModelWithoutSpaces() {
         Enforcer e = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv");
 
         testEnforce(e, "alice", "data1", "read", true);
@@ -198,6 +213,25 @@ public class ModelUnitTest {
     }
 
     @Test
+    public void testRBACModelWithDomainsAtRuntimeMockAdapter(){
+        AdapterMock adapter = new AdapterMock("examples/rbac_with_domains_policy.csv");
+        Enforcer e = new Enforcer("examples/rbac_with_domains_model.conf", adapter);
+
+        e.addPolicy("admin", "domain3", "data1", "read");
+        e.addGroupingPolicy("alice", "admin", "domain3");
+
+        testDomainEnforce(e, "alice", "domain3", "data1", "read", true);
+
+        testDomainEnforce(e, "alice", "domain1", "data1", "read", true);
+        e.removeFilteredPolicy(1, "domain1", "data1");
+        testDomainEnforce(e, "alice", "domain1", "data1", "read", false);
+
+        testDomainEnforce(e, "bob", "domain2", "data2", "read", true);
+        e.removePolicy("admin", "domain2", "data2", "read");
+        testDomainEnforce(e, "bob", "domain2", "data2", "read", false);
+    }
+
+    @Test
     public void testRBACModelWithDeny() {
         Enforcer e = new Enforcer("examples/rbac_with_deny_model.conf", "examples/rbac_with_deny_policy.csv");
 
@@ -251,6 +285,43 @@ public class ModelUnitTest {
         testEnforce(e, "bob", "data1", "write", false);
         testEnforce(e, "bob", "data2", "read", false);
         testEnforce(e, "bob", "data2", "write", true);
+    }
+
+    @Test
+    public void testRBACModelWithPattern(){
+        Enforcer e = new Enforcer("examples/rbac_with_pattern_model.conf", "examples/rbac_with_pattern_policy.csv");
+
+        // Here's a little confusing: the matching function here is not the custom function used in matcher.
+        // It is the matching function used by "g" (and "g2", "g3" if any..)
+        // You can see in policy that: "g2, /book/:id, book_group", so in "g2()" function in the matcher, instead
+        // of checking whether "/book/:id" equals the obj: "/book/1", it checks whether the pattern matches.
+        // You can see it as normal RBAC: "/book/:id" == "/book/1" becomes KeyMatch2("/book/:id", "/book/1")
+        e.addNamedMatchingFunc("g2", "KeyMatch2", BuiltInFunctions::keyMatch2);
+        e.addNamedMatchingFunc("g", "KeyMatch2", BuiltInFunctions::keyMatch2);
+        testEnforce(e, "any_user", "/pen3/1", "GET", true);
+        testEnforce(e, "/book/user/1", "/pen4/1", "GET", true);
+
+        testEnforce(e, "/book/user/1", "/pen4/1", "POST", true);
+
+        testEnforce(e, "alice", "/book/1", "GET", true);
+        testEnforce(e, "alice", "/book/2", "GET", true);
+        testEnforce(e, "alice", "/pen/1", "GET", true);
+        testEnforce(e, "alice", "/pen/2", "GET", false);
+        testEnforce(e, "bob", "/book/1", "GET", false);
+        testEnforce(e, "bob", "/pen/1", "GET", true);
+        testEnforce(e, "bob", "/pen/2", "GET", true);
+
+        // AddMatchingFunc() is actually setting a function because only one function is allowed,
+        // so when we set "KeyMatch3", we are actually replacing "KeyMatch2" with "KeyMatch3".
+        e.addNamedMatchingFunc("g2", "KeyMatch2", BuiltInFunctions::keyMatch3);
+        testEnforce(e, "alice", "/book2/1", "GET", true);
+        testEnforce(e, "alice", "/book2/2", "GET", true);
+        testEnforce(e, "alice", "/pen2/1", "GET", true);
+        testEnforce(e, "alice", "/pen2/2", "GET", false);
+        testEnforce(e, "bob", "/book2/1", "GET", false);
+        testEnforce(e, "bob", "/book2/2", "GET", false);
+        testEnforce(e, "bob", "/pen2/1", "GET", true);
+        testEnforce(e, "bob", "/pen2/2", "GET", true);
     }
 
     class CustomRoleManager implements RoleManager {

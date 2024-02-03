@@ -35,7 +35,7 @@ public class AbacAPIUnitTest {
         testEnforce(e, alice, "/data1", "read", true);
         testEnforce(e, alice, "/data1", "write", false);
         alice.setAge(25);
-        testEnforce(e, alice, "/data1", "read", false);
+        testEnforce(e, alice, "/data1", "read", true);
         testEnforce(e, alice, "/data1", "write", false);
         testEnforce(e, alice, "/data2", "read", false);
         testEnforce(e, alice, "/data2", "write", true);

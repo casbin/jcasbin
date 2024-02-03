@@ -17,13 +17,18 @@ package org.casbin.jcasbin.main;
 import org.casbin.jcasbin.persist.file_adapter.AdapterMock;
 import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.BuiltInFunctions;
+import org.casbin.jcasbin.util.Util;
 import org.junit.Test;
 
-import java.util.List;
+import java.util.*;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.casbin.jcasbin.main.TestUtil.testDomainEnforce;
 import static org.casbin.jcasbin.main.TestUtil.testEnforce;
 import static org.casbin.jcasbin.main.TestUtil.testEnforceWithoutUsers;
+import static org.junit.Assert.assertEquals;
 
 public class ModelUnitTest {
     @Test
@@ -414,6 +419,109 @@ public class ModelUnitTest {
         testEnforce(e, "bob", data1, "write", false);
         testEnforce(e, "bob", data2, "read", true);
         testEnforce(e, "bob", data2, "write", true);
+    }
+
+    @Test
+    public void testABACMapRequest(){
+        Enforcer e = new Enforcer("examples/abac_model.conf");
+
+        Map<String, Object> data1 = new HashMap<>();
+        data1.put("Name", "data1");
+        data1.put("Owner", "alice");
+
+        Map<String, Object> data2 = new HashMap<>();
+        data2.put("Name", "data2");
+        data2.put("Owner", "bob");
+
+        testEnforce(e, "alice", data1, "read", true);
+        testEnforce(e, "alice", data1, "write", true);
+        testEnforce(e, "alice", data2, "read", false);
+        testEnforce(e, "alice", data2, "write", false);
+        testEnforce(e, "bob", data1, "read", false);
+        testEnforce(e, "bob", data1, "write", false);
+        testEnforce(e, "bob", data2, "read", true);
+        testEnforce(e, "bob", data2, "write", true);
+    }
+
+    static class StructRequest {
+        private List<Object> Roles;
+        private boolean Enabled;
+        private int Age;
+        private String Name;
+
+        // Getters and setters
+        public List<Object> getRoles() {
+            return Roles;
+        }
+
+        public void setRoles(List<Object> Roles) {
+            this.Roles = Roles;
+        }
+
+        public boolean isEnabled() {
+            return Enabled;
+        }
+
+        public void setEnabled(boolean Enabled) {
+            this.Enabled = Enabled;
+        }
+
+        public int getAge() {
+            return Age;
+        }
+
+        public void setAge(int Age) {
+            this.Age = Age;
+        }
+
+        public String getName() {
+            return Name;
+        }
+
+        public void setName(String Name) {
+            this.Name = Name;
+        }
+    }
+
+    public static void testEnforce(Enforcer e, Object sub, Object obj, String act, boolean res) {
+        try {
+            boolean myRes = e.enforce(sub, obj, act);
+            assertEquals(String.format("%s, %s, %s: %b, supposed to be %b", sub, obj, act, myRes, res), res, myRes);
+        } catch (Exception ex) {
+            throw new RuntimeException(String.format("Enforce Error: %s", ex.getMessage()), ex);
+        }
+    }
+
+    @Test
+    public void testABACTypes(){
+        Enforcer e = new Enforcer("examples/abac_model.conf");
+        String matcher = "\"moderator\" in r.sub.Roles && r.sub.Enabled == true && r.sub.Age >= 21 && r.sub.Name != \"foo\"";
+        e.getModel().model.get("m").get("m").value = (Util.removeComments(Util.escapeAssertion(matcher)));
+
+        // Struct request
+        StructRequest structRequest = new StructRequest();
+        structRequest.setRoles(Arrays.asList("user", "moderator"));
+        structRequest.setEnabled(true);
+        structRequest.setAge(30);
+        structRequest.setName("alice");
+        testEnforce(e, structRequest, null, "", true);
+
+        // Map request
+        Map<String, Object> mapRequest = new HashMap<>();
+        mapRequest.put("Roles", Arrays.asList("user", "moderator"));
+        mapRequest.put("Enabled", true);
+        mapRequest.put("Age", 30);
+        mapRequest.put("Name", "alice");
+        testEnforce(e, mapRequest, null, "", true);
+
+        // JSON request
+        e.enableAcceptJsonRequest(true);
+        try {
+            String jsonRequest = new ObjectMapper().writeValueAsString(mapRequest);
+            testEnforce(e, jsonRequest, "", "", true);
+        } catch (JsonProcessingException jsonProcessingException) {
+            jsonProcessingException.printStackTrace();
+        }
     }
 
     @Test

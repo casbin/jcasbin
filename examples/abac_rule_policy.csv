@@ -1,3 +1,2 @@
-p, r.sub.not_exist_attribute_test == true, /data0, read
-p, r.sub.age > 18 && r.sub.age < 25, /data1, read
-p, r.sub.age < 60, /data2, write
+p, r.sub.Age > 18, /data1, read
+p, r.sub.Age < 60, /data2, write

@@ -14,6 +14,9 @@
 
 package org.casbin.jcasbin.main;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
@@ -57,6 +60,7 @@ public class CoreEnforcer {
     boolean autoBuildRoleLinks;
     boolean autoNotifyWatcher = true;
     boolean autoNotifyDispatcher = true;
+    boolean acceptJsonRequest = false;
 
     private AviatorEvaluatorInstance aviatorEval;
 
@@ -448,6 +452,15 @@ public class CoreEnforcer {
     }
 
     /**
+     * EnableAcceptJsonRequest controls whether to accept json as a request parameter
+     *
+     * @param acceptJsonRequest
+     */
+    public void enableAcceptJsonRequest(boolean acceptJsonRequest) {
+        this.acceptJsonRequest = acceptJsonRequest;
+    }
+
+    /**
      * buildRoleLinks manually rebuild the
      * role inheritance relations.
      */
@@ -514,6 +527,28 @@ public class CoreEnforcer {
             expString = model.model.get("m").get(mType).value;
         } else {
             expString = Util.removeComments(Util.escapeAssertion(matcher));
+        }
+
+        // json process
+        if (acceptJsonRequest) {
+            try {
+                List<Object> parsedRvals = new ArrayList<>();
+                ObjectMapper objectMapper = new ObjectMapper();
+
+                for (Object rval : rvals) {
+                    if (rval instanceof String && !((String) rval).isEmpty() && Util.isJsonString((String) rval)) {
+                        String jsonString = (String) rval;
+                        Map<String, Object> mapValue = objectMapper.readValue(jsonString, new TypeReference<Map<String, Object>>() {});
+                        parsedRvals.add(mapValue);
+                    } else {
+                        parsedRvals.add(rval);
+                    }
+                }
+
+                rvals = parsedRvals.toArray();
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
         }
 
         expString = Util.convertInSyntax(expString);

@@ -14,6 +14,8 @@
 
 package org.casbin.jcasbin.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -328,6 +330,22 @@ public class Util {
             return MessageDigest.getInstance(algorithm);
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalArgumentException(e);
+        }
+    }
+
+    /**
+     * Helper method to check if a string is a valid JSON
+     *
+     * @param str
+     * @return boolean
+     */
+    public static boolean isJsonString(String str) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.readTree(str);
+            return true;
+        } catch (JsonProcessingException e) {
+            return false;
         }
     }
 }

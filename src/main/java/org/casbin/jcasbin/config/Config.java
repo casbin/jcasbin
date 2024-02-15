@@ -120,6 +120,12 @@ public class Config {
             } else if (line.startsWith("[") && line.endsWith("]")) {
                 section = line.substring(1, line.length() - 1);
             } else {
+                int index1 = line.indexOf(DEFAULT_COMMENT);
+                int index2 = line.indexOf(DEFAULT_COMMENT_SEM);
+                int index = (index1 != -1 && index2 != -1) ? Math.min(index1, index2) : (index1 != -1) ? index1 : (index2 != -1) ? index2 : -1;
+                if (index != -1)
+                    line = line.substring(0, index);
+
                 String[] optionVal = line.split("=", 2);
                 if (optionVal.length != 2) {
                     throw new IllegalArgumentException(String.format("parse the content error : line %d , %s = ? ", lineNum, optionVal[0]));

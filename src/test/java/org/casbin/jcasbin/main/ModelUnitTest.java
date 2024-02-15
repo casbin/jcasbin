@@ -14,10 +14,14 @@
 
 package org.casbin.jcasbin.main;
 
+import com.googlecode.aviator.runtime.function.FunctionUtils;
+import com.googlecode.aviator.runtime.type.AviatorBoolean;
+import com.googlecode.aviator.runtime.type.AviatorObject;
 import org.casbin.jcasbin.persist.file_adapter.AdapterMock;
 import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.BuiltInFunctions;
 import org.casbin.jcasbin.util.Util;
+import org.casbin.jcasbin.util.function.CustomFunction;
 import org.junit.Test;
 
 import java.util.*;
@@ -619,6 +623,41 @@ public class ModelUnitTest {
         testEnforce(e, "alice", "/alice_data2/myid/using/res_id", "GET", true);
     }
 
+    public boolean customFunction(String key1, String key2){
+        if (key1.equals("/alice_data2/myid/using/res_id") && key2.equals("/alice_data/:resource")){
+            return true;
+        } else if (key1.equals("/alice_data2/myid/using/res_id") && key2.equals("/alice_data2/:id/using/:resId")){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public class customFunctionWrapper extends CustomFunction {
+        @Override
+        public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+            String key1 = FunctionUtils.getStringValue(arg1, env);
+            String key2 = FunctionUtils.getStringValue(arg2, env);
+
+            return AviatorBoolean.valueOf(customFunction(key1, key2));
+        }
+
+        @Override
+        public String getName() {
+            return "keyMatchCustom";
+        }
+    }
+
+    @Test
+    public void testKeyMatchCustomModel(){
+        Enforcer e = new Enforcer("examples/keymatch_custom_model.conf", "examples/keymatch2_policy.csv");
+
+        e.addFunction("keyMatchCustom", new customFunctionWrapper());
+
+        testEnforce(e, "alice", "/alice_data2/myid", "GET", false);
+        testEnforce(e, "alice", "/alice_data2/myid/using/res_id", "GET", true);
+    }
+
     @Test
     public void testIPMatchModel() {
         Enforcer e = new Enforcer("examples/ipmatch_model.conf", "examples/ipmatch_policy.csv");
@@ -674,6 +713,20 @@ public class ModelUnitTest {
     }
 
     @Test
+    public void testRBACModelInMultiLines(){
+        Enforcer e = new Enforcer("examples/rbac_model_in_multi_line.conf", "examples/rbac_policy.csv");
+
+        testEnforce(e, "alice", "data1", "read", true);
+        testEnforce(e, "alice", "data1", "write", false);
+        testEnforce(e, "alice", "data2", "read", true);
+        testEnforce(e, "alice", "data2", "write", true);
+        testEnforce(e, "bob", "data1", "read", false);
+        testEnforce(e, "bob", "data1", "write", false);
+        testEnforce(e, "bob", "data2", "read", false);
+        testEnforce(e, "bob", "data2", "write", true);
+    }
+
+    @Test
     public void testABACNotUsingPolicy(){
         Enforcer e = new Enforcer("examples/abac_not_using_policy_model.conf", "examples/abac_rule_effect_policy.csv");
 
@@ -684,6 +737,54 @@ public class ModelUnitTest {
         testEnforce(e, "alice", data1, "write", true);
         testEnforce(e, "alice", data2, "read", false);
         testEnforce(e, "alice", data2, "write", false);
+    }
+
+    public class TestSubject{
+        private String name;
+        private int age;
+
+        public TestSubject(String name, int age){
+            this.name = name;
+            this.age = age;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public int getAge() {
+            return age;
+        }
+
+        public void setAge(int age) {
+            this.age = age;
+        }
+    }
+
+    @Test
+    public void testABACPolicy(){
+        Enforcer e = new Enforcer("examples/abac_rule_model.conf", "examples/abac_rule_policy.csv");
+
+        TestSubject sub1 = new TestSubject("alice", 16);
+        TestSubject sub2 = new TestSubject("alice", 20);
+        TestSubject sub3 = new TestSubject("alice", 65);
+
+        testEnforce(e, sub1, "/data1", "read", false);
+        testEnforce(e, sub1, "/data2", "read", false);
+        testEnforce(e, sub1, "/data1", "write", false);
+        testEnforce(e, sub1, "/data2", "write", true);
+        testEnforce(e, sub2, "/data1", "read", true);
+        testEnforce(e, sub2, "/data2", "read", false);
+        testEnforce(e, sub2, "/data1", "write", false);
+        testEnforce(e, sub2, "/data2", "write", true);
+        testEnforce(e, sub3, "/data1", "read", true);
+        testEnforce(e, sub3, "/data2", "read", false);
+        testEnforce(e, sub3, "/data1", "write", false);
+        testEnforce(e, sub3, "/data2", "write", false);
     }
 
     @Test

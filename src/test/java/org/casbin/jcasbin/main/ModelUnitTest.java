@@ -525,6 +525,64 @@ public class ModelUnitTest {
     }
 
     @Test
+    public void testABACJsonRequest(){
+        Enforcer e1 = new Enforcer("examples/abac_model.conf");
+        e1.enableAcceptJsonRequest(true);
+
+        Map data1Json = new HashMap<String,String>();
+        data1Json.put("Name", "data1");
+        data1Json.put("Owner", "alice");
+        Map data2Json = new HashMap<String,String>();
+        data2Json.put("Name", "data2");
+        data2Json.put("Owner", "bob");
+
+        testEnforce(e1, "alice", data1Json, "read", true);
+        testEnforce(e1, "alice", data1Json, "write", true);
+        testEnforce(e1, "alice", data2Json, "read", false);
+        testEnforce(e1, "alice", data2Json, "write", false);
+        testEnforce(e1, "bob", data1Json, "read", false);
+        testEnforce(e1, "bob", data1Json, "write", false);
+        testEnforce(e1, "bob", data2Json, "read", true);
+        testEnforce(e1, "bob", data2Json, "write", true);
+
+
+        Enforcer e2 = new Enforcer("examples/abac_not_using_policy_model.conf", "examples/abac_rule_effect_policy.csv");
+        e2.enableAcceptJsonRequest(true);
+
+        testEnforce(e2, "alice", data1Json, "read", true);
+        testEnforce(e2, "alice", data1Json, "write", true);
+        testEnforce(e2, "alice", data2Json, "read", false);
+        testEnforce(e2, "alice", data2Json, "write", false);
+
+
+        Enforcer e3 = new Enforcer("examples/abac_rule_model.conf", "examples/abac_rule_policy.csv");
+        e3.enableAcceptJsonRequest(true);
+
+        Map sub1Json = new HashMap<String,Object>();
+        sub1Json.put("Name", "alice");
+        sub1Json.put("Age", 16);
+        Map sub2Json = new HashMap<String,String>();
+        sub2Json.put("Name", "alice");
+        sub2Json.put("Age", 20);
+        Map sub3Json = new HashMap<String,String>();
+        sub3Json.put("Name", "alice");
+        sub3Json.put("Age", 65);
+
+        testEnforce(e3, sub1Json, "/data1", "read", false);
+        testEnforce(e3, sub1Json, "/data2", "read", false);
+        testEnforce(e3, sub1Json, "/data1", "write", false);
+        testEnforce(e3, sub1Json, "/data2", "write", true);
+        testEnforce(e3, sub2Json, "/data1", "read", true);
+        testEnforce(e3, sub2Json, "/data2", "read", false);
+        testEnforce(e3, sub2Json, "/data1", "write", false);
+        testEnforce(e3, sub2Json, "/data2", "write", true);
+        testEnforce(e3, sub3Json, "/data1", "read", true);
+        testEnforce(e3, sub3Json, "/data2", "read", false);
+        testEnforce(e3, sub3Json, "/data1", "write", false);
+        testEnforce(e3, sub3Json, "/data2", "write", false);
+    }
+
+    @Test
     public void testKeyMatchModel() {
         Enforcer e = new Enforcer("examples/keymatch_model.conf", "examples/keymatch_policy.csv");
 
@@ -613,6 +671,19 @@ public class ModelUnitTest {
         Enforcer e = new Enforcer("examples/priority_model.conf", "examples/priority_indeterminate_policy.csv");
 
         testEnforce(e, "alice", "data1", "read", false);
+    }
+
+    @Test
+    public void testABACNotUsingPolicy(){
+        Enforcer e = new Enforcer("examples/abac_not_using_policy_model.conf", "examples/abac_rule_effect_policy.csv");
+
+        TestResource data1 = new TestResource("data1", "alice");
+        TestResource data2 = new TestResource("data2", "bob");
+
+        testEnforce(e, "alice", data1, "read", true);
+        testEnforce(e, "alice", data1, "write", true);
+        testEnforce(e, "alice", data2, "read", false);
+        testEnforce(e, "alice", data2, "write", false);
     }
 
     @Test

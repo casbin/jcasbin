@@ -571,7 +571,7 @@ public class CoreEnforcer {
         final int policyLen = policy.size();
         int explainIndex = -1;
 
-        if (policyLen != 0) {
+        if (policyLen != 0 && expString.contains(pType+"_")) {
             policyEffects = new Effect[policyLen];
             matcherResults = new float[policyLen];
 

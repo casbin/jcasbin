@@ -788,6 +788,20 @@ public class ModelUnitTest {
     }
 
     @Test
+    public void testCommentModel(){
+        Enforcer e = new Enforcer("examples/comment_model.conf", "examples/basic_policy.csv");
+
+        testEnforce(e, "alice", "data1", "read", true);
+        testEnforce(e, "alice", "data1", "write", false);
+        testEnforce(e, "alice", "data2", "read", false);
+        testEnforce(e, "alice", "data2", "write", false);
+        testEnforce(e, "bob", "data1", "read", false);
+        testEnforce(e, "bob", "data1", "write", false);
+        testEnforce(e, "bob", "data2", "read", false);
+        testEnforce(e, "bob", "data2", "write", true);
+    }
+
+    @Test
     public void testSubjectPriorityWithDomain() {
         Enforcer e = new Enforcer("examples/subject_priority_model_with_domain.conf", "examples/subject_priority_policy_with_domain.csv");
 

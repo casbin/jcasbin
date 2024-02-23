@@ -802,6 +802,35 @@ public class ModelUnitTest {
     }
 
     @Test
+    public void testDomainMatchModel(){
+        Enforcer e = new Enforcer("examples/rbac_with_domain_pattern_model.conf", "examples/rbac_with_domain_pattern_policy.csv");
+        e.addNamedDomainMatchingFunc("g", "keyMatch2", BuiltInFunctions::keyMatch2);
+
+        testDomainEnforce(e, "alice", "domain1", "data1", "read", true);
+        testDomainEnforce(e, "alice", "domain1", "data1", "write", true);
+        testDomainEnforce(e, "alice", "domain1", "data2", "read", false);
+        testDomainEnforce(e, "alice", "domain1", "data2", "write", false);
+        testDomainEnforce(e, "alice", "domain2", "data2", "read", true);
+        testDomainEnforce(e, "alice", "domain2", "data2", "write", true);
+        testDomainEnforce(e, "bob", "domain2", "data1", "read", false);
+        testDomainEnforce(e, "bob", "domain2", "data1", "write", false);
+        testDomainEnforce(e, "bob", "domain2", "data2", "read", true);
+        testDomainEnforce(e, "bob", "domain2", "data2", "write", true);
+    }
+
+    @Test
+    public void testAllMatchModel(){
+        Enforcer e = new Enforcer("examples/rbac_with_all_pattern_model.conf", "examples/rbac_with_all_pattern_policy.csv");
+        e.addNamedMatchingFunc("g", "keyMatch2", BuiltInFunctions::keyMatch2);
+        e.addNamedDomainMatchingFunc("g", "keyMatch2", BuiltInFunctions::keyMatch2);
+
+        testDomainEnforce(e, "alice", "domain1", "/book/1", "read", true);
+        testDomainEnforce(e, "alice", "domain1", "/book/1", "write", false);
+        testDomainEnforce(e, "alice", "domain2", "/book/1", "read", false);
+        testDomainEnforce(e, "alice", "domain2", "/book/1", "write", true);
+    }
+
+    @Test
     public void testSubjectPriorityWithDomain() {
         Enforcer e = new Enforcer("examples/subject_priority_model_with_domain.conf", "examples/subject_priority_policy_with_domain.csv");
 

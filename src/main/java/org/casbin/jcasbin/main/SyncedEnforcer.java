@@ -19,6 +19,8 @@ import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.Watcher;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -30,6 +32,8 @@ import java.util.function.Supplier;
 public class SyncedEnforcer extends Enforcer {
 
     private final static ReadWriteLock READ_WRITE_LOCK = new ReentrantReadWriteLock();
+    private final Object stopAutoLoad = new Object();
+    private final AtomicInteger autoLoadRunning = new AtomicInteger(0);
 
     /**
      * ;
@@ -96,6 +100,45 @@ public class SyncedEnforcer extends Enforcer {
      */
     public SyncedEnforcer(String modelPath, String policyFile, boolean enableLog) {
         super(modelPath, policyFile, enableLog);
+    }
+
+    public boolean isAutoLoadingRunning() {
+        return autoLoadRunning.get() != 0;
+    }
+
+    public void startAutoLoadPolicy(long d) {
+        if (!autoLoadRunning.compareAndSet(0, 1)) {
+            return;
+        }
+
+        Thread thread = new Thread(() -> {
+            try {
+                int n = 1;
+                while (true) {
+                    TimeUnit.MILLISECONDS.sleep(d);
+                    loadPolicy();
+                    // Uncomment this line to see when the policy is loaded.
+                    // System.out.println("Load policy for time: " + n);
+                    n++;
+                    if (Thread.interrupted()) {
+                        break;
+                    }
+                }
+            } catch (InterruptedException ignored) {
+                // Thread interrupted, exit the loop
+            } finally {
+                autoLoadRunning.set(0);
+            }
+        });
+        thread.start();
+    }
+
+    public void stopAutoLoadPolicy() {
+        if (isAutoLoadingRunning()) {
+            synchronized (stopAutoLoad) {
+                stopAutoLoad.notify();
+            }
+        }
     }
 
     /**

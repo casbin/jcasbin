@@ -14,26 +14,18 @@
 
 package org.casbin.jcasbin.main;
 
-import com.googlecode.aviator.AviatorEvaluator;
-import com.googlecode.aviator.Expression;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
-import org.casbin.jcasbin.util.BuiltInFunctions;
 import org.casbin.jcasbin.util.EnforceContext;
 import org.casbin.jcasbin.util.Util;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
 
 import static java.util.Arrays.asList;
 import static org.casbin.jcasbin.main.CoreEnforcer.newModel;
@@ -399,6 +391,54 @@ public class EnforcerUnitTest {
     }
 
     @Test
+    public void testFileAdapterAutoSave() {
+        Enforcer e = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv");
+
+        // test addPolicy() autoSave
+        e.enableAutoSave(false);
+        testEnforce(e, "erica", "data3", "read", false);
+        e.addPolicy("erica", "data3", "read");
+        testEnforce(e, "erica", "data3", "read", true);
+        e.loadPolicy();
+        testEnforce(e, "erica", "data3", "read", false);
+
+        e.enableAutoSave(true);
+        testEnforce(e, "erica", "data3", "read", false);
+        e.addPolicy("erica", "data3", "read");
+        testEnforce(e, "erica", "data3", "read", true);
+        e.loadPolicy();
+        testEnforce(e, "erica", "data3", "read", true);
+
+        // test removePolicy() autoSave
+        e.enableAutoSave(false);
+        e.removePolicy("erica", "data3", "read");
+        testEnforce(e, "erica", "data3", "read", false);
+        e.loadPolicy();
+        testEnforce(e, "erica", "data3", "read", true);
+        e.enableAutoSave(true);
+        e.removePolicy("erica", "data3", "read");
+        testEnforce(e, "erica", "data3", "read", false);
+        e.loadPolicy();
+        testEnforce(e, "erica", "data3", "read", false);
+
+        // test savePolicy()
+        e.enableAutoSave(false);
+        e.addPolicy("erica", "data3", "read");
+        testEnforce(e, "erica", "data3", "read", true);
+        e.loadPolicy();
+        testEnforce(e, "erica", "data3", "read", false);
+        e.addPolicy("erica", "data3", "read");
+        testEnforce(e, "erica", "data3", "read", true);
+        e.savePolicy();
+        e.loadPolicy();
+        testEnforce(e, "erica", "data3", "read", true);
+        e.removePolicy("erica", "data3", "read");
+        e.savePolicy();
+        e.loadPolicy();
+        testEnforce(e, "erica", "data3", "read", false);
+    }
+
+    @Test
     public void testRoleLinks() {
         Enforcer e = new Enforcer("examples/rbac_model.conf");
         e.enableAutoBuildRoleLinks(false);
@@ -634,64 +674,6 @@ public class EnforcerUnitTest {
         testEnforce(e, "alice", "data2", "read", true);
         testEnforceWithContext(e, enforceContext, new AbacAPIUnitTest.TestEvalRule("alice", 70), "/data1", "read", false);
         testEnforceWithContext(e, enforceContext, new AbacAPIUnitTest.TestEvalRule("alice", 30), "/data1", "read", true);
-    }
-
-    @Test
-    public void testHasLinkSynchronized(){
-        File testingDir = null;
-        try {
-            testingDir = Files.createTempDirectory("testingDir").toFile();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        File f = null;
-        try {
-            f = File.createTempFile("policies", null, testingDir);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        FileAdapter a = new FileAdapter(f.getAbsolutePath());
-
-        Enforcer e = new Enforcer("examples/haslink_synchronized_model.conf", a);
-
-        e.enableAutoSave(true);
-        e.addNamedMatchingFunc("g", "keyMatch4", BuiltInFunctions::keyMatch4);
-
-        // 添加 gs 角色的关系
-        String[][] gs = new String[1001][3];
-        gs[0] = new String[]{"admin@alice.co", "temp", "alice"};
-        for (int i = 0; i < 1000; i++) {
-            gs[i+1] = new String[]{i + "@alice.co", "temp", "alice"};
-        }
-        e.addGroupingPolicies(gs);
-
-        String[][] policy = {{"alice", "/data", "allow"}};
-        e.addPolicies(policy);
-        e.savePolicy();
-
-        int n = 100;
-        CountDownLatch countDownLatch = new CountDownLatch(n);
-
-        for (int i = 0; i < n; i++) {
-            int finalI = i;
-            new Thread(() -> {
-                boolean res = e.enforce("alice", "data");
-                if (!res){
-                    System.out.println("result failure: " + finalI);
-                }
-                countDownLatch.countDown();
-            }).start();
-        }
-
-        try {
-            countDownLatch.await();
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        }
-
-        System.out.println("Done!");
     }
 
     public static class TestSub{

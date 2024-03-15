@@ -26,6 +26,7 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -99,10 +100,10 @@ public class FileAdapter implements Adapter {
 
     private List<String> getModelPolicy(Model model, String ptype) {
         List<String> policy = new ArrayList<>();
-        model.model.get(ptype).forEach((k, v) -> {
+        Optional.ofNullable(model.model.get(ptype)).ifPresent(entry -> entry.forEach((k, v) -> {
             List<String> p = v.policy.parallelStream().map(x -> k + ", " + Util.arrayToString(x)).collect(Collectors.toList());
             policy.addAll(p);
-        });
+        }));
         return policy;
     }
 
@@ -130,7 +131,16 @@ public class FileAdapter implements Adapter {
      */
     @Override
     public void addPolicy(String sec, String ptype, List<String> rule) {
-        throw new UnsupportedOperationException("not implemented");
+        String ruleText = "\n" + ptype + ", " + String.join(", ", rule) + "\n";
+        if (byteArrayInputStream != null && readOnly) {
+            throw new CasbinAdapterException("Policy file can not write, because use inputStream is readOnly");
+        }
+        try (FileOutputStream fos = new FileOutputStream(filePath, true)) {
+            IOUtils.write(ruleText, fos, Charset.forName("UTF-8"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new CasbinAdapterException("Policy add error");
+        }
     }
 
     /**
@@ -138,7 +148,18 @@ public class FileAdapter implements Adapter {
      */
     @Override
     public void removePolicy(String sec, String ptype, List<String> rule) {
-        throw new UnsupportedOperationException("not implemented");
+        String ruleText = ptype + ", " + String.join(", ", rule);
+        if (byteArrayInputStream != null && readOnly) {
+            throw new CasbinAdapterException("Policy file can not write, because use inputStream is readOnly");
+        }
+        try {
+            List<String> lines = IOUtils.readLines(new FileInputStream(filePath), Charset.forName("UTF-8"));
+            lines.remove(ruleText);
+            savePolicyFile(String.join("\n", lines));
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new CasbinAdapterException("Policy remove error");
+        }
     }
 
     /**

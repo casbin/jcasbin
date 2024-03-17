@@ -69,7 +69,7 @@ public class ManagementAPIUnitTest {
     @Test
     public void testModifyPolicyAPI() {
         Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
-
+        e.enableAutoSave(false);
         testGetPolicy(e, asList(
             asList("alice", "data1", "read"),
             asList("bob", "data2", "write"),
@@ -131,7 +131,7 @@ public class ManagementAPIUnitTest {
     @Test
     public void testModifyGroupingPolicyAPI() {
         Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
-
+        e.enableAutoSave(false);
         testGetRoles(e, "alice", asList("data2_admin"));
         testGetRoles(e, "bob", asList());
         testGetRoles(e, "eve", asList());

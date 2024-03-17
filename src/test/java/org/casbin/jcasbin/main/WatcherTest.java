@@ -65,6 +65,7 @@ public class WatcherTest {
     @Test
     public void testSelfModify() {
         Enforcer enforcer = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
+        enforcer.enableAutoSave(false);
         SampleWatcher thisIsTestWatcher = new SampleWatcher();
         enforcer.setWatcher(thisIsTestWatcher);
         AtomicInteger called = new AtomicInteger(-1);

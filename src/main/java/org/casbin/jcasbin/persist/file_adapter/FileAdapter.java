@@ -131,7 +131,7 @@ public class FileAdapter implements Adapter {
      */
     @Override
     public void addPolicy(String sec, String ptype, List<String> rule) {
-        String ruleText = "\n" + ptype + ", " + String.join(", ", rule) + "\n";
+        String ruleText = System.lineSeparator() + ptype + ", " + String.join(", ", rule);
         if (byteArrayInputStream != null && readOnly) {
             throw new CasbinAdapterException("Policy file can not write, because use inputStream is readOnly");
         }

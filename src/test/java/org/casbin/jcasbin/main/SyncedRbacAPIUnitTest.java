@@ -26,6 +26,7 @@ public class SyncedRbacAPIUnitTest {
     @Test
     public void testRoleAPI() {
         Enforcer e = new SyncedEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
+
         testGetRoles(e, "alice", asList("data2_admin"));
         testGetRoles(e, "bob", asList());
         testGetRoles(e, "data2_admin", asList());

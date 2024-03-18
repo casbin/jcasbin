@@ -642,7 +642,7 @@ public class EnforcerUnitTest {
     @Test
     public void testEnforceWithMatcher() {
         Enforcer e = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv");
-        e.enableAutoSave(false);
+
         // the previous matcher is
         // m = r.sub == p.sub && r.obj == p.obj && r.act == p.act
         testEnforce(e, "alice", "data1", "read", true);

@@ -178,6 +178,7 @@ public class ModelUnitTest {
     @Test
     public void testRBACModelWithDomainsAtRuntime() {
         Enforcer e = new Enforcer("examples/rbac_with_domains_model.conf");
+
         e.addPolicy("admin", "domain1", "data1", "read");
         e.addPolicy("admin", "domain1", "data1", "write");
         e.addPolicy("admin", "domain2", "data2", "read");

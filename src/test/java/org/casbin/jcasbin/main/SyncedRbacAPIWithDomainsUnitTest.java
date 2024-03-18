@@ -23,6 +23,7 @@ public class SyncedRbacAPIWithDomainsUnitTest {
     @Test
     public void testRoleAPIWithDomains() {
         Enforcer e = new SyncedEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv");
+
         testGetRolesInDomain(e, "alice", "domain1", asList("admin"));
         testGetRolesInDomain(e, "bob", "domain1", asList());
         testGetRolesInDomain(e, "admin", "domain1", asList());
@@ -50,6 +51,7 @@ public class SyncedRbacAPIWithDomainsUnitTest {
     @Test
     public void testUserAPIWithDomains() {
         Enforcer e = new SyncedEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv");
+
         testGetUsersInDomain(e, "alice", "domain1", asList());
         testGetUsersInDomain(e, "bob", "domain1", asList());
         testGetUsersInDomain(e, "admin", "domain1", asList("alice"));

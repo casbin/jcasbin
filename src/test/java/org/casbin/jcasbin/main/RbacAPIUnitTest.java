@@ -34,6 +34,7 @@ public class RbacAPIUnitTest {
     @Test
     public void testRoleAPI() {
         Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
+
         testGetRoles(e, "alice", asList("data2_admin"));
         testGetRoles(e, "bob", asList());
         testGetRoles(e, "data2_admin", asList());
@@ -127,6 +128,7 @@ public class RbacAPIUnitTest {
     @Test
     public void testGFunctionCache() {
         Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
+
         testEnforce(e, "alice", "data2", "read", true);
         e.removeGroupingPolicy(Arrays.asList("alice","data2_admin"));
         // Ensure that the gFunction cache is different for each enforce

@@ -32,6 +32,7 @@ import org.casbin.jcasbin.model.Assertion;
 import org.casbin.jcasbin.model.FunctionMap;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.*;
+import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
 import org.casbin.jcasbin.rbac.DomainManager;
 import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.BuiltInFunctions;
@@ -70,7 +71,7 @@ public class CoreEnforcer {
         watcher = null;
 
         enabled = true;
-        autoSave = true;
+        autoSave = adapter instanceof FileAdapter ? false : true;
         autoBuildRoleLinks = true;
         dispatcher = null;
         aviatorEval = AviatorEvaluator.newInstance();

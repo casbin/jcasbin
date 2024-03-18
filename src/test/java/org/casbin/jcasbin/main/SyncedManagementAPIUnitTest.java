@@ -66,7 +66,6 @@ public class SyncedManagementAPIUnitTest {
     @Test
     public void testModifyPolicyAPI() {
         Enforcer e = new SyncedEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
-        e.enableAutoSave(false);
         testGetPolicy(e, asList(
                 asList("alice", "data1", "read"),
                 asList("bob", "data2", "write"),
@@ -96,7 +95,6 @@ public class SyncedManagementAPIUnitTest {
     @Test
     public void testModifyGroupingPolicyAPI() {
         Enforcer e = new SyncedEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
-        e.enableAutoSave(false);
         testGetRoles(e, "alice", asList("data2_admin"));
         testGetRoles(e, "bob", asList());
         testGetRoles(e, "eve", asList());

@@ -69,7 +69,6 @@ public class ManagementAPIUnitTest {
     @Test
     public void testModifyPolicyAPI() {
         Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
-        e.enableAutoSave(false);
         testGetPolicy(e, asList(
             asList("alice", "data1", "read"),
             asList("bob", "data2", "write"),

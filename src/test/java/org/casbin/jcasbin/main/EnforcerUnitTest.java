@@ -14,8 +14,6 @@
 
 package org.casbin.jcasbin.main;
 
-import com.googlecode.aviator.AviatorEvaluator;
-import com.googlecode.aviator.Expression;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
@@ -29,9 +27,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
@@ -365,22 +361,23 @@ public class EnforcerUnitTest {
         testEnforce(e, "bob", "data2", "write", true);
 
         e.enableAutoSave(true);
-        // Because AutoSave is enabled, the policy change not only affects the policy in Casbin enforcer,
-        // but also affects the policy in the storage.
-        e.removePolicy("alice", "data1", "read");
-
-        // However, the file adapter doesn't implement the AutoSave feature, so enabling it has no effect at all here.
-
+        testEnforce(e, "bob", "data2", "write", true);
+        e.removePolicy("bob", "data2", "write");
+        // Affects the policy in the memory
+        testEnforce(e, "bob", "data2", "write", false);
+        // Affects the policy in the adapter
         // Reload the policy from the storage to see the effect.
         e.loadPolicy();
-        testEnforce(e, "alice", "data1", "read", true); // Will not be false here.
+        testEnforce(e, "alice", "data1", "read", true);
         testEnforce(e, "alice", "data1", "write", false);
         testEnforce(e, "alice", "data2", "read", false);
         testEnforce(e, "alice", "data2", "write", false);
         testEnforce(e, "bob", "data1", "read", false);
         testEnforce(e, "bob", "data1", "write", false);
         testEnforce(e, "bob", "data2", "read", false);
-        testEnforce(e, "bob", "data2", "write", true);
+        testEnforce(e, "bob", "data2", "write", false);
+        // prevent previous operations from affecting the CSV file, add the remove policy
+        e.addPolicy("bob", "data2", "write");
     }
 
     @Test
@@ -396,6 +393,66 @@ public class EnforcerUnitTest {
         testEnforce(e, "bob", "data1", "write", false);
         testEnforce(e, "bob", "data2", "read", false);
         testEnforce(e, "bob", "data2", "write", true);
+    }
+
+    @Test
+    public void testFileAdapterAutoSave() {
+        Enforcer e = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv");
+
+        // test addPolicy() autoSave
+        e.enableAutoSave(false);
+        testEnforce(e, "erica", "data3", "read", false);
+        e.addPolicy("erica", "data3", "read");
+        testEnforce(e, "erica", "data3", "read", true);
+        e.loadPolicy();
+        testEnforce(e, "erica", "data3", "read", false);
+
+        e.enableAutoSave(true);
+        testEnforce(e, "erica", "data3", "read", false);
+        e.addPolicy("erica", "data3", "read");
+        testEnforce(e, "erica", "data3", "read", true);
+        e.loadPolicy();
+        testEnforce(e, "erica", "data3", "read", true);
+
+        // test removePolicy() autoSave
+        e.enableAutoSave(false);
+        e.removePolicy("erica", "data3", "read");
+        testEnforce(e, "erica", "data3", "read", false);
+        e.loadPolicy();
+        testEnforce(e, "erica", "data3", "read", true);
+        e.enableAutoSave(true);
+        e.removePolicy("erica", "data3", "read");
+        testEnforce(e, "erica", "data3", "read", false);
+        e.loadPolicy();
+        testEnforce(e, "erica", "data3", "read", false);
+
+        // test savePolicy()
+        e.enableAutoSave(false);
+        e.addPolicy("erica", "data3", "read");
+        testEnforce(e, "erica", "data3", "read", true);
+        e.loadPolicy();
+        testEnforce(e, "erica", "data3", "read", false);
+        e.addPolicy("erica", "data3", "read");
+        testEnforce(e, "erica", "data3", "read", true);
+        e.savePolicy();
+        e.loadPolicy();
+        testEnforce(e, "erica", "data3", "read", true);
+        e.removePolicy("erica", "data3", "read");
+        e.savePolicy();
+        e.loadPolicy();
+        testEnforce(e, "erica", "data3", "read", false);
+
+        // test group policy auto save
+        e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
+        e.enableAutoSave(true);
+        testEnforce(e, "alice", "data2", "read", true);
+        e.removeGroupingPolicy("alice", "data2_admin");
+        testEnforce(e, "alice", "data2", "read", false);
+        e.loadPolicy();
+        testEnforce(e, "alice", "data2", "read", false);
+        e.addGroupingPolicy("alice", "data2_admin");
+        e.loadPolicy();
+        testEnforce(e, "alice", "data2", "read", true);
     }
 
     @Test
@@ -569,6 +626,7 @@ public class EnforcerUnitTest {
         testEnforce(e, "data2_allow_group", "data2", "write", true);
 
         // add a higher priority policy
+        e.enableAutoSave(false);
         e.addPolicy("bob", "data2", "write", "deny", "1");
 
         testEnforce(e, "alice", "data1", "write", true);

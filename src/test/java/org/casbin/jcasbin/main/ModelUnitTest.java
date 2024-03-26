@@ -881,4 +881,81 @@ public class ModelUnitTest {
         testDomainEnforce(e, "bob", "domain2", "data2", "read", true);
         testDomainEnforce(e, "bob", "domain2", "data2", "write", true);
     }
+
+    @Test
+    public void testTemporalRolesModel(){
+        Enforcer e = new Enforcer("examples/rbac_with_temporal_roles_model.conf", "examples/rbac_with_temporal_roles_policy.csv");
+
+        e.addNamedLinkConditionFunc("g", "alice", "data2_admin", BuiltInFunctions::timeMatchFunc);
+        e.addNamedLinkConditionFunc("g", "alice", "data3_admin", BuiltInFunctions::timeMatchFunc);
+        e.addNamedLinkConditionFunc("g", "alice", "data4_admin", BuiltInFunctions::timeMatchFunc);
+        e.addNamedLinkConditionFunc("g", "alice", "data5_admin", BuiltInFunctions::timeMatchFunc);
+        e.addNamedLinkConditionFunc("g", "alice", "data6_admin", BuiltInFunctions::timeMatchFunc);
+        e.addNamedLinkConditionFunc("g", "alice", "data7_admin", BuiltInFunctions::timeMatchFunc);
+        e.addNamedLinkConditionFunc("g", "alice", "data8_admin", BuiltInFunctions::timeMatchFunc);
+
+        testEnforce(e, "alice", "data1", "read", true);
+        testEnforce(e, "alice", "data1", "write", true);
+        testEnforce(e, "alice", "data2", "read", false);
+        testEnforce(e, "alice", "data2", "write", false);
+        testEnforce(e, "alice", "data3", "read", true);
+        testEnforce(e, "alice", "data3", "write", true);
+        testEnforce(e, "alice", "data4", "read", true);
+        testEnforce(e, "alice", "data4", "write", true);
+        testEnforce(e, "alice", "data5", "read", true);
+        testEnforce(e, "alice", "data5", "write", true);
+        testEnforce(e, "alice", "data6", "read", false);
+        testEnforce(e, "alice", "data6", "write", false);
+        testEnforce(e, "alice", "data7", "read", true);
+        testEnforce(e, "alice", "data7", "write", true);
+        testEnforce(e, "alice", "data8", "read", false);
+        testEnforce(e, "alice", "data8", "write", false);
+    }
+
+    @Test
+    public void testTemporalRolesModelWithDomain(){
+        Enforcer e = new Enforcer("examples/rbac_with_domain_temporal_roles_model.conf", "examples/rbac_with_domain_temporal_roles_policy.csv");
+
+        e.addNamedDomainLinkConditionFunc("g", "alice", "data2_admin", "domain2", BuiltInFunctions::timeMatchFunc);
+        e.addNamedDomainLinkConditionFunc("g", "alice", "data3_admin", "domain3", BuiltInFunctions::timeMatchFunc);
+        e.addNamedDomainLinkConditionFunc("g", "alice", "data4_admin", "domain4", BuiltInFunctions::timeMatchFunc);
+        e.addNamedDomainLinkConditionFunc("g", "alice", "data5_admin", "domain5", BuiltInFunctions::timeMatchFunc);
+        e.addNamedDomainLinkConditionFunc("g", "alice", "data6_admin", "domain6", BuiltInFunctions::timeMatchFunc);
+        e.addNamedDomainLinkConditionFunc("g", "alice", "data7_admin", "domain7", BuiltInFunctions::timeMatchFunc);
+        e.addNamedDomainLinkConditionFunc("g", "alice", "data8_admin", "domain8", BuiltInFunctions::timeMatchFunc);
+
+        testDomainEnforce(e, "alice", "domain1", "data1", "read", true);
+        testDomainEnforce(e, "alice", "domain1", "data1", "write", true);
+        testDomainEnforce(e, "alice", "domain2", "data2", "read", false);
+        testDomainEnforce(e, "alice", "domain2", "data2", "write", false);
+        testDomainEnforce(e, "alice", "domain3", "data3", "read", true);
+        testDomainEnforce(e, "alice", "domain3", "data3", "write", true);
+        testDomainEnforce(e, "alice", "domain4", "data4", "read", true);
+        testDomainEnforce(e, "alice", "domain4", "data4", "write", true);
+        testDomainEnforce(e, "alice", "domain5", "data5", "read", true);
+        testDomainEnforce(e, "alice", "domain5", "data5", "write", true);
+        testDomainEnforce(e, "alice", "domain6", "data6", "read", false);
+        testDomainEnforce(e, "alice", "domain6", "data6", "write", false);
+        testDomainEnforce(e, "alice", "domain7", "data7", "read", true);
+        testDomainEnforce(e, "alice", "domain7", "data7", "write", true);
+        testDomainEnforce(e, "alice", "domain8", "data8", "read", false);
+        testDomainEnforce(e, "alice", "domain8", "data8", "write", false);
+
+        testDomainEnforce(e, "alice", "domain_not_exist", "data1", "read", false);
+        testDomainEnforce(e, "alice", "domain_not_exist", "data1", "write", false);
+        testDomainEnforce(e, "alice", "domain_not_exist", "data2", "read", false);
+        testDomainEnforce(e, "alice", "domain_not_exist", "data2", "write", false);
+        testDomainEnforce(e, "alice", "domain_not_exist", "data3", "read", false);
+        testDomainEnforce(e, "alice", "domain_not_exist", "data3", "write", false);
+        testDomainEnforce(e, "alice", "domain_not_exist", "data4", "read", false);
+        testDomainEnforce(e, "alice", "domain_not_exist", "data4", "write", false);
+        testDomainEnforce(e, "alice", "domain_not_exist", "data5", "read", false);
+        testDomainEnforce(e, "alice", "domain_not_exist", "data5", "write", false);
+        testDomainEnforce(e, "alice", "domain_not_exist", "data6", "read", false);
+        testDomainEnforce(e, "alice", "domain_not_exist", "data6", "write", false);
+        testDomainEnforce(e, "alice", "domain_not_exist", "data7", "read", false);
+        testDomainEnforce(e, "alice", "domain_not_exist", "data7", "write", false);
+        testDomainEnforce(e, "alice", "domain_not_exist", "data8", "read", false);
+        testDomainEnforce(e, "alice", "domain_not_exist", "data8", "write", false);
+    }
 }

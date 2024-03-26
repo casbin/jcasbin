@@ -15,6 +15,8 @@
 package org.casbin.jcasbin.rbac;
 
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Role represents the data structure for a role in RBAC.
@@ -25,6 +27,8 @@ class Role {
     private final Map<String, Role> users;
     private final Map<String, Role> matched;
     private final Map<String, Role> matchedBy;
+    private final Map<LinkConditionFuncKey, Function<String[], Boolean>> linkConditionFuncMap;
+    private final Map<LinkConditionFuncKey, String[]> linkConditionFuncParamsMap;
 
     protected Role(String name) {
         this.name = name;
@@ -32,6 +36,8 @@ class Role {
         this.users = new HashMap<>();
         this.matched = new HashMap<>();
         this.matchedBy = new HashMap<>();
+        this.linkConditionFuncMap = new HashMap<>();
+        this.linkConditionFuncParamsMap = new HashMap<>();
     }
 
     String getName() {
@@ -74,6 +80,25 @@ class Role {
             role.matched.remove(this.name);
             iterator.remove();
         }
+    }
+
+    public void rangeRoles(Consumer<? super Role> fn) {
+        roles.forEach((key, value) -> {
+            Role role = (Role) value;
+            fn.accept(role);
+            role.matched.forEach((matchedKey, matchedValue) -> {
+                Role matchedRole = (Role) matchedValue;
+                fn.accept(matchedRole);
+            });
+        });
+
+        matchedBy.forEach((key, value) -> {
+            Role role = (Role) value;
+            role.roles.forEach((roleKey, roleValue) -> {
+                Role subRole = (Role) roleValue;
+                fn.accept(subRole);
+            });
+        });
     }
 
     @Override
@@ -127,5 +152,25 @@ class Role {
         this.users.values().forEach(role -> allUsers.putAll(role.matched));
         this.matchedBy.values().forEach(role -> allUsers.putAll(role.users));
         return allUsers;
+    }
+
+    void addLinkConditionFunc(Role role, String domain, Function<String[], Boolean> fn){
+        linkConditionFuncMap.put(new LinkConditionFuncKey(role.name, domain), fn);
+    }
+
+    Function<String[], Boolean> getLinkConditionFunc(Role role, String domain){
+        Function<String[], Boolean> function = linkConditionFuncMap.get(new LinkConditionFuncKey(role.name, domain));
+        if (function == null) {
+            return null;
+        }
+        return linkConditionFuncMap.get(new LinkConditionFuncKey(role.name, domain));
+    }
+
+    void setLinkConditionFuncParams(Role role, String domain, String... params){
+        linkConditionFuncParamsMap.put(new LinkConditionFuncKey(role.name, domain), params);
+    }
+
+    String[] getLinkConditionFuncParams(Role role, String domain){
+        return linkConditionFuncParamsMap.get(new LinkConditionFuncKey(role.name, domain));
     }
 }

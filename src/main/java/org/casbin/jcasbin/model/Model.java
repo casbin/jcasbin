@@ -18,13 +18,9 @@ import org.casbin.jcasbin.config.Config;
 import org.casbin.jcasbin.log.*;
 import org.casbin.jcasbin.util.Util;
 
+import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.casbin.jcasbin.util.Util.splitCommaDelimited;
 
@@ -64,6 +60,28 @@ public class Model extends Policy {
         return model.addDef(sec, key, value);
     }
 
+    private static final Pattern paramsPattern = Pattern.compile("\\((.*?)\\)");
+
+    /**
+     * getParamsToken Get ParamsToken from Assertion.Value
+     */
+    private static List<String> getParamsToken(String value) {
+        Matcher matcher = paramsPattern.matcher(value);
+        if (!matcher.find()) {
+            return null;
+        }
+        String paramsString = matcher.group(1);
+        if (paramsString == null || paramsString.isEmpty()) {
+            return null;
+        }
+        String[] paramsArray = paramsString.split(",");
+        List<String> paramsList = new ArrayList<>();
+        for (String param : paramsArray) {
+            paramsList.add(param.trim());
+        }
+        return paramsList;
+    }
+
     /**
      * addDef adds an assertion to the model.
      *
@@ -91,6 +109,14 @@ public class Model extends Policy {
                     ast.priorityIndex = i;
                 }
             }
+        } else if ("g".equals(sec)) {
+            if (getParamsToken(ast.value) != null){
+                ast.paramsTokens =  getParamsToken(ast.value).toArray(new String[0]);
+            }
+            int paramsTokens_length = ast.paramsTokens==null?0:ast.paramsTokens.length;
+            String[] tokens_array = value.split(",");
+            List<String> tokens_list = Arrays.asList(tokens_array).subList(0, tokens_array.length - paramsTokens_length);
+            ast.tokens = tokens_list.toArray(new String[0]);
         } else {
             ast.value = Util.removeComments(Util.escapeAssertion(ast.value));
         }

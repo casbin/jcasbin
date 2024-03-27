@@ -23,9 +23,9 @@ import java.util.function.BiPredicate;
 public class DefaultRoleManager implements RoleManager {
     private static final String DEFAULT_DOMAIN = "casbin::default";
     Map<String, Role> allRoles;
-    private final int maxHierarchyLevel;
+    final int maxHierarchyLevel;
 
-    private BiPredicate<String, String> matchingFunc;
+    BiPredicate<String, String> matchingFunc;
     private SyncedLRUCache<String, Boolean> matchingFuncCache;
 
     /**
@@ -87,7 +87,7 @@ public class DefaultRoleManager implements RoleManager {
         });
     }
 
-    private boolean match(String str, String pattern) {
+    boolean match(String str, String pattern) {
         String cacheKey =  String.join("$$", str, pattern);
         Boolean matched = this.matchingFuncCache.get(cacheKey);
         if (matched == null) {
@@ -101,7 +101,7 @@ public class DefaultRoleManager implements RoleManager {
         return matched;
     }
 
-    private Role getRole(String name) {
+    Role getRole(String name) {
         Role role = this.allRoles.get(name);
         if (role == null) {
             role = new Role(name);
@@ -125,7 +125,7 @@ public class DefaultRoleManager implements RoleManager {
         return role;
     }
 
-    private void removeRole(String name) {
+    void removeRole(String name) {
         final Role role = this.allRoles.get(name);
         if (role != null) {
             this.allRoles.remove(name);

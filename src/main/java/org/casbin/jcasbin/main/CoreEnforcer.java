@@ -33,14 +33,14 @@ import org.casbin.jcasbin.model.FunctionMap;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.*;
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
-import org.casbin.jcasbin.rbac.DomainManager;
-import org.casbin.jcasbin.rbac.RoleManager;
+import org.casbin.jcasbin.rbac.*;
 import org.casbin.jcasbin.util.BuiltInFunctions;
 import org.casbin.jcasbin.util.EnforceContext;
 import org.casbin.jcasbin.util.Util;
 
 import java.util.*;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
 
 /**
  * CoreEnforcer defines the core functionality of an enforcer.
@@ -55,6 +55,7 @@ public class CoreEnforcer {
     Watcher watcher;
     Dispatcher dispatcher;
     Map<String, RoleManager> rmMap;
+    Map<String, ConditionalRoleManager> condRmMap;
 
     private boolean enabled;
     boolean autoSave;
@@ -67,6 +68,7 @@ public class CoreEnforcer {
 
     void initialize() {
         rmMap = new HashMap<>();
+        condRmMap = new HashMap<>();
         eft = new DefaultEffector();
         watcher = null;
 
@@ -287,6 +289,7 @@ public class CoreEnforcer {
         }
         if (autoBuildRoleLinks) {
             buildRoleLinks();
+            buildConditionalRoleLinks();
         }
     }
 
@@ -317,6 +320,7 @@ public class CoreEnforcer {
         }
         if (autoBuildRoleLinks) {
             buildRoleLinks();
+            buildConditionalRoleLinks();
         }
     }
 
@@ -372,8 +376,31 @@ public class CoreEnforcer {
         for (String ptype : model.model.get("g").keySet()) {
             if (rmMap.containsKey(ptype)) {
                 rmMap.get(ptype).clear();
-            } else {
-                addOrUpdateDomainManagerMatching(ptype);
+                continue;
+            }
+            Assertion assertion = model.model.get("g").get(ptype);
+            int token_length = (assertion.tokens != null ? assertion.tokens.length : 0);
+            int paramsToken_length = (assertion.paramsTokens != null ? assertion.paramsTokens.length : 0);
+            if (token_length <= 2 && paramsToken_length == 0) {
+                assertion.rm = new DomainManager(10);
+                rmMap.put(ptype, assertion.rm);
+            }
+            if (token_length <= 2 && paramsToken_length != 0) {
+                assertion.condRM =new ConditionalRoleManager(10);
+                condRmMap.put(ptype, assertion.condRM);
+            }
+            if (token_length > 2) {
+                if (paramsToken_length == 0) {
+                    assertion.rm = new DomainManager(10);
+                    rmMap.put(ptype, assertion.rm);
+                } else {
+                    assertion.condRM = new ConditionalRoleManager(10);
+                    condRmMap.put(ptype, assertion.condRM);
+                }
+                String matchFun = "keyMatch(r_dom, p_dom)";
+                if (model.model.get("m").get("m").value.contains(matchFun)) {
+                    addNamedDomainMatchingFunc(ptype, "g", BuiltInFunctions::keyMatch);
+                }
             }
         }
     }
@@ -409,7 +436,9 @@ public class CoreEnforcer {
         }
 
         for (String ptype : model.model.get("g").keySet()) {
-            rmMap.get(ptype).clear();
+            if (rmMap.get(ptype) != null) {
+                rmMap.get(ptype).clear();
+            }
         }
     }
 
@@ -466,10 +495,21 @@ public class CoreEnforcer {
      * role inheritance relations.
      */
     public void buildRoleLinks() {
-        for (RoleManager rm : rmMap.values()) {
-            rm.clear();
+        if (!rmMap.isEmpty()) {
+            for (RoleManager rm : rmMap.values()) {
+                rm.clear();
+            }
+            model.buildRoleLinks(rmMap);
         }
-        model.buildRoleLinks(rmMap);
+    }
+
+    public void buildConditionalRoleLinks(){
+        if (!condRmMap.isEmpty()) {
+            for (ConditionalRoleManager condRm : condRmMap.values()) {
+                condRm.clear();
+            }
+            model.buildConditionalRoleLinks(condRmMap);
+        }
     }
 
     /**
@@ -499,8 +539,17 @@ public class CoreEnforcer {
                 Assertion ast = entry.getValue();
 
                 RoleManager rm = ast.rm;
-                AviatorFunction aviatorFunction = BuiltInFunctions.GenerateGFunctionClass.generateGFunction(key, rm);
-                gFunctions.put(key, aviatorFunction);
+                if (rm != null){
+                    AviatorFunction aviatorFunction = BuiltInFunctions.GenerateGFunctionClass.generateGFunction(key, rm);
+                    gFunctions.put(key, aviatorFunction);
+                }
+
+                ConditionalRoleManager condRM = ast.condRM;
+                if (condRM != null){
+                    AviatorFunction aviatorFunction = BuiltInFunctions.GenerateConditionalGFunctionClass.generateConditionalGFunction(key, condRM);
+                    gFunctions.put(key, aviatorFunction);
+                }
+
             }
         }
         for (AviatorFunction f : gFunctions.values()) {
@@ -736,10 +785,10 @@ public class CoreEnforcer {
         if (rmMap.containsKey(ptype)) {
             DomainManager rm = (DomainManager) rmMap.get(ptype);
             rm.addMatchingFunc(name, fn);
-            clearRmMap();
-            if (autoBuildRoleLinks) {
-                buildRoleLinks();
-            }
+//            clearRmMap();
+//            if (autoBuildRoleLinks) {
+//                buildRoleLinks();
+//            }
             return true;
         }
         return false;
@@ -756,6 +805,57 @@ public class CoreEnforcer {
 //            if (autoBuildRoleLinks) {
 //                buildRoleLinks();
 //            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * addNamedLinkConditionFunc Add condition function fn for Link userName->roleName,
+     * when fn returns true, Link is valid, otherwise invalid
+     */
+    public boolean addNamedLinkConditionFunc(String ptype, String user, String role, Function<String[], Boolean> fn){
+        if (condRmMap.containsKey(ptype)){
+            ConditionalRoleManager condRm = condRmMap.get(ptype);
+            condRm.addLinkConditionFunc(user, role, fn);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * addNamedDomainLinkConditionFunc Add condition function fn for Link userName-> {roleName, domain},
+     * when fn returns true, Link is valid, otherwise invalid
+     */
+    public boolean addNamedDomainLinkConditionFunc(String ptype, String user, String role, String domain, Function<String[], Boolean> fn) {
+        if (condRmMap.containsKey(ptype)){
+            ConditionalRoleManager condRm = condRmMap.get(ptype);
+            condRm.addDomainLinkConditionFunc(user, role, domain, fn);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * setNamedLinkConditionFuncParams Sets the parameters of the condition function fn for Link userName->roleName
+     */
+    public boolean setNamedLinkConditionFuncParams(String ptype, String user, String role, String... params){
+        if (condRmMap.containsKey(ptype)){
+            ConditionalRoleManager condRm = condRmMap.get(ptype);
+            condRm.setLinkConditionFuncParams(user, role, params);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * setNamedDomainLinkConditionFuncParams Sets the parameters of the condition function fn
+     * for Link userName->{roleName, domain}
+     */
+    public boolean setNamedDomainLinkConditionFuncParams(String ptype, String user, String role, String domain, String... params){
+        if (condRmMap.containsKey(ptype)){
+            ConditionalRoleManager condRm = condRmMap.get(ptype);
+            condRm.setDomainLinkConditionFuncParams(user, role, domain, params);
             return true;
         }
         return false;

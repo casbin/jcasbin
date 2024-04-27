@@ -168,7 +168,7 @@ Note: you can also initialize an enforcer with policy in DB instead of file, see
    String obj = "data1"; // the resource that is going to be accessed.
    String act = "read"; // the operation that the user performs on the resource.
 
-   if (enforcer.enforce(sub, obj, act) == true) {
+   if (enforcer.enforce(sub, obj, act)) {
        // permit alice to read data1
    } else {
        // deny the request, show an error

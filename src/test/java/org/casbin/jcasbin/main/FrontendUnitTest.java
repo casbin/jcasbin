@@ -21,27 +21,45 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.List;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
 public class FrontendUnitTest {
 
-  @Test
-  public void testCasbinJsGetPermissionForUser() throws IOException {
-    SyncedEnforcer e = new SyncedEnforcer("examples/rbac_model.conf", "examples/rbac_with_hierarchy_policy.csv");
-    HashMap<String, Object> received = new Gson().fromJson(Frontend.casbinJsGetPermissionForUser(e, "alice"), HashMap.class);
-    String expectedModelStr = new String(Files.readAllBytes(Paths.get("examples/rbac_model.conf")));
-    assertEquals(received.get("m"), expectedModelStr);
+    @Test
+    public void testCasbinJsGetPermissionForUser() throws IOException {
+        SyncedEnforcer e = new SyncedEnforcer("examples/rbac_model.conf", "examples/rbac_with_hierarchy_policy.csv");
+        HashMap<String, Object> received = new Gson().fromJson(Frontend.casbinJsGetPermissionForUser(e, "alice"), HashMap.class);
 
-    String expectedPolicyStr = new String(Files.readAllBytes(Paths.get("examples/rbac_with_hierarchy_policy.csv")));
-    String[] expectedPolicyItem = expectedPolicyStr.split(",|\n");
-    int i = 0;
-    for (List<String> sArr : (List<List<String>>) received.get("p")) {
-      for (String s : sArr) {
-        assertEquals(expectedPolicyItem[i].trim(), s.trim());
-        i++;
-      }
+        String expectedModelStr = new String(Files.readAllBytes(Paths.get("examples/rbac_model.conf")));
+        assertEquals(normalizeLineSeparators((String) received.get("m")), normalizeLineSeparators(expectedModelStr));
+
+        assertEquals(
+            received.get("p"),
+            asList(
+                asList("p", "alice", "data1", "read"),
+                asList("p", "bob", "data2", "write"),
+                asList("p", "data1_admin", "data1", "read"),
+                asList("p", "data1_admin", "data1", "write"),
+                asList("p", "data2_admin", "data2", "read"),
+                asList("p", "data2_admin", "data2", "write")
+            )
+        );
+
+        assertEquals(
+            received.get("g"),
+            asList(
+                asList("g", "alice", "admin"),
+                asList("g", "admin", "data1_admin"),
+                asList("g", "admin", "data2_admin")
+            )
+        );
+
     }
-  }
+
+    private static String normalizeLineSeparators(String text) {
+        // 替换所有类型的行分隔符为 \n
+        return text.replaceAll("\r\n|\r|\n", "\n");
+    }
 }

@@ -23,20 +23,33 @@ import java.util.List;
 import java.util.Map;
 
 public class Frontend {
-  public static String casbinJsGetPermissionForUser(Enforcer e, String user) {
-    Model model = e.getModel();
-    Map<String, Object> m = new HashMap<>();
-    m.put("m", model.saveModelToText().trim());
-    List<List<String>> policies = new ArrayList<>();
-    for (String ptype : model.model.get("p").keySet()) {
-      List<List<String>> policy = model.getPolicy("p", ptype);
-      for (List<String> p : policy) {
-        List<String> tmp = new ArrayList<>(p);
-        tmp.add(0, ptype);
-        policies.add(tmp);
-      }
+
+    /**
+     * casbinJsGetPermissionForUser gets permissions for a user or role in json format.
+     * @param e the enforcer.
+     * @param user the user.
+     * @return model, pRules, gRules in json format.
+     */
+    public static String casbinJsGetPermissionForUser(Enforcer e, String user) {
+        Model model = e.getModel();
+        Map<String, Object> m = new HashMap<>();
+        m.put("m", model.saveModelToText().trim());
+
+        m.put("p", getRulesBySection(model, "p"));
+        m.put("g", getRulesBySection(model, "g"));
+        return new Gson().toJson(m);
     }
-    m.put("p", policies);
-    return new Gson().toJson(m);
-  }
+
+    private static List<List<String>> getRulesBySection(Model model, String sec) {
+        List<List<String>> rules = new ArrayList<>();
+        for (String ptype : model.model.get(sec).keySet()) {
+            List<List<String>> policy = model.getPolicy(sec, ptype);
+            for (List<String> p : policy) {
+                List<String> tmp = new ArrayList<>(p);
+                tmp.add(0, ptype);
+                rules.add(tmp);
+            }
+        }
+        return rules;
+    }
 }

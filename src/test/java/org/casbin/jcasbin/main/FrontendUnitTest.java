@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
 
@@ -35,9 +36,16 @@ public class FrontendUnitTest {
     assertEquals(received.get("m"), expectedModelStr);
 
     String expectedPolicyStr = new String(Files.readAllBytes(Paths.get("examples/rbac_with_hierarchy_policy.csv")));
+    expectedPolicyStr = Pattern.compile("\n+").matcher(expectedPolicyStr).replaceAll("\n");
     String[] expectedPolicyItem = expectedPolicyStr.split(",|\n");
     int i = 0;
     for (List<String> sArr : (List<List<String>>) received.get("p")) {
+      for (String s : sArr) {
+        assertEquals(expectedPolicyItem[i].trim(), s.trim());
+        i++;
+      }
+    }
+    for (List<String> sArr : (List<List<String>>) received.get("g")) {
       for (String s : sArr) {
         assertEquals(expectedPolicyItem[i].trim(), s.trim());
         i++;

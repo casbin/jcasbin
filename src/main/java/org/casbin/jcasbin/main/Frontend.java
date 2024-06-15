@@ -37,6 +37,16 @@ public class Frontend {
       }
     }
     m.put("p", policies);
+    policies = new ArrayList<>();
+    for (String ptype : model.model.get("g").keySet()) {
+        List<List<String>> policy = model.getPolicy("g", ptype);
+        for (List<String> p : policy) {
+          List<String> tmp = new ArrayList<>(p);
+          tmp.add(0, ptype);
+          policies.add(tmp);
+        }
+    }
+    m.put("g", policies);
     return new Gson().toJson(m);
   }
 }

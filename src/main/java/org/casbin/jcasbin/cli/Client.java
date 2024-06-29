@@ -2,18 +2,15 @@ package org.casbin.jcasbin.cli;
 
 import org.apache.commons.cli.*;
 import org.casbin.jcasbin.main.Enforcer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Client {
-    private static final Logger log = LoggerFactory.getLogger(Client.class);
 
     public static void main(String[] args) {
         try {
             boolean res = clientEnforce(args);
-            log.info("Result: {}", res);
+            System.out.println(res);
         } catch (ParseException e) {
-            log.error(e.getMessage());
+            e.printStackTrace();
         }
     }
 

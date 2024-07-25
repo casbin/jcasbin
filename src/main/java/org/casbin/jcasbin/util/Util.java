@@ -35,11 +35,15 @@ public class Util {
     public static boolean enableLog = true;
     private static Pattern evalReg = Pattern.compile("\\beval\\(([^),]*)\\)");
 
+    private static Pattern BracketsReg = Pattern.compile("\\{[^}]*\\}");
+
     private static Pattern escapeAssertionRegex = Pattern.compile("\\b(r|p)[0-9]*\\.");
 
     private static Logger LOGGER = LoggerFactory.getLogger("org.casbin.jcasbin");
 
     private static final String md5AlgorithmName = "MD5";
+
+    private static final String MEDIAN = "||";
 
     /**
      * logPrint prints the log.
@@ -270,12 +274,21 @@ public class Util {
         String[] records = null;
         if (s != null) {
             try {
+                Matcher matcher = BracketsReg.matcher(s);
+                StringBuffer sb = new StringBuffer();
+                while (matcher.find()) {
+                    String match = matcher.group();
+                    String replaced = match.replaceAll(",", MEDIAN);
+                    matcher.appendReplacement(sb, replaced);
+                }
+                matcher.appendTail(sb);
+                s = sb.toString();
                 CSVFormat csvFormat = CSVFormat.Builder.create().setIgnoreSurroundingSpaces(true).build();
                 CSVParser csvParser = csvFormat.parse(new StringReader(s));
                 List<CSVRecord> csvRecords = csvParser.getRecords();
                 records = new String[csvRecords.get(0).size()];
                 for (int i = 0; i < csvRecords.get(0).size(); i++) {
-                    records[i] = csvRecords.get(0).get(i).trim();
+                    records[i] = csvRecords.get(0).get(i).replace(MEDIAN, ",").trim();
                 }
             } catch (IOException e) {
                 Util.logPrintfError("CSV parser failed to parse this line: " + s, e);

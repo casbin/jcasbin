@@ -274,7 +274,7 @@ public class Util {
         String[] records = null;
         if (s != null) {
             try {
-                s = replaceCommonInBrackets(s);
+                s = replaceCommaInBrackets(s);
                 CSVFormat csvFormat = CSVFormat.Builder.create().setIgnoreSurroundingSpaces(true).build();
                 CSVParser csvParser = csvFormat.parse(new StringReader(s));
                 List<CSVRecord> csvRecords = csvParser.getRecords();
@@ -318,7 +318,7 @@ public class Util {
         return true;
     }
 
-    public static String replaceCommonInBrackets(String s){
+    public static String replaceCommaInBrackets(String s){
         Matcher matcher = BracketsReg.matcher(s);
         StringBuffer sb = new StringBuffer();
         while (matcher.find()) {

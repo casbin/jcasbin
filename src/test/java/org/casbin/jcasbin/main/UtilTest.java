@@ -115,7 +115,7 @@ public class UtilTest {
             String csv = "\n";
 
             // given
-            utilMocked.when(() -> Util.replaceCommonInBrackets(anyString())).thenReturn(csv);
+            utilMocked.when(() -> Util.replaceCommaInBrackets(anyString())).thenReturn(csv);
             utilMocked.when(() -> Util.splitCommaDelimited(anyString())).thenCallRealMethod();
 
             // when

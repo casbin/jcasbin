@@ -274,15 +274,7 @@ public class Util {
         String[] records = null;
         if (s != null) {
             try {
-                Matcher matcher = BracketsReg.matcher(s);
-                StringBuffer sb = new StringBuffer();
-                while (matcher.find()) {
-                    String match = matcher.group();
-                    String replaced = match.replaceAll(",", MEDIAN);
-                    matcher.appendReplacement(sb, replaced);
-                }
-                matcher.appendTail(sb);
-                s = sb.toString();
+                s = replaceCommonInBrackets(s);
                 CSVFormat csvFormat = CSVFormat.Builder.create().setIgnoreSurroundingSpaces(true).build();
                 CSVParser csvParser = csvFormat.parse(new StringReader(s));
                 List<CSVRecord> csvRecords = csvParser.getRecords();
@@ -324,6 +316,18 @@ public class Util {
             }
         }
         return true;
+    }
+
+    public static String replaceCommonInBrackets(String s){
+        Matcher matcher = BracketsReg.matcher(s);
+        StringBuffer sb = new StringBuffer();
+        while (matcher.find()) {
+            String match = matcher.group();
+            String replaced = match.replaceAll(",", MEDIAN);
+            matcher.appendReplacement(sb, replaced);
+        }
+        matcher.appendTail(sb);
+        return sb.length() > 0 ? sb.toString() : s;
     }
 
     public static boolean hasEval(String exp) {

@@ -388,6 +388,7 @@ public class CoreEnforcer {
             if (token_length <= 2 && paramsToken_length != 0) {
                 assertion.condRM =new ConditionalRoleManager(10);
                 condRmMap.put(ptype, assertion.condRM);
+                rmMap.put(ptype, assertion.condRM);
             }
             if (token_length > 2) {
                 if (paramsToken_length == 0) {
@@ -396,6 +397,7 @@ public class CoreEnforcer {
                 } else {
                     assertion.condRM = new ConditionalRoleManager(10);
                     condRmMap.put(ptype, assertion.condRM);
+                    rmMap.put(ptype, assertion.condRM);
                 }
                 String matchFun = "keyMatch(r_dom, p_dom)";
                 if (model.model.get("m").get("m").value.contains(matchFun)) {

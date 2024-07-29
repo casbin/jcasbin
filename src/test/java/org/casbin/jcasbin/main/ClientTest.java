@@ -32,4 +32,20 @@ public class ClientTest {
         assertEquals(Client.clientEnforce(new String[]{"-m","examples/abac_rule_with_domains_model.conf","-p","examples/abac_rule_with_domains_policy.csv","-e","bob,domain2,data2,read"}), true);
     }
 
+    @Test
+    public void testEnforceEx() throws ParseException {
+        testEnforceExCli((EnforceResult)Client.clientEnforce(new String[]{"-m", "examples/basic_model.conf", "-p", "examples/basic_policy.csv", "-ex", "alice,data1,read"}),true, new String[]{"alice", "data1", "read"});
+        testEnforceExCli((EnforceResult)Client.clientEnforce(new String[]{"-m", "examples/basic_model.conf", "-p", "examples/basic_policy.csv", "-ex", "bob,data2,write"}),true, new String[]{"bob", "data2", "write"});
+        testEnforceExCli((EnforceResult)Client.clientEnforce(new String[]{"-m", "examples/basic_model.conf", "-p", "examples/basic_policy.csv", "-ex", "root,data2,read"}),false, new String[]{});
+        testEnforceExCli((EnforceResult)Client.clientEnforce(new String[]{"-m", "examples/basic_model.conf", "-p", "examples/basic_policy.csv", "-ex", "root,data3,read"}),false, new String[]{});
+        testEnforceExCli((EnforceResult)Client.clientEnforce(new String[]{"-m", "examples/basic_model.conf", "-p", "examples/basic_policy.csv", "-ex", "jack,data3,read"}),false, new String[]{});
+    }
+
+    private void testEnforceExCli(EnforceResult enforceResult, boolean res, String[] explain) {
+        assertEquals(res, enforceResult.isAllow());
+        for (int i = 0; i < explain.length; i++) {
+            assertEquals(explain[i], enforceResult.getExplain().get(i));
+        }
+    }
+
 }

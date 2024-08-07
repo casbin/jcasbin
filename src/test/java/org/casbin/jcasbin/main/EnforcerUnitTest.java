@@ -222,20 +222,21 @@ public class EnforcerUnitTest {
     }
 
     @Test
-    public void testRBACModelInDomain(){
-        Enforcer e = new Enforcer("examples/keymatch_with_rbac_in_domain.conf","examples/keymatch_with_rbac_in_domain.csv");
-        testDomainEnforce(e,"Username==test2","engines/engine1","*","attach",true);
+    public void testRBACModelInDomain() {
+        Enforcer e = new Enforcer("examples/keymatch_with_rbac_in_domain.conf", "examples/keymatch_with_rbac_in_domain.csv");
+        testDomainEnforce(e, "Username==test2", "engines/engine1", "*", "attach", true);
     }
+
     @Test
     public void testInOp() {
         Enforcer e = new Enforcer("examples/in_op_sytanx.conf", "examples/in_op_sytanx.csv");
 
         TestSub sub = new TestSub("alice");
         TestSub sub2 = new TestSub("alice2");
-        TestObj obj = new TestObj(new String[]{"alice","bob"});
+        TestObj obj = new TestObj(new String[]{"alice", "bob"});
 
-        assertTrue(e.enforce(sub,obj));
-        assertFalse(e.enforce(sub2,obj));
+        assertTrue(e.enforce(sub, obj));
+        assertFalse(e.enforce(sub2, obj));
     }
 
     @Test
@@ -565,7 +566,7 @@ public class EnforcerUnitTest {
     }
 
     @Test
-    public void testEnforceParamCheck(){
+    public void testEnforceParamCheck() {
         Enforcer e = new Enforcer("examples/rbac_model.conf");
         assertTrue(e.validateEnforce("user501", "data9", "read", "too many params")); //warn only
         assertFalse(e.validateEnforce("data9", "read"));//throw error
@@ -578,7 +579,7 @@ public class EnforcerUnitTest {
         String obj = "data1";
         Set<String> actions = e.getPermittedActions(sub, obj);
         Util.logPrint(sub + " has permissions to access " + obj + " with following actions:");
-        for (String action :actions) {
+        for (String action : actions) {
             Util.logPrint(action); //alice should have read-only access to data1
         }
 
@@ -586,7 +587,7 @@ public class EnforcerUnitTest {
 
         actions = e.getPermittedActions(sub, obj);
         Util.logPrint(sub + " has permissions to access " + obj + " with following actions:");
-        for (String action :actions) {
+        for (String action : actions) {
             Util.logPrint(action); //alice should have read and write access to data2
         }
 
@@ -595,7 +596,7 @@ public class EnforcerUnitTest {
         actions = e.getPermittedActions(sub, data1);
 
         Util.logPrint(sub + " has permissions to access " + data1.name + " with following actions:");
-        for (String action :actions) {
+        for (String action : actions) {
             // The result shows that alice should have no access to data1,
             // because no action defines.
             // This method has no meaning for ABAC model,
@@ -671,6 +672,22 @@ public class EnforcerUnitTest {
     }
 
     @Test
+    public void testDomainBatchEnforce() {
+        Enforcer e = new Enforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv");
+
+        List<Boolean> results = asList(true, true, false);
+        List<Boolean> myResults = e.batchEnforce(
+            asList(
+                asList("alice", "domain1", "data1", "read"),
+                asList("alice", "domain1", "data1", "write"),
+                asList("bob", "domain2", "data1", "write")
+            )
+        );
+
+        Assert.assertArrayEquals(myResults.toArray(new Boolean[0]), results.toArray(new Boolean[0]));
+    }
+
+    @Test
     public void testBatchEnforceWithMatcher() {
         Enforcer e = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv");
 
@@ -695,7 +712,7 @@ public class EnforcerUnitTest {
     }
 
     @Test
-    public void testHasLinkSynchronized(){
+    public void testHasLinkSynchronized() {
         File testingDir = null;
         try {
             testingDir = Files.createTempDirectory("testingDir").toFile();
@@ -721,7 +738,7 @@ public class EnforcerUnitTest {
         String[][] gs = new String[1001][3];
         gs[0] = new String[]{"admin@alice.co", "temp", "alice"};
         for (int i = 0; i < 1000; i++) {
-            gs[i+1] = new String[]{i + "@alice.co", "temp", "alice"};
+            gs[i + 1] = new String[]{i + "@alice.co", "temp", "alice"};
         }
         e.addGroupingPolicies(gs);
 
@@ -736,7 +753,7 @@ public class EnforcerUnitTest {
             int finalI = i;
             new Thread(() -> {
                 boolean res = e.enforce("alice", "data");
-                if (!res){
+                if(!res) {
                     System.out.println("result failure: " + finalI);
                 }
                 countDownLatch.countDown();
@@ -752,18 +769,23 @@ public class EnforcerUnitTest {
         System.out.println("Done!");
     }
 
-    public static class TestSub{
+    public static class TestSub {
         private String name;
 
         public TestSub(String name) {
             this.name = name;
         }
 
-        public String getName() { return name; }
+        public String getName() {
+            return name;
+        }
 
-        public void setName(String name) { this.name = name; }
+        public void setName(String name) {
+            this.name = name;
+        }
     }
-    public static class TestAdmins{
+
+    public static class TestAdmins {
         private String name;
 
         public TestAdmins(String name) {
@@ -778,7 +800,8 @@ public class EnforcerUnitTest {
             this.name = name;
         }
     }
-    public static class TestObj{
+
+    public static class TestObj {
         private String[] admins;
 
         public TestObj(String[] admins) {

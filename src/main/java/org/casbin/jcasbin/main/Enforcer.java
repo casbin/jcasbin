@@ -623,7 +623,7 @@ public class Enforcer extends ManagementEnforcer {
     public List<Boolean> batchEnforce(List<List<String>> rules) {
         List<Boolean> results = new ArrayList<>();
         for (List<String> rule:rules) {
-            boolean result = this.enforce(rule.get(0), rule.get(1), rule.get(2));
+            boolean result = this.enforce(rule.toArray());
             results.add(result);
         }
         return results;
@@ -639,7 +639,7 @@ public class Enforcer extends ManagementEnforcer {
     public List<Boolean> batchEnforceWithMatcher(String matcher, List<List<String>> rules) {
         List<Boolean> results = new ArrayList<>();
         for (List<String> rule : rules) {
-            boolean result = this.enforceWithMatcher(matcher, rule.get(0), rule.get(1), rule.get(2));
+            boolean result = this.enforceWithMatcher(matcher, rule.toArray());
             results.add(result);
         }
         return results;

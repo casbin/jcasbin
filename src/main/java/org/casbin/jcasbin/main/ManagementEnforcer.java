@@ -337,7 +337,20 @@ public class ManagementEnforcer extends InternalEnforcer {
      * @return succeeds or not.
      */
     public boolean addNamedPolicies(String ptype, List<List<String>> rules) {
-        return addPolicies("p", ptype, rules);
+        return addPolicies("p", ptype, rules, false);
+    }
+
+    /**
+     * addNamedPoliciesEx adds authorization rules to the current named policy.
+     * If the rule already exists, the rule will not be added.
+     * But unlike AddNamedPolicies, other non-existent rules are added instead of returning false directly
+     *
+     * @param ptype the policy type, can be "p", "p2", "p3", ..
+     * @param rules the "p" policy rules.
+     * @return succeeds or not.
+     */
+    public boolean addNamedPoliciesEx(String ptype, List<List<String>> rules) {
+        return addPolicies("p", ptype, rules, true);
     }
 
     /**
@@ -616,7 +629,7 @@ public class ManagementEnforcer extends InternalEnforcer {
      * @return succeeds or not.
      */
     public boolean addNamedGroupingPolicies(String ptype, List<List<String>> rules) {
-        return addPolicies("g", ptype, rules);
+        return addPolicies("g", ptype, rules, false);
     }
 
     /**

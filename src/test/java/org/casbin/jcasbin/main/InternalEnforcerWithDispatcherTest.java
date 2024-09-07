@@ -43,7 +43,7 @@ public class InternalEnforcerWithDispatcherTest {
 
     @Test
     public void testAddPolicies() {
-        boolean result = enforcer.addPolicies(SEC, PTYPE, singletonList(RULE));
+        boolean result = enforcer.addPolicies(SEC, PTYPE, singletonList(RULE), false);
         assertTrue(result);
     }
 

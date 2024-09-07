@@ -615,6 +615,20 @@ public class SyncedEnforcer extends Enforcer {
     }
 
     /**
+     * addNamedPoliciesEx adds authorization rules to the current named policy.
+     * If the rule already exists, the rule will not be added.
+     * But unlike AddNamedPolicies, other non-existent rules are added instead of returning false directly
+     *
+     * @param ptype the policy type, can be "p", "p2", "p3", ..
+     * @param rules the "p" policy rules.
+     * @return succeeds or not.
+     */
+    @Override
+    public boolean addNamedPoliciesEx(String ptype, List<List<String>> rules) {
+        return runSynchronized(() -> super.addNamedPoliciesEx(ptype, rules), READ_WRITE_LOCK.writeLock());
+    }
+
+    /**
      * updateNamedPolicy updates an authorization rule to the current named policy.
      *
      * @param ptype   the policy type, can be "p", "p2", "p3", ..

@@ -126,6 +126,15 @@ public class ManagementAPIUnitTest {
 
         e.updateNamedPolicy("p", asList("eve", "data2", "read"), asList("eve", "data4", "read"));
         testGetPolicy(e, asList(asList("eve", "data4", "read")));
+
+        e.addNamedPolicies("p", asList(asList("eve", "data4", "read"), asList("user1", "data1", "read")));
+        testGetPolicy(e, asList(asList("eve", "data4", "read")));
+
+        e.addNamedPoliciesEx("p", asList(asList("eve", "data4", "read"), asList("user1", "data1", "read")));
+        testGetPolicy(e, asList(asList("eve", "data4", "read"), asList("user1", "data1", "read")));
+
+
+
     }
 
     @Test

@@ -91,6 +91,12 @@ public class SyncedManagementAPIUnitTest {
         e.removeFilteredPolicy(1, "data2");
 
         testGetPolicy(e, asList(asList("eve", "data3", "read")));
+
+        e.addNamedPolicies("p", asList(asList("eve", "data3", "read"), asList("user1", "data1", "read")));
+        testGetPolicy(e, asList(asList("eve", "data3", "read")));
+
+        e.addNamedPoliciesEx("p", asList(asList("eve", "data3", "read"), asList("user1", "data1", "read")));
+        testGetPolicy(e, asList(asList("eve", "data3", "read"), asList("user1", "data1", "read")));
     }
 
     @Test

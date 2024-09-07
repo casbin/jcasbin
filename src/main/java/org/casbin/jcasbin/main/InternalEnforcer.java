@@ -104,7 +104,15 @@ class InternalEnforcer extends CoreEnforcer {
     /**
      * addPolicies adds rules to the current policy.
      */
-    boolean addPolicies(String sec, String ptype, List<List<String>> rules) {
+    boolean addPolicies(String sec, String ptype, List<List<String>> rules, boolean autoRemoveRepeat) {
+        if(autoRemoveRepeat) {
+            for (List<String> rule : rules) {
+                if(model.hasPolicy(sec, ptype, rule)) {
+                    model.removePolicy(sec, ptype, rule);
+                }
+            }
+        }
+
         if (mustUseDispatcher()) {
             dispatcher.addPolicies(sec, ptype, rules);
             return true;

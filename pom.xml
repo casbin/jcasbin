@@ -132,7 +132,7 @@
                     <publishingServerId>ossrh</publishingServerId>
                     <tokenAuth>true</tokenAuth>
                     <!-- Release versions will be synced to Maven Central automatically. -->
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                    <autoPublish>true</autoPublish>
                 </configuration>
             </plugin>
             <plugin>

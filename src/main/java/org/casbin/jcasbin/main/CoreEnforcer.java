@@ -486,7 +486,7 @@ public class CoreEnforcer {
     /**
      * EnableAcceptJsonRequest controls whether to accept json as a request parameter
      *
-     * @param acceptJsonRequest
+     * @param acceptJsonRequest a boolean that indicates whether JSON requests are accepted.
      */
     public void enableAcceptJsonRequest(boolean acceptJsonRequest) {
         this.acceptJsonRequest = acceptJsonRequest;
@@ -782,6 +782,11 @@ public class CoreEnforcer {
 
     /**
      * addNamedMatchingFunc add MatchingFunc by ptype RoleManager
+     *
+     * @param ptype the type of the role manager.
+     * @param name  the name of the matching function to be added.
+     * @param fn    the matching function.
+     * @return whether the matching function was successfully added.
      */
     public boolean addNamedMatchingFunc(String ptype, String name, BiPredicate<String, String> fn) {
         if (rmMap.containsKey(ptype)) {
@@ -798,6 +803,11 @@ public class CoreEnforcer {
 
     /**
      * addNamedMatchingFunc add MatchingFunc by ptype RoleManager
+     *
+     * @param ptype the type of the role manager.
+     * @param name  the name of the matching function to be added.
+     * @param fn    the domain matching function.
+     * @return whether the matching function was successfully added.
      */
     public boolean addNamedDomainMatchingFunc(String ptype, String name, BiPredicate<String, String> fn) {
         if (rmMap.containsKey(ptype)) {
@@ -813,8 +823,14 @@ public class CoreEnforcer {
     }
 
     /**
-     * addNamedLinkConditionFunc Add condition function fn for Link userName->roleName,
+     * addNamedLinkConditionFunc Add condition function fn for Link userName-&gt;roleName,
      * when fn returns true, Link is valid, otherwise invalid
+     *
+     * @param ptype the type of the role manager.
+     * @param user  the username for which the link condition is being added.
+     * @param role  the role associated with the user for which the condition is evaluated.
+     * @param fn    a function that takes an array of parameters (e.g., [user, role]) and returns a Boolean indicating the validity of the link.
+     * @return whether the Link is valid.
      */
     public boolean addNamedLinkConditionFunc(String ptype, String user, String role, Function<String[], Boolean> fn){
         if (condRmMap.containsKey(ptype)){
@@ -826,8 +842,15 @@ public class CoreEnforcer {
     }
 
     /**
-     * addNamedDomainLinkConditionFunc Add condition function fn for Link userName-> {roleName, domain},
+     * addNamedDomainLinkConditionFunc Add condition function fn for Link userName-&gt; {roleName, domain},
      * when fn returns true, Link is valid, otherwise invalid
+     *
+     * @param ptype  the type of the conditional role manager.
+     * @param user   the username for which the link condition is being added.
+     * @param role   the role associated with the user for which the condition is evaluated.
+     * @param domain the domain associated with the role.
+     * @param fn     a function that takes an array of parameters (e.g., [user, role, domain]) and returns a Boolean indicating the validity of the link.
+     * @return whether the Link is valid.
      */
     public boolean addNamedDomainLinkConditionFunc(String ptype, String user, String role, String domain, Function<String[], Boolean> fn) {
         if (condRmMap.containsKey(ptype)){
@@ -839,7 +862,13 @@ public class CoreEnforcer {
     }
 
     /**
-     * setNamedLinkConditionFuncParams Sets the parameters of the condition function fn for Link userName->roleName
+     * setNamedLinkConditionFuncParams Sets the parameters of the condition function fn for Link userName-&gt;roleName
+     *
+     * @param ptype  the type of the conditional role manager.
+     * @param user   the username for which the link condition parameters are being set.
+     * @param role   the role associated with the user for which the parameters are being configured.
+     * @param params an array of parameters to be passed to the condition function.
+     * @return whether the Link is valid.
      */
     public boolean setNamedLinkConditionFuncParams(String ptype, String user, String role, String... params){
         if (condRmMap.containsKey(ptype)){
@@ -852,7 +881,14 @@ public class CoreEnforcer {
 
     /**
      * setNamedDomainLinkConditionFuncParams Sets the parameters of the condition function fn
-     * for Link userName->{roleName, domain}
+     * for Link userName-&gt;{roleName, domain}
+     *
+     * @param ptype  the type of the conditional role manager.
+     * @param user   the username for which the link condition parameters are being set.
+     * @param role   the role associated with the user for which the parameters are being configured.
+     * @param domain the domain associated with the role and user.
+     * @param params an array of parameters to be passed to the condition function, allowing customization of the condition logic.
+     * @return whether the parameters were successfully set.
      */
     public boolean setNamedDomainLinkConditionFuncParams(String ptype, String user, String role, String domain, String... params){
         if (condRmMap.containsKey(ptype)){
@@ -863,6 +899,14 @@ public class CoreEnforcer {
         return false;
     }
 
+    /***
+     * getRTokens Retrieves request tokens and populates them into the provided parameters map.
+     *
+     * @param parameters a map to store the request tokens and their corresponding values.
+     * @param rType      the type of the request for which tokens are being retrieved, used to access the appropriate model.
+     * @param rvals      the request needs to be mediated, usually an array
+     *                   of strings, can be class instances if ABAC is used.
+     */
     private void getRTokens(Map<String, Object> parameters, String rType, Object... rvals) {
         String[] requestTokens = model.model.get("r").get(rType).tokens;
         if(requestTokens.length != rvals.length) {
@@ -874,6 +918,14 @@ public class CoreEnforcer {
         }
     }
 
+    /***
+     * getPTokens Retrieves policy tokens and populates them into the provided parameters map.
+     *
+     * @param parameters a map to store the policy tokens and their corresponding values.
+     * @param pType the type of the policy for which tokens are being retrieved, used for context.
+     * @param pvals a list of values corresponding to the policy tokens.
+     * @param pTokens an array of tokens associated with the policy.
+     */
     private void getPTokens(Map<String, Object> parameters, String pType, List<String> pvals, String[] pTokens) {
         if (pTokens.length != pvals.size()) {
             throw new CasbinMatcherException("invalid policy size: expected " + pTokens.length +

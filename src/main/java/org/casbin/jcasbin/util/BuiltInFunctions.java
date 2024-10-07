@@ -40,6 +40,9 @@ public class BuiltInFunctions {
 
     /**
      * validate the variadic string parameter size
+     *
+     * @param args         the expected number of arguments.
+     * @param expectedLen  the variadic string arguments to validate.
      */
     public static void validateVariadicStringArgs(int expectedLen, String... args) throws IllegalArgumentException {
         int length = args!=null?args.length:0;
@@ -194,7 +197,7 @@ public class BuiltInFunctions {
      * KeyMatch5 determines whether key1 matches the pattern of key2 and ignores the parameters in key2.
      *
      * <pre>
-     * For example, "/foo/bar?status=1&type=2" matches "/foo/bar"
+     * For example, "/foo/bar?status=1&amp;type=2" matches "/foo/bar"
      * </pre>
      *
      * @param key1 the first argument.
@@ -232,8 +235,9 @@ public class BuiltInFunctions {
     /**
      * KeyGet2 returns value matched pattern.For example, "/resource1" matches "/:resource", if the pathVar == "resource", then "resource1" will be returned.
      *
-     * @param key1 the first argument.
-     * @param key2 the second argument.
+     * @param key1    the first argument.
+     * @param key2    the second argument.
+     * @param pathVar the name of the variable to retrieve from the matched pattern.
      * @return the matched part.
      */
     public static String keyGet2Func(String key1, String key2, String pathVar) {
@@ -417,7 +421,7 @@ public class BuiltInFunctions {
         /**
          * GenerateConditionalGFunction is the factory method of the g(_, _[, _]) function with conditions.
          *
-         * @param name the name of the g(_, _) function, can be "g", "g2", ..
+         * @param name    the name of the g(_, _) function, can be "g", "g2", ..
          * @param condRm  the conditional role manager used by the function.
          * @return the function.
          */
@@ -497,6 +501,9 @@ public class BuiltInFunctions {
 
     /**
      * timeMatchFunc is the wrapper for TimeMatch.
+     *
+     * @param args the arguments for the time match function.
+     * @return whether the time matches the pattern.
      */
     public static boolean timeMatchFunc(String... args) {
         try {
@@ -511,6 +518,10 @@ public class BuiltInFunctions {
     /**
      * TimeMatch determines whether the current time is between startTime and endTime.
      * You can use "_" to indicate that the parameter is ignored
+     *
+     * @param startTime the start time as a string in the format "yyyy-MM-dd HH:mm:ss". Use "_" to ignore the start time.
+     * @param endTime the end time as a string in the format "yyyy-MM-dd HH:mm:ss". Use "_" to ignore the end time.
+     * @return whether the current time is between startTime and endTime
      */
     public static boolean timeMatch(String startTime, String endTime) {
         LocalDateTime now = LocalDateTime.now();

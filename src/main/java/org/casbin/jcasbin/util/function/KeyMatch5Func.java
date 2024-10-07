@@ -22,9 +22,9 @@ import org.casbin.jcasbin.util.BuiltInFunctions;
 import java.util.Map;
 
 /**
+ * KeyMatch5Func is the wrapper for KeyMatch5.
  * @author Yixiang Zhao (@seriouszyx)
- * @description KeyMatch5Func is the wrapper for KeyMatch5.
- * @date 2021-11-13 20:32
+ * 2021-11-13 20:32
  **/
 public class KeyMatch5Func extends AbstractFunction {
 

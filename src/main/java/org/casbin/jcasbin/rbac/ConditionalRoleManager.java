@@ -114,6 +114,10 @@ public class ConditionalRoleManager extends DefaultRoleManager{
 
     /**
      * getLinkConditionFunc get LinkConditionFunc based on userName, roleName
+     *
+     * @param userName the name of the user for whom the link condition function is retrieved.
+     * @param roleName the name of the role for which the link condition function is retrieved.
+     * @return the link condition function that determines the validity of the link for the given user and role.
      */
     public Function<String[], Boolean> getLinkConditionFunc(String userName, String roleName){
         return getDomainLinkConditionFunc(userName, roleName, "");
@@ -121,6 +125,12 @@ public class ConditionalRoleManager extends DefaultRoleManager{
 
     /**
      * getDomainLinkConditionFunc get LinkConditionFunc based on userName, roleName, domain
+     *
+     * @param userName the name of the user for whom the link condition function is retrieved.
+     * @param roleName the name of the role for which the link condition function is retrieved.
+     * @param domain   the domain associated with the link condition function.
+     * @return the link condition function that determines the validity of the link for the given user, role, and domain,
+     *         or null if either the user or role does not exist.
      */
     public Function<String[], Boolean> getDomainLinkConditionFunc(String userName, String roleName, String domain){
         Role user = getRole(userName);
@@ -138,6 +148,11 @@ public class ConditionalRoleManager extends DefaultRoleManager{
 
     /**
      * getLinkConditionFuncParams gets parameters of LinkConditionFunc based on userName, roleName, domain
+     *
+     * @param userName the name of the user whose link condition function parameters are retrieved.
+     * @param roleName the name of the role whose link condition function parameters are retrieved.
+     * @param domain   an array of domain names associated with the link condition function.
+     * @return a list of parameters for the link condition function, or null if no parameters are found.
      */
     public List<String> getLinkConditionFuncParams(String userName, String roleName, String[] domain){
         boolean userCreated = !this.allRoles.containsKey(userName);
@@ -165,6 +180,10 @@ public class ConditionalRoleManager extends DefaultRoleManager{
 
     /**
      * addLinkConditionFunc is based on userName, roleName, add LinkConditionFunc
+     *
+     * @param userName the name of the user for whom the link condition function is being added.
+     * @param roleName the name of the role associated with the link condition function.
+     * @param fn       the link condition function to be added, which takes an array of strings and returns a boolean.
      */
     public void addLinkConditionFunc(String userName, String roleName, Function<String[], Boolean> fn){
         addDomainLinkConditionFunc(userName, roleName, "", fn);
@@ -172,6 +191,11 @@ public class ConditionalRoleManager extends DefaultRoleManager{
 
     /**
      * addDomainLinkConditionFunc is based on userName, roleName, domain, add LinkConditionFunc
+     *
+     * @param userName the name of the user for whom the link condition function is being added.
+     * @param roleName the name of the role associated with the link condition function.
+     * @param domain   the domain for which the link condition function is applicable.
+     * @param fn the link condition function to be added, which takes an array of strings and returns a boolean.
      */
     public void addDomainLinkConditionFunc(String userName, String roleName, String domain, Function<String[], Boolean> fn){
         Role user = getRole(userName);
@@ -182,6 +206,10 @@ public class ConditionalRoleManager extends DefaultRoleManager{
 
     /**
      * SetLinkConditionFuncParams sets parameters of LinkConditionFunc based on userName, roleName, domain
+     *
+     * @param userName the name of the user for whom the link condition function parameters are being set.
+     * @param roleName the name of the role associated with the link condition function.
+     * @param params the parameters to be set for the link condition function.
      */
     public void setLinkConditionFuncParams(String userName, String roleName, String... params) {
         setDomainLinkConditionFuncParams(userName, roleName, "", params);
@@ -189,6 +217,11 @@ public class ConditionalRoleManager extends DefaultRoleManager{
 
     /**
      * SetDomainLinkConditionFuncParams sets parameters of LinkConditionFunc based on userName, roleName, domain
+     *
+     * @param userName the name of the user for whom the link condition function parameters are being set.
+     * @param roleName the name of the role associated with the link condition function.
+     * @param domain   the domain related to the link condition function.
+     * @param params   the parameters to be set for the link condition function.
      */
     public void setDomainLinkConditionFuncParams(String userName, String roleName, String domain, String... params) {
         Role user = getRole(userName);

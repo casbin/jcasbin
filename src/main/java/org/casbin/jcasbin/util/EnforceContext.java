@@ -14,9 +14,9 @@
 package org.casbin.jcasbin.util;
 
 /**
+ * EnforceContext is used as the first element of the parameter "rvals" in method "enforce"
  * @author Yixiang Zhao (@seriouszyx)
- * @description EnforceContext is used as the first element of the parameter "rvals" in method "enforce"
- * @date 2021-11-30 18:56
+ * 2021-11-30 18:56
  **/
 public class EnforceContext {
 

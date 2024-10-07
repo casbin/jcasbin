@@ -101,7 +101,7 @@ public class DistributedEnforcer extends SyncedEnforcer {
      * AddPolicySelf provides a method for dispatcher to add authorization rules to the current policy.
      * The function returns the rules affected and error.
      *
-     * @param shouldPersist
+     * @param shouldPersist whether the changes should be persisted.
      * @param sec     the section, "p" or "g".
      * @param ptype   the policy type, "p", "p2", .. or "g", "g2", ..
      * @param rules   the rules.
@@ -146,7 +146,7 @@ public class DistributedEnforcer extends SyncedEnforcer {
      * RemovePolicySelf provides a method for dispatcher to remove policies from current policy.
      * The function returns the rules affected and error.
      *
-     * @param shouldPersist
+     * @param shouldPersist whether the changes should be persisted.
      * @param sec     the section, "p" or "g".
      * @param ptype   the policy type, "p", "p2", .. or "g", "g2", ..
      * @param rules   the rules.
@@ -184,7 +184,7 @@ public class DistributedEnforcer extends SyncedEnforcer {
      * field filters can be specified.
      * The function returns the rules affected and error.
      *
-     * @param shouldPersist
+     * @param shouldPersist whether the changes should be persisted.
      * @param sec     the section, "p" or "g".
      * @param ptype   the policy type, "p", "p2", .. or "g", "g2", ..
      * @param fieldIndex the policy rule's start index to be matched.
@@ -220,7 +220,7 @@ public class DistributedEnforcer extends SyncedEnforcer {
     /**
      * ClearPolicySelf provides a method for dispatcher to clear all rules from the current policy.
      *
-     * @param shouldPersist
+     * @param shouldPersist whether the changes should be persisted.
      */
     public void clearPolicySelf(BooleanSupplier shouldPersist) {
         if (shouldPersist.getAsBoolean()) {
@@ -239,7 +239,7 @@ public class DistributedEnforcer extends SyncedEnforcer {
     /**
      * UpdatePolicySelf provides a method for dispatcher to update an authorization rule from the current policy.
      *
-     * @param shouldPersist
+     * @param shouldPersist whether the changes should be persisted.
      * @param sec     the section, "p" or "g".
      * @param ptype   the policy type, "p", "p2", .. or "g", "g2", ..
      * @param oldRule the old rule.

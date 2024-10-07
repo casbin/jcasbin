@@ -64,6 +64,7 @@ public class DefaultRoleManager implements RoleManager {
     /**
      * addMatchingFunc support use pattern in g.
      *
+     * @param name the name of the matching function.
      * @param matchingFunc the matching function.
      */
     public void addMatchingFunc(String name, BiPredicate<String, String> matchingFunc) {
@@ -74,6 +75,7 @@ public class DefaultRoleManager implements RoleManager {
     /**
      * addDomainMatchingFunc support use domain pattern in g
      *
+     * @param name the name of the domain matching function.
      * @param domainMatchingFunc the domain matching function.
      */
     public void addDomainMatchingFunc(String name, BiPredicate<String, String> domainMatchingFunc) {

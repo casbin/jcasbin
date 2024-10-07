@@ -111,12 +111,9 @@ public class UtilTest {
             MockedConstruction<CSVFormat> stringReaderMocked = BDDMockito.mockConstruction(CSVFormat.class, (mock, context) -> {
                 BDDMockito.given(mock.parse(any(StringReader.class))).willThrow(ioEx);
             })) {
-
-            String csv = "\n";
-
             // given
-            utilMocked.when(() -> Util.replaceCommaInBrackets(anyString())).thenReturn(csv);
             utilMocked.when(() -> Util.splitCommaDelimited(anyString())).thenCallRealMethod();
+            String csv = "\n";
 
             // when
             Util.splitCommaDelimited(csv);

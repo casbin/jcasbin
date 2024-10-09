@@ -392,6 +392,12 @@ public class Policy {
 
     /**
      * buildIncrementalConditionalRoleLinks provides incremental build the role inheritance relations.
+     *
+     * @param condRmMap a map of conditional role managers used for role link management.
+     * @param op        the operation to perform, such as adding or removing role links.
+     * @param sec       the section of the policy, typically "g" for role inheritance.
+     * @param ptype     the policy type, which specifies the kind of roles being managed.
+     * @param rules     the rules that define the role links to be built.
      */
     public void buildIncrementalConditionalRoleLinks(Map<String, ConditionalRoleManager> condRmMap, Model.PolicyOperations op, String sec, String ptype, List<List<String>> rules){
         if ("g".equals(sec) && condRmMap.containsKey(ptype)) {
@@ -401,6 +407,8 @@ public class Policy {
 
     /**
      * buildConditionalRoleLinks initializes the roles in RBAC.
+     *
+     * @param condRmMap a map of conditional role managers that manage the role links and their conditions.
      */
     public void buildConditionalRoleLinks(Map<String, ConditionalRoleManager> condRmMap){
         printPolicy();

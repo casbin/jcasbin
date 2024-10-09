@@ -336,8 +336,8 @@ public class Util {
     /**
      * Helper method to check if a string is a valid JSON
      *
-     * @param str
-     * @return boolean
+     * @param str the string to be checked.
+     * @return whether the string is a valid
      */
     public static boolean isJsonString(String str) {
         try {

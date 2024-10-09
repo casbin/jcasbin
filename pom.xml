@@ -85,7 +85,11 @@
                     <source>11</source>
                     <detectJavaApiLink>false</detectJavaApiLink>
                     <!-- Turn off Java 8 strict Javadoc checking -->
-                    <additionalparam>-Xdoclint:none</additionalparam>
+<!--                    <additionalparam>-Xdoclint:none</additionalparam>-->
+                    <doclint>none</doclint>
+                    <sourceFileIncludes>
+                        <sourceFileInclude>**/*.java</sourceFileInclude>
+                    </sourceFileIncludes>
                     <tags>
                         <tag>
                             <name>notnull</name>

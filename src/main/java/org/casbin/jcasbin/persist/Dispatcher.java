@@ -22,27 +22,30 @@ import java.util.List;
  */
 public interface Dispatcher {
     /**
-     * // AddPolicies adds policies rule to all instance.
-     * @param sec
-     * @param ptype
-     * @param rules
+     * AddPolicies adds policies rule to all instance.
+     *
+     * @param sec   the section to which the policies belong, e.g., "p" or "g".
+     * @param ptype the policy type, such as "p" for permissions or "g" for roles.
+     * @param rules the list of policy rules to be added, where each rule is represented as a list of strings.
      */
     void addPolicies(String sec, String ptype, List<List<String>> rules);
 
     /**
      * RemovePolicies removes policies rule from all instance.
-     * @param sec
-     * @param ptype
-     * @param rules
+     *
+     * @param sec   the section from which to remove policies, e.g., "p" or "g".
+     * @param ptype the policy type to remove, such as "p" or "g".
+     * @param rules the list of policy rules to be removed, where each rule is represented as a list of strings.
      */
     void removePolicies(String sec, String ptype, List<List<String>> rules);
 
     /**
      * RemoveFilteredPolicy removes policy rules that match the filter from all instance.
-     * @param sec
-     * @param ptype
-     * @param fieldIndex
-     * @param fieldValues
+     *
+     * @param sec         the section from which to remove policies, e.g., "p" or "g".
+     * @param ptype       the policy type to filter, such as "p" or "g".
+     * @param fieldIndex  the index of the field to filter on.
+     * @param fieldValues the values to filter by for the specified field index.
      */
     void removeFilteredPolicy(String sec, String ptype, int fieldIndex, String... fieldValues);
 
@@ -53,10 +56,11 @@ public interface Dispatcher {
 
     /**
      * UpdatePolicy updates policy rule from all instance.
-     * @param sec
-     * @param ptype
-     * @param oldRule
-     * @param newRule
+     *
+     * @param sec     the section containing the policy, e.g., "p" or "g".
+     * @param ptype   the policy type to update, such as "p" or "g".
+     * @param oldRule the existing policy rule to be updated, represented as a list of strings.
+     * @param newRule the new policy rule that will replace the old one, represented as a list of strings.
      */
     void updatePolicy(String sec, String ptype, List<String> oldRule, List<String> newRule);
 }

@@ -165,6 +165,8 @@ public class Model extends Policy {
 
     /**
      * SetLogger sets the model's logger.
+     *
+     * @param logger the logger to be set for the model.
      */
     public void setLogger(Logger logger) {
         for (Map<String, Assertion> astMap : model.values()) {
@@ -177,6 +179,8 @@ public class Model extends Policy {
 
     /**
      * NewModel creates an empty model.
+     *
+     * @return a new instance of the Model.
      */
     public static Model newModel() {
         Model model = new Model();
@@ -188,6 +192,7 @@ public class Model extends Policy {
      * NewModelFromString creates a model from a string which contains model text.
      *
      * @param path the path of the model file.
+     * @return the model loaded from file.
      */
     public static Model newModelFromFile(String path) {
         Model model = new Model();
@@ -199,6 +204,7 @@ public class Model extends Policy {
      * NewModelFromString creates a model from a string which contains model text.
      *
      * @param text the path of the file.
+     * @return the model loaded from text.
      */
     public static Model newModelFromString(String text) {
         Model model = new Model();
@@ -250,6 +256,9 @@ public class Model extends Policy {
 
     /**
      * hasSection checks if the section exists in the model.
+     *
+     * @param sec the section name to check, such as "p" or "g".
+     * @return  whether the section exists in the model.
      */
     public boolean hasSection(String sec) {
         Map<String, Assertion> section = model.get(sec);

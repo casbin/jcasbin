@@ -734,7 +734,7 @@ public class EnforcerUnitTest {
         e.enableAutoSave(true);
         e.addNamedMatchingFunc("g", "keyMatch4", BuiltInFunctions::keyMatch4);
 
-        // 添加 gs 角色的关系
+        // Add the relationship of gs role
         String[][] gs = new String[1001][3];
         gs[0] = new String[]{"admin@alice.co", "temp", "alice"};
         for (int i = 0; i < 1000; i++) {

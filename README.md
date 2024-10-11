@@ -3,7 +3,7 @@
 [![codebeat badge](https://codebeat.co/badges/c17c9ee1-da42-4db3-8047-9574ad2b23b1)](https://codebeat.co/projects/github-com-casbin-jcasbin-master)
 [![GitHub Actions](https://github.com/casbin/jcasbin/workflows/build/badge.svg)](https://github.com/casbin/jcasbin/actions)
 [![codecov](https://codecov.io/gh/casbin/jcasbin/branch/master/graph/badge.svg?token=pKOEodQ3q9)](https://codecov.io/gh/casbin/jcasbin)
-[![Javadocs](https://www.javadoc.io/badge/org.casbin/jcasbin.svg)](https://www.javadoc.io/doc/org.casbin/jcasbin)
+[![javadoc](https://javadoc.io/badge2/org.casbin/jcasbin/javadoc.svg)](https://javadoc.io/doc/org.casbin/jcasbin)
 [![Maven Central](https://img.shields.io/maven-central/v/org.casbin/jcasbin.svg)](https://mvnrepository.com/artifact/org.casbin/jcasbin/latest)
 [![Release](https://img.shields.io/github/release/casbin/jcasbin.svg)](https://github.com/casbin/jcasbin/releases/latest)
 [![Discord](https://img.shields.io/discord/1022748306096537660?logo=discord&label=discord&color=5865F2)](https://discord.gg/S5UjpzGZjN)

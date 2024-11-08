@@ -154,7 +154,7 @@ public class FileAdapter implements Adapter {
         }
         try {
             List<String> lines = IOUtils.readLines(new FileInputStream(filePath), Charset.forName("UTF-8"));
-            lines.remove(ruleText);
+            lines.removeIf(line -> line.replaceAll("\\s", "").equals(ruleText.replaceAll("\\s", "")));
             savePolicyFile(String.join("\n", lines));
         } catch (IOException e) {
             e.printStackTrace();

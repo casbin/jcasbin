@@ -19,6 +19,7 @@ import org.casbin.jcasbin.model.Model;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.casbin.jcasbin.util.Util.splitCommaDelimited;
 
@@ -40,7 +41,14 @@ public class Helper {
 
         String key = tokens[0];
         String sec = key.substring(0, 1);
-        Assertion ast = model.model.get(sec).get(key);
+        Map<String, Assertion> astMap = model.model.get(sec);
+        if(astMap == null) {
+            return;
+        }
+        Assertion ast = astMap.get(key);
+        if(ast == null) {
+            return;
+        }
         List<String> policy = Arrays.asList(Arrays.copyOfRange(tokens, 1, tokens.length));
         ast.policy.add(policy);
         ast.policyIndex.put(policy.toString(), ast.policy.size() - 1);

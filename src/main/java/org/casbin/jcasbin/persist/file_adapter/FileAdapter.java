@@ -111,7 +111,7 @@ public class FileAdapter implements Adapter {
         try {
             List<String> lines = IOUtils.readLines(inputStream, Charset.forName("UTF-8"));
             lines.forEach(x -> handler.accept(x, model));
-        } catch (IOException e) {
+        } catch (UncheckedIOException e) {
             e.printStackTrace();
             throw new CasbinAdapterException("Policy load error");
         }

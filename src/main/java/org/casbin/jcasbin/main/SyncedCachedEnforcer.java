@@ -121,7 +121,7 @@ public class SyncedCachedEnforcer extends SyncedEnforcer{
      * @return The result of the enforcement check.
      */
     public boolean enforce(Object... rvals) {
-        if (enableCache.get()) {
+        if (!enableCache.get()) {
             return super.enforce(rvals);
         }
 

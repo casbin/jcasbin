@@ -120,8 +120,9 @@ public class SyncedCachedEnforcer extends SyncedEnforcer{
      * @param rvals Parameters for the enforcement check.
      * @return The result of the enforcement check.
      */
+    @Override
     public boolean enforce(Object... rvals) {
-        if (enableCache.get()) {
+        if (!enableCache.get()) {
             return super.enforce(rvals);
         }
 
@@ -143,6 +144,7 @@ public class SyncedCachedEnforcer extends SyncedEnforcer{
     /**
      * Loads the policy, clearing the cache if enabled.
      */
+    @Override
     public void loadPolicy() {
         if(enableCache == null || !enableCache.get()){
             super.loadPolicy();
@@ -160,6 +162,7 @@ public class SyncedCachedEnforcer extends SyncedEnforcer{
      * @param params Policy parameters.
      * @return Whether the addition was successful.
      */
+    @Override
     public boolean addPolicy(String... params) {
         if (!checkOneAndRemoveCache(params)) {
             return false;
@@ -173,7 +176,22 @@ public class SyncedCachedEnforcer extends SyncedEnforcer{
      * @param rules Policy rules.
      * @return Whether the addition was successful.
      */
+    @Override
     public boolean addPolicies(List<List<String>> rules) {
+        if (!checkManyAndRemoveCache(rules)) {
+            return false;
+        }
+        return super.addPolicies(rules);
+    }
+
+    /**
+     * Adds multiple policies while checking and removing the cache.
+     *
+     * @param rules Policy rules.
+     * @return Whether the addition was successful.
+     */
+    @Override
+    public boolean addPolicies(String[][] rules) {
         if (!checkManyAndRemoveCache(rules)) {
             return false;
         }
@@ -186,6 +204,7 @@ public class SyncedCachedEnforcer extends SyncedEnforcer{
      * @param params Policy parameters.
      * @return Whether the removal was successful.
      */
+    @Override
     public boolean removePolicy(String... params) {
         if (!checkOneAndRemoveCache(params)) {
             return false;
@@ -199,7 +218,22 @@ public class SyncedCachedEnforcer extends SyncedEnforcer{
      * @param rules Policy rules.
      * @return Whether the removal was successful.
      */
+    @Override
     public boolean removePolicies(List<List<String>>rules) {
+        if (!checkManyAndRemoveCache(rules)) {
+            return false;
+        }
+        return super.removePolicies(rules);
+    }
+
+    /**
+     * Removes multiple policies while checking and removing the cache.
+     *
+     * @param rules Policy rules.
+     * @return Whether the removal was successful.
+     */
+    @Override
+    public boolean removePolicies(String[][] rules) {
         if (!checkManyAndRemoveCache(rules)) {
             return false;
         }
@@ -306,7 +340,7 @@ public class SyncedCachedEnforcer extends SyncedEnforcer{
      */
     private boolean checkOneAndRemoveCache(String... params) {
         if (enableCache.get()) {
-            String key = getKey((Object) params);
+            String key = getKey((Object []) params);
             if (key != null) {
                 cache.delete(key);
             }
@@ -323,7 +357,25 @@ public class SyncedCachedEnforcer extends SyncedEnforcer{
     private boolean checkManyAndRemoveCache(List<List<String>> rules) {
         if (!rules.isEmpty() && enableCache.get()) {
             for (List<String> rule : rules) {
-                String key = getKey(rule);
+                String key = getKey(rule.toArray());
+                if (key != null) {
+                    cache.delete(key);
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Checks and removes cache for multiple policies.
+     *
+     * @param rules Policy rules.
+     * @return Whether the check was successful.
+     */
+    private boolean checkManyAndRemoveCache(String[][] rules) {
+        if (rules != null && enableCache.get()) {
+            for (String[] rule : rules) {
+                String key = getKey((Object[]) rule);
                 if (key != null) {
                     cache.delete(key);
                 }

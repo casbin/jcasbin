@@ -16,11 +16,15 @@ package org.casbin.jcasbin.main;
 
 import org.casbin.jcasbin.util.Util;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
 import static org.casbin.jcasbin.main.TestUtil.testDomainEnforce;
 import static org.casbin.jcasbin.main.TestUtil.testEnforce;
+import static org.junit.Assert.*;
 
 public class AbacAPIUnitTest {
     @Test
@@ -55,6 +59,34 @@ public class AbacAPIUnitTest {
         testDomainEnforce(e, "bob", "domain1", "data2", "write", false);
         testDomainEnforce(e, "bob", "domain2", "data2", "read", true);
         testDomainEnforce(e, "bob", "domain2", "data2", "read", true);
+    }
+
+    @Test
+    public void testEvalWithComma() {
+        Enforcer e = new Enforcer("examples/abac_rule_with_comma_model.conf");
+        List<String> rule = new ArrayList<>();
+        rule.add("true");
+        rule.add("\"let test=seq.set('alice','bob');include(test,r.sub.name)\"");
+        rule.add("read");
+        List<String> newRule = new ArrayList<>();
+        newRule.add("true");
+        newRule.add("\"let test=seq.set('bob');include(test,r.sub.name)\"");
+        newRule.add("read");
+        assertTrue(e.addPolicy(rule));
+        assertFalse(e.addPolicy(rule));
+
+        Map<String, Object> sub = new HashMap<>();
+        sub.put("name", "alice");
+
+        testEnforce(e, sub, "data1", "read", true);
+
+        assertTrue(e.updatePolicy("p", "p", rule, newRule));
+        testEnforce(e, sub, "data1", "read", false);
+        sub.put("name", "bob");
+        testEnforce(e, sub, "data1", "read", true);
+
+        assertTrue(e.removePolicy(newRule));
+        testEnforce(e, sub, "data1", "read", false);
     }
 
     @Test

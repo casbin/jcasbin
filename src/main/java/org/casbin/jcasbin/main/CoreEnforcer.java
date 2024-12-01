@@ -42,6 +42,9 @@ import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
+import static org.casbin.jcasbin.util.Util.hasEval;
+import static org.casbin.jcasbin.util.Util.splitCommaDelimitedList;
+
 /**
  * CoreEnforcer defines the core functionality of an enforcer.
  */
@@ -580,6 +583,7 @@ public class CoreEnforcer {
         } else {
             expString = Util.removeComments(Util.escapeAssertion(matcher));
         }
+        boolean hasEval = hasEval(expString);
 
         // json process
         if (acceptJsonRequest) {
@@ -629,6 +633,9 @@ public class CoreEnforcer {
 
             for (int i = 0; i < policy.size(); i++) {
                 List<String> pvals = policy.get(i);
+                if (hasEval) {
+                    pvals = splitCommaDelimitedList(pvals);
+                }
                 Map<String, Object> parameters = new HashMap<>(rvals.length + pTokens.length);
                 getPTokens(parameters, pType, pvals, pTokens);
                 getRTokens(parameters, rType, rvals);

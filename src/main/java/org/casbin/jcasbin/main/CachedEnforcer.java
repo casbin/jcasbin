@@ -166,9 +166,10 @@ public class CachedEnforcer extends Enforcer{
      * @param params The parameters of the policy to be removed.
      * @return True if the policy was removed, false otherwise.
      */
+    @Override
     public boolean removePolicy(String... params){
         if (enableCache.get()) {
-            String key = getKey(params);
+            String key = getKey((Object[]) params);
             if (key != null) {
                 cache.delete(key);
             }
@@ -187,6 +188,23 @@ public class CachedEnforcer extends Enforcer{
         if (!rules.isEmpty() && enableCache.get()) {
             for (List<String> rule : rules) {
                 String key = getKey(rule.toArray());
+                cache.delete(key);
+            }
+        }
+        return super.removePolicies(rules);
+    }
+
+    /**
+     * Removes multiple policies from the enforcer.
+     *
+     * @param rules The list of policies to be removed.
+     * @return True if the policies were removed, false otherwise.
+     */
+    @Override
+    public boolean removePolicies(String[][] rules) {
+        if (rules != null && enableCache.get()) {
+            for (String[] rule : rules) {
+                String key = getKey((Object[]) rule);
                 cache.delete(key);
             }
         }

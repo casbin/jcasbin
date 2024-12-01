@@ -63,14 +63,14 @@ public class AbacAPIUnitTest {
 
     @Test
     public void testEvalWithComma() {
-        Enforcer e = new Enforcer("examples/abac_rule_with_comma_model.conf");
+        Enforcer e = new Enforcer("examples/abac_rule_model.conf");
         List<String> rule = new ArrayList<>();
-        rule.add("true");
         rule.add("\"let test=seq.set('alice','bob');include(test,r.sub.name)\"");
+        rule.add("data1");
         rule.add("read");
         List<String> newRule = new ArrayList<>();
-        newRule.add("true");
         newRule.add("\"let test=seq.set('bob');include(test,r.sub.name)\"");
+        newRule.add("data1");
         newRule.add("read");
         assertTrue(e.addPolicy(rule));
         assertFalse(e.addPolicy(rule));

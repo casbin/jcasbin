@@ -27,6 +27,7 @@ import org.mockito.MockedStatic;
 import java.io.IOException;
 import java.io.StringReader;
 
+import static org.casbin.jcasbin.util.Util.hasEval;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
 
@@ -82,6 +83,13 @@ public class UtilTest {
     assertArrayEquals(new String[]{"\"a", "\"b\"", "c\""}, Util.splitCommaDelimited("\"\"\"a\",\"\"\"b\"\"\",\"c\"\"\""));
     assertArrayEquals(new String[]{"\"a", "\"b\"", "c\""}, Util.splitCommaDelimited("\"\"\"a\",\"\"\"b\"\"\",\"c\"\"\""));
     assertArrayEquals(new String[]{"a b", "c", "d"}, Util.splitCommaDelimited("\"a b\", c, d"));
+  }
+
+  @Test
+  public void testHasEval() {
+      assertTrue(hasEval("eval(test)"));
+      assertTrue(hasEval("r_act == p_act && eval(p_sub_rule) && eval(p_obj_rule)"));
+      assertFalse(hasEval("evaltest"));
   }
 
   @Test

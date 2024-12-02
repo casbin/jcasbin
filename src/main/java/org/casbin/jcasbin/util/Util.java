@@ -285,6 +285,21 @@ public class Util {
     }
 
     /**
+     * splits each string in the given list by commas according to CSV format
+     * and removes any extra double quotes
+     * @param rule the rule to be modified
+     * @return the modified rule
+     */
+    public static List<String> splitCommaDelimitedList(List<String> rule) {
+        List<String> modifiedRule = new ArrayList<>();
+        for (String s : rule) {
+            String[] strings = splitCommaDelimited(s);
+            modifiedRule.add(strings[0]);
+        }
+        return modifiedRule;
+    }
+
+    /**
      * setEquals determines whether two string sets are identical.
      *
      * @param a the first set.
@@ -314,7 +329,7 @@ public class Util {
     }
 
     public static boolean hasEval(String exp) {
-        return evalReg.matcher(exp).matches();
+        return evalReg.matcher(exp).find();
     }
 
     public static String replaceEval(String s, String replacement) {

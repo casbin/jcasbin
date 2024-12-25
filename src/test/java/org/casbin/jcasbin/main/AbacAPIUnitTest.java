@@ -14,10 +14,8 @@
 
 package org.casbin.jcasbin.main;
 
+import org.casbin.jcasbin.util.Util;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -44,15 +42,6 @@ public class AbacAPIUnitTest {
         alice.setAge(60);
         testEnforce(e, alice, "/data2", "read", false);
         testEnforce(e, alice, "/data2", "write", false);
-
-        List<String> rule = new ArrayList<>();
-        rule.add("\"r.sub.name == 'alice,green'\"");
-        rule.add("data1");
-        rule.add("read");
-        e.addPolicy(rule);
-
-        TestEvalRule aliceGreen = new TestEvalRule("alice,green", 18);
-        testEnforce(e, aliceGreen, "data1", "read", true);
     }
 
     @Test

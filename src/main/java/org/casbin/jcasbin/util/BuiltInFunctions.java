@@ -37,6 +37,7 @@ public class BuiltInFunctions {
 
     private static final Pattern KEY_MATCH2_PATTERN = Pattern.compile(":[^/]+");
     private static final Pattern KEY_MATCH3_PATTERN = Pattern.compile("\\{[^/]+\\}");
+    private static final Pattern KEY_MATCH5_PATTERN = Pattern.compile("\\{[^/]+\\}");
 
     /**
      * validate the variadic string parameter size
@@ -206,10 +207,14 @@ public class BuiltInFunctions {
      */
     public static boolean keyMatch5(String key1, String key2) {
         int i = key1.indexOf('?');
-        if (i == -1) {
-            return key1.equals(key2);
+        if (i != -1) {
+            key1 = key1.substring(0,i);
         }
-        return key1.substring(0, i).equals(key2);
+
+        key2 = key2.replace("/*", "/.*");
+        key2 = KEY_MATCH5_PATTERN.matcher(key2).replaceAll("[^/]+");
+
+        return regexMatch(key1, "^" + key2 + "$");
     }
 
     /**

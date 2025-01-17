@@ -127,11 +127,43 @@ public class BuiltInFunctionsUnitTest {
 
     @Test
     public void testKeyMatch5Func() {
+        testKeyMatch5("/alice_data/hello/123", "/alice_data/{resource}/.*", true);
+
         testKeyMatch5("/parent/child?status=1&type=2", "/parent/child", true);
         testKeyMatch5("/parent?status=1&type=2", "/parent/child", false);
+
         testKeyMatch5("/parent/child/?status=1&type=2", "/parent/child/", true);
         testKeyMatch5("/parent/child/?status=1&type=2", "/parent/child", false);
         testKeyMatch5("/parent/child?status=1&type=2", "/parent/child/", false);
+
+        testKeyMatch5("/foo", "/foo", true);
+        testKeyMatch5("/foo", "/foo*", true);
+        testKeyMatch5("/foo", "/foo/*", false);
+        testKeyMatch5("/foo/bar", "/foo", false);
+        testKeyMatch5("/foo/bar", "/foo*", false);
+        testKeyMatch5("/foo/bar", "/foo/*", true);
+        testKeyMatch5("/foobar", "/foo", false);
+        testKeyMatch5("/foobar", "/foo*", false);
+        testKeyMatch5("/foobar", "/foo/*", false);
+
+        testKeyMatch5("/", "/{resource}", false);
+        testKeyMatch5("/resource1", "/{resource}", true);
+        testKeyMatch5("/myid", "/{id}/using/{resId}", false);
+        testKeyMatch5("/myid/using/myresid", "/{id}/using/{resId}", true);
+
+        testKeyMatch5("/proxy/myid", "/proxy/{id}/*", false);
+        testKeyMatch5("/proxy/myid/", "/proxy/{id}/*", true);
+        testKeyMatch5("/proxy/myid/res", "/proxy/{id}/*", true);
+        testKeyMatch5("/proxy/myid/res/res2", "/proxy/{id}/*", true);
+        testKeyMatch5("/proxy/myid/res/res2/res3", "/proxy/{id}/*", true);
+        testKeyMatch5("/proxy/", "/proxy/{id}/*", false);
+
+        testKeyMatch5("/proxy/myid?status=1&type=2", "/proxy/{id}/*", false);
+        testKeyMatch5("/proxy/myid/", "/proxy/{id}/*", true);
+        testKeyMatch5("/proxy/myid/res?status=1&type=2", "/proxy/{id}/*", true);
+        testKeyMatch5("/proxy/myid/res/res2?status=1&type=2", "/proxy/{id}/*", true);
+        testKeyMatch5("/proxy/myid/res/res2/res3?status=1&type=2", "/proxy/{id}/*", true);
+        testKeyMatch5("/proxy/", "/proxy/{id}/*", false);
     }
 
     @Test

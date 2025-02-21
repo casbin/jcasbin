@@ -35,6 +35,8 @@ public class Util {
     public static boolean enableLog = true;
     private static Pattern evalReg = Pattern.compile("\\beval\\(([^),]*)\\)");
 
+    private static final Pattern IN_SYNTAX_PATTERN = Pattern.compile("([a-zA-Z0-9_.()\"]*) +in +([a-zA-Z0-9_.()\"]*)");
+
     private static Pattern escapeAssertionRegex = Pattern.compile("\\b(r|p)[0-9]*\\.");
 
     private static Logger LOGGER = LoggerFactory.getLogger("org.casbin.jcasbin");
@@ -144,16 +146,17 @@ public class Util {
      * @return the 'include' expression.
      */
     public static String convertInSyntax(String expString) {
-        String reg = "([a-zA-Z0-9_.()\"]*) +in +([a-zA-Z0-9_.()\"]*)";
-        Matcher m1 = Pattern.compile(reg).matcher(expString);
-        StringBuffer sb = new StringBuffer();
-        boolean flag = false;
-        while (m1.find()) {
-            flag = true;
-            m1.appendReplacement(sb, "include($2, $1)");
+        Matcher matcher = IN_SYNTAX_PATTERN.matcher(expString);
+        if (matcher.find()) {
+            StringBuffer sb = new StringBuffer();
+            do {
+                matcher.appendReplacement(sb, "include($2, $1)");
+            } while (matcher.find());
+            matcher.appendTail(sb);
+            return sb.toString();
         }
-        m1.appendTail(sb);
-        return flag ? sb.toString() : expString;
+
+        return expString;
     }
 
     /**

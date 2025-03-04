@@ -146,17 +146,23 @@ public class Util {
      * @return the 'include' expression.
      */
     public static String convertInSyntax(String expString) {
-        Matcher matcher = IN_SYNTAX_PATTERN.matcher(expString);
-        if (matcher.find()) {
-            StringBuffer sb = new StringBuffer();
-            do {
-                matcher.appendReplacement(sb, "include($2, $1)");
-            } while (matcher.find());
-            matcher.appendTail(sb);
-            return sb.toString();
+        if (expString.contains(" in ")) {
+            Matcher matcher = IN_SYNTAX_PATTERN.matcher(expString);
+            if (matcher.find()) {
+                return replaceInSyntaxWithInclude(matcher);
+            }
         }
 
         return expString;
+    }
+
+    private static String replaceInSyntaxWithInclude(Matcher matcher) {
+        StringBuffer sb = new StringBuffer();
+        do {
+            matcher.appendReplacement(sb, "include($2, $1)");
+        } while (matcher.find());
+        matcher.appendTail(sb);
+        return sb.toString();
     }
 
     /**

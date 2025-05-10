@@ -284,9 +284,7 @@ public class CoreEnforcer {
         model.sortPoliciesBySubjectHieraichy();
 
         clearRmMap();
-        if (Util.enableLog) {
-            model.printPolicy();
-        }
+        model.printPolicy();
         if (autoBuildRoleLinks) {
             buildRoleLinks();
             buildConditionalRoleLinks();
@@ -315,9 +313,7 @@ public class CoreEnforcer {
         model.sortPoliciesBySubjectHieraichy();
 
         initRmMap();
-        if (Util.enableLog) {
-            model.printPolicy();
-        }
+        model.printPolicy();
         if (autoBuildRoleLinks) {
             buildRoleLinks();
             buildConditionalRoleLinks();

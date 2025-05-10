@@ -44,6 +44,15 @@ public class Util {
     private static final String md5AlgorithmName = "MD5";
 
     /**
+     * isLogPrintEnabled checks if {@code logPrint} or {@code logPrintfInfo} are enabled.
+     *
+     * @return {@code true} if INFO logs are enabled.
+     */
+    public static boolean isLogPrintEnabled() {
+        return enableLog && LOGGER.isInfoEnabled();
+    }
+
+    /**
      * logPrint prints the log.
      *
      * @param v the log.
@@ -55,11 +64,24 @@ public class Util {
     }
 
     /**
+     * logPrintfInfo prints the log with the SLF4J format.
+     *
+     * @param format the format of the log.
+     * @param v      the log.
+     */
+    public static void logPrintfInfo(String format, Object... v) {
+        if (enableLog) {
+            LOGGER.info(format, v);
+        }
+    }
+
+    /**
      * logPrintf prints the log with the format.
      *
      * @param format the format of the log.
      * @param v      the log.
      */
+    @Deprecated
     public static void logPrintf(String format, String... v) {
         if (enableLog) {
             String tmp = String.format(format, (Object[]) v);

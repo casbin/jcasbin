@@ -72,7 +72,7 @@ public class Assertion {
             this.rm.addLink(rule.get(0), rule.get(1), rule.subList(2, rule.size()).toArray(new String[0]));
         }
 
-        Util.logPrint("Role links for: " + key);
+        Util.logPrintfInfo("Role links for: {}", key);
         rm.printRoles();
     }
 
@@ -165,7 +165,7 @@ public class Assertion {
             addConditionalRoleLink(rule, domainRule);
         }
 
-        Util.logPrint("Role links for: " + key);
+        Util.logPrintfInfo("Role links for: {}", key);
         condRM.printRoles();
     }
 

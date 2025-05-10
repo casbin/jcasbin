@@ -177,6 +177,6 @@ public class DomainManager implements RoleManager {
 
     @Override
     public void printRoles() {
-        Util.logPrint(toString());
+        Util.logPrintfInfo("{}", this);
     }
 }

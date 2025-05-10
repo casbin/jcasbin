@@ -316,10 +316,13 @@ public class Model extends Policy {
      * printModel prints the model to the log.
      */
     public void printModel() {
+        if (!Util.isLogPrintEnabled()) {
+            return;
+        }
         Util.logPrint("Model:");
         for (Map.Entry<String, Map<String, Assertion>> entry : model.entrySet()) {
             for (Map.Entry<String, Assertion> entry2 : entry.getValue().entrySet()) {
-                Util.logPrintf("%s.%s: %s", entry.getKey(), entry2.getKey(), entry2.getValue().value);
+                Util.logPrintfInfo("{}.{}: {}", entry.getKey(), entry2.getKey(), entry2.getValue().value);
             }
         }
     }

@@ -51,6 +51,9 @@ public class Policy {
      * printPolicy prints the policy to log.
      */
     public void printPolicy() {
+        if (!Util.isLogPrintEnabled()) {
+            return;
+        }
         Util.logPrint("Policy:");
         if (model.containsKey("p")) {
             for (Map.Entry<String, Assertion> entry : model.get("p").entrySet()) {

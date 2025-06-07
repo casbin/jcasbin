@@ -86,7 +86,7 @@ class InternalEnforcer extends CoreEnforcer {
             try {
                 adapter.addPolicy(sec, ptype, rule);
             } catch (UnsupportedOperationException ignored) {
-                Util.logPrintf("Method not implemented");
+                Util.logPrint("Method not implemented");
             } catch (Exception e) {
                 Util.logPrint("An exception occurred:" + e.getMessage());
                 return false;
@@ -128,7 +128,7 @@ class InternalEnforcer extends CoreEnforcer {
                     ((BatchAdapter) adapter).addPolicies(sec, ptype, rules);
                 }
             } catch (UnsupportedOperationException ignored) {
-                Util.logPrintf("Method not implemented");
+                Util.logPrint("Method not implemented");
             } catch (Exception e) {
                 Util.logPrint("An exception occurred:" + e.getMessage());
                 return false;
@@ -165,7 +165,7 @@ class InternalEnforcer extends CoreEnforcer {
             try {
                 adapter.removePolicy(sec, ptype, rule);
             } catch (UnsupportedOperationException ignored) {
-                Util.logPrintf("Method not implemented");
+                Util.logPrint("Method not implemented");
             } catch (Exception e) {
                 Util.logPrint("An exception occurred:" + e.getMessage());
                 return false;
@@ -203,7 +203,7 @@ class InternalEnforcer extends CoreEnforcer {
                 try {
                     ((UpdatableAdapter) adapter).updatePolicy(sec, ptype, oldRule, newRule);
                 } catch (UnsupportedOperationException ignored) {
-                    Util.logPrintf("Method not implemented");
+                    Util.logPrint("Method not implemented");
                 } catch (Exception e) {
                     Util.logPrint("An exception occurred:" + e.getMessage());
                     return false;
@@ -274,7 +274,7 @@ class InternalEnforcer extends CoreEnforcer {
                     ((BatchAdapter) adapter).removePolicies(sec, ptype, rules);
                 }
             } catch (UnsupportedOperationException ignored) {
-                Util.logPrintf("Method not implemented");
+                Util.logPrint("Method not implemented");
             } catch (Exception e) {
                 Util.logPrint("An exception occurred:" + e.getMessage());
                 return false;
@@ -310,7 +310,7 @@ class InternalEnforcer extends CoreEnforcer {
             try {
                 adapter.removeFilteredPolicy(sec, ptype, fieldIndex, fieldValues);
             } catch (UnsupportedOperationException ignored) {
-                Util.logPrintf("Method not implemented");
+                Util.logPrint("Method not implemented");
             } catch (Exception e) {
                 Util.logPrint("An exception occurred:" + e.getMessage());
                 return false;

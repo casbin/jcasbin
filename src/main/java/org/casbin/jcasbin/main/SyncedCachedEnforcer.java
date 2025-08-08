@@ -132,7 +132,7 @@ public class SyncedCachedEnforcer extends SyncedEnforcer{
         }
 
         Boolean cachedResult = getCachedResult(key);
-        if (cachedResult) {
+        if (cachedResult != null) {
             return cachedResult;
         }
 

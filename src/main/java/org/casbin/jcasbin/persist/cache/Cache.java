@@ -36,7 +36,7 @@ public interface Cache {
      * @param key the key to retrieve
      * @return an Optional containing the boolean value if present, otherwise Optional.empty()
      */
-    boolean get(String key);
+    Boolean get(String key);
 
     /**
      * Delete removes the specific key from the cache.

@@ -79,14 +79,14 @@ public class DefaultCache implements Cache {
      * @throws CasbinCacheException If the key does not exist in the cache.
      * @return The value corresponding to the key.
      */
-    public boolean get(String key) {
+    public Boolean get(String key) {
         CacheItem item = cache.get(key);
         if (item == null) {
-            return false;
+            return null;
         }
         if (item.isExpired()) {
             cache.remove(key);
-            return false;
+            return null;
         }
         return item.getValue();
     }

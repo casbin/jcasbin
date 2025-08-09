@@ -29,7 +29,7 @@ public class CachedEnforcerUnitTest {
     private Cache cache;
 
     private void testEnforceCache(String sub, String obj, String act, boolean expectedRes) throws Exception {
-        boolean actualRes = cachedEnforcer.enforce(sub, obj, act);
+        Boolean actualRes = cachedEnforcer.enforce(sub, obj, act);
         assertEquals(String.format("%s, %s, %s: %s, supposed to be %s", sub, obj, act, actualRes, expectedRes), expectedRes, actualRes);
     }
 
@@ -87,17 +87,17 @@ public class CachedEnforcerUnitTest {
     public void testInvalidateCache() throws Exception {
         cachedEnforcer = new CachedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv", false);
 
-        boolean cacheKey = cachedEnforcer.getCache().get(cachedEnforcer.getCacheKey("alice", "data1", "read"));
-        assertFalse(String.format("alice, data1, read: %s, supposed to be %s", cacheKey, false), cacheKey);
+        Boolean cacheKey = cachedEnforcer.getCache().get(cachedEnforcer.getCacheKey("alice", "data1", "read"));
+        assertNull(String.format("alice, data1, read: %s, supposed to be %s", cacheKey, null), cacheKey);
 
-        boolean actualRes = cachedEnforcer.enforce("alice", "data1", "read");
+        Boolean actualRes = cachedEnforcer.enforce("alice", "data1", "read");
         cacheKey = cachedEnforcer.getCache().get(cachedEnforcer.getCacheKey("alice", "data1", "read"));
         assertTrue(String.format("alice, data1, read: %s, supposed to be %s", actualRes, true), actualRes);
         assertTrue(String.format("alice, data1, read: %s, supposed to be %s", cacheKey, true), cacheKey);
 
         cachedEnforcer.invalidateCache();
         cacheKey = cachedEnforcer.getCache().get(cachedEnforcer.getCacheKey("alice", "data1", "read"));
-        assertFalse(String.format("alice, data1, read: %s, supposed to be %s", cacheKey, false), cacheKey);
+        assertNull(String.format("alice, data1, read: %s, supposed to be %s", cacheKey, null), cacheKey);
 
     }
 
@@ -132,14 +132,14 @@ public class CachedEnforcerUnitTest {
         // Test cache expiration
         cache.set(getKey("alice", "data1", "read"),true,Duration.ofMillis(10));
         cachedEnforcer.setCache(cache);
-        boolean cacheKey = cachedEnforcer.getCache().get(cachedEnforcer.getCacheKey("alice", "data1", "read"));
+        Boolean cacheKey = cachedEnforcer.getCache().get(cachedEnforcer.getCacheKey("alice", "data1", "read"));
         assertTrue(String.format("alice, data1, read: %s, supposed to be %s", cacheKey, true), cacheKey);
 
         // Wait for the cache to expire
         Thread.sleep(15);
 
         cacheKey = cachedEnforcer.getCache().get(cachedEnforcer.getCacheKey("alice", "data1", "read"));
-        assertFalse(String.format("alice, data1, read: %s, supposed to be %s", cacheKey, false), cacheKey);
+        assertNull(String.format("alice, data1, read: %s, supposed to be %s", cacheKey, null), cacheKey);
 
         // Replace cache during test run
         cache.clear();
@@ -152,7 +152,7 @@ public class CachedEnforcerUnitTest {
         cache.set(getKey("jack", "data1", "write"),true,Duration.ofMillis(1000));
         cachedEnforcer.setCache(cache);
         cacheKey = cachedEnforcer.getCache().get(cachedEnforcer.getCacheKey("bob", "data1", "read"));
-        assertFalse(String.format("bob, data1, read: %s, supposed to be %s", cacheKey, false), cacheKey);
+        assertNull(String.format("bob, data1, read: %s, supposed to be %s", cacheKey, null), cacheKey);
 
         cacheKey = cachedEnforcer.getCache().get(cachedEnforcer.getCacheKey("jack", "data1", "write"));
         assertTrue(String.format("jack, data1, write: %s, supposed to be %s", cacheKey, true), cacheKey);

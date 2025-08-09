@@ -133,8 +133,8 @@ public class CachedEnforcer extends Enforcer{
             return super.enforce(rvals);
         }
 
-        boolean cachedResult = getCachedResult(key);
-        if (cachedResult) {
+        Boolean cachedResult = getCachedResult(key);
+        if (cachedResult != null) {
             return cachedResult;
         }
 
@@ -217,7 +217,7 @@ public class CachedEnforcer extends Enforcer{
      * @param key The cache key.
      * @return The cached result, or null if not found.
      */
-    private boolean getCachedResult(String key) {
+    private Boolean getCachedResult(String key) {
         READ_WRITE_LOCK.readLock().lock();
         try {
             return cache.get(key);

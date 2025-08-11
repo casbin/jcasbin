@@ -401,7 +401,7 @@ public class BuiltInFunctions {
                         value = AviatorBoolean.valueOf(name1.equals(name2));
                     } else if (len == 2) {
                         value = AviatorBoolean.valueOf(rm.hasLink(name1, name2));
-                    } else if (len == 3) {
+                    } else if (len >= 3) {
                         String domain = FunctionUtils.getStringValue(args[2], env);
                         value = AviatorBoolean.valueOf(rm.hasLink(name1, name2, domain));
                     } else {
@@ -460,7 +460,7 @@ public class BuiltInFunctions {
                         hasLink = name1.equals(name2);
                     } else if (len == 2) {
                         hasLink = condRm.hasLink(name1, name2);
-                    } else if (len == 3) {
+                    } else if (len >= 3) {
                         String domain = FunctionUtils.getStringValue(args[2], env);
                         hasLink = condRm.hasLink(name1, name2, domain);
                     } else {

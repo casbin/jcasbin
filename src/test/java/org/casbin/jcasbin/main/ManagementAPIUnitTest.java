@@ -173,6 +173,26 @@ public class ManagementAPIUnitTest {
         e.removeNamedGroupingPolicies("g", groupingRules);
         e.removeNamedGroupingPolicies("g", groupingRules);
 
+        // Test addNamedGroupingPoliciesEx
+        String[][] groupingRulesEx = {
+            {"ham", "data4_admin"},
+            {"jack", "data5_admin"},
+            {"duplicate", "data6_admin"}
+        };
+
+        // First add some duplicate rules to test Ex behavior
+        e.addNamedGroupingPolicy("g", "ham", "data4_admin");
+        testGetRoles(e, "ham", asList("data4_admin"));
+
+        // addNamedGroupingPoliciesEx should succeed even with duplicates
+        Assert.assertTrue(e.addNamedGroupingPoliciesEx("g", groupingRulesEx));
+        testGetRoles(e, "ham", asList("data4_admin")); // Still only one rule
+        testGetRoles(e, "jack", asList("data5_admin")); // New rule added
+        testGetRoles(e, "duplicate", asList("data6_admin")); // New rule added
+
+        // Clean up
+        e.removeNamedGroupingPolicies("g", groupingRulesEx);
+
         testGetRoles(e, "alice", asList());
         testGetRoles(e, "bob", asList("data1_admin"));
         testGetRoles(e, "eve", asList("data3_admin"));

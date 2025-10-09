@@ -886,6 +886,32 @@ public class SyncedEnforcer extends Enforcer {
     }
 
     /**
+     * addGroupingPoliciesEx adds role inheritance rules to the current policy.
+     * If the rule already exists, the rule will not be added.
+     * But unlike addGroupingPolicies, other non-existent rules are added instead of returning false directly.
+     *
+     * @param rules the "g" policy rules, ptype "g" is implicitly used.
+     * @return succeeds or not.
+     */
+    @Override
+    public boolean addGroupingPoliciesEx(List<List<String>> rules) {
+        return runSynchronized(() -> super.addGroupingPoliciesEx(rules), READ_WRITE_LOCK.writeLock());
+    }
+
+    /**
+     * addGroupingPoliciesEx adds role inheritance rules to the current policy.
+     * If the rule already exists, the rule will not be added.
+     * But unlike addGroupingPolicies, other non-existent rules are added instead of returning false directly.
+     *
+     * @param rules the "g" policy rules, ptype "g" is implicitly used.
+     * @return succeeds or not.
+     */
+    @Override
+    public boolean addGroupingPoliciesEx(String[][] rules) {
+        return runSynchronized(() -> super.addGroupingPoliciesEx(rules), READ_WRITE_LOCK.writeLock());
+    }
+
+    /**
      * addNamedGroupingPolicy adds a named role inheritance rule to the current policy.
      * If the rule already exists, the function returns false and the rule will not be added.
      * Otherwise the function returns true by adding the new rule.
@@ -950,6 +976,34 @@ public class SyncedEnforcer extends Enforcer {
     @Override
     public boolean removeGroupingPolicy(List<String> params) {
         return runSynchronized(() -> super.removeGroupingPolicy(params), READ_WRITE_LOCK.writeLock());
+    }
+
+    /**
+     * addNamedGroupingPoliciesEx adds named role inheritance rules to the current policy.
+     * If the rule already exists, the rule will not be added.
+     * But unlike addNamedGroupingPolicies, other non-existent rules are added instead of returning false directly.
+     *
+     * @param ptype the policy type, can be "g", "g2", "g3", ..
+     * @param rules the "g" policy rules.
+     * @return succeeds or not.
+     */
+    @Override
+    public boolean addNamedGroupingPoliciesEx(String ptype, List<List<String>> rules) {
+        return runSynchronized(() -> super.addNamedGroupingPoliciesEx(ptype, rules), READ_WRITE_LOCK.writeLock());
+    }
+
+    /**
+     * addNamedGroupingPoliciesEx adds named role inheritance rules to the current policy.
+     * If the rule already exists, the rule will not be added.
+     * But unlike addNamedGroupingPolicies, other non-existent rules are added instead of returning false directly.
+     *
+     * @param ptype the policy type, can be "g", "g2", "g3", ..
+     * @param rules the "g" policy rules.
+     * @return succeeds or not.
+     */
+    @Override
+    public boolean addNamedGroupingPoliciesEx(String ptype, String[][] rules) {
+        return runSynchronized(() -> super.addNamedGroupingPoliciesEx(ptype, rules), READ_WRITE_LOCK.writeLock());
     }
 
     /**

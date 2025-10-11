@@ -217,6 +217,66 @@ public class ManagementAPIUnitTest {
     }
 
     @Test
+    public void testModifyGroupingPolicyAPIEx() {
+        Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
+
+        // Initial state: alice has role data2_admin
+        testGetRoles(e, "alice", asList("data2_admin"));
+
+        String[][] groupingRules = {
+            {"alice", "data2_admin"}, // This rule already exists
+            {"bob", "data1_admin"},   // This is new
+            {"eve", "data3_admin"}    // This is new
+        };
+
+        // Test addGroupingPoliciesEx - should add only new rules (bob and eve), not fail on existing (alice)
+        boolean result = e.addGroupingPoliciesEx(groupingRules);
+        Assert.assertTrue("addGroupingPoliciesEx should return true", result);
+        testGetRoles(e, "alice", asList("data2_admin"));
+        testGetRoles(e, "bob", asList("data1_admin"));
+        testGetRoles(e, "eve", asList("data3_admin"));
+
+        // Clean up for next test
+        e.removeGroupingPolicy("bob", "data1_admin");
+        e.removeGroupingPolicy("eve", "data3_admin");
+
+        // Test with List<List<String>>
+        List<List<String>> groupingRulesList = asList(
+            asList("alice", "data2_admin"), // Already exists
+            asList("bob", "data1_admin"),   // New
+            asList("ham", "data4_admin")    // New
+        );
+
+        result = e.addGroupingPoliciesEx(groupingRulesList);
+        Assert.assertTrue("addGroupingPoliciesEx with List should return true", result);
+        testGetRoles(e, "alice", asList("data2_admin"));
+        testGetRoles(e, "bob", asList("data1_admin"));
+        testGetRoles(e, "ham", asList("data4_admin"));
+
+        // Clean up
+        e.removeGroupingPolicy("bob", "data1_admin");
+        e.removeGroupingPolicy("ham", "data4_admin");
+
+        // Test addNamedGroupingPoliciesEx with List<List<String>>
+        result = e.addNamedGroupingPoliciesEx("g", groupingRulesList);
+        Assert.assertTrue("addNamedGroupingPoliciesEx with List should return true", result);
+        testGetRoles(e, "alice", asList("data2_admin"));
+        testGetRoles(e, "bob", asList("data1_admin"));
+        testGetRoles(e, "ham", asList("data4_admin"));
+
+        // Clean up
+        e.removeGroupingPolicy("bob", "data1_admin");
+        e.removeGroupingPolicy("ham", "data4_admin");
+
+        // Test addNamedGroupingPoliciesEx with String[][]
+        result = e.addNamedGroupingPoliciesEx("g", groupingRules);
+        Assert.assertTrue("addNamedGroupingPoliciesEx with String[][] should return true", result);
+        testGetRoles(e, "alice", asList("data2_admin"));
+        testGetRoles(e, "bob", asList("data1_admin"));
+        testGetRoles(e, "eve", asList("data3_admin"));
+    }
+
+    @Test
     public void should_throwsNullPointException_when_setAviatorEvaluator_given_nullInstance() {
         // given
         AviatorEvaluatorInstance instance = null;

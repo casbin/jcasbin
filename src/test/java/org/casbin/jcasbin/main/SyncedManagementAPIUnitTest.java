@@ -138,4 +138,60 @@ public class SyncedManagementAPIUnitTest {
         testGetUsers(e, "data2_admin", asList());
         testGetUsers(e, "data3_admin", asList("eve"));
     }
+
+    @Test
+    public void testModifyGroupingPolicyAPIEx() {
+        Enforcer e = new SyncedEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
+
+        // Initial state: alice has role data2_admin
+        testGetRoles(e, "alice", asList("data2_admin"));
+
+        String[][] groupingRules = {
+            {"alice", "data2_admin"}, // This rule already exists
+            {"bob", "data1_admin"},   // This is new
+            {"eve", "data3_admin"}    // This is new
+        };
+
+        // Test addGroupingPoliciesEx - should add only new rules (bob and eve), not fail on existing (alice)
+        e.addGroupingPoliciesEx(groupingRules);
+        testGetRoles(e, "alice", asList("data2_admin"));
+        testGetRoles(e, "bob", asList("data1_admin"));
+        testGetRoles(e, "eve", asList("data3_admin"));
+
+        // Clean up for next test
+        e.removeGroupingPolicy("bob", "data1_admin");
+        e.removeGroupingPolicy("eve", "data3_admin");
+
+        // Test with List<List<String>>
+        List<List<String>> groupingRulesList = asList(
+            asList("alice", "data2_admin"), // Already exists
+            asList("bob", "data1_admin"),   // New
+            asList("ham", "data4_admin")    // New
+        );
+
+        e.addGroupingPoliciesEx(groupingRulesList);
+        testGetRoles(e, "alice", asList("data2_admin"));
+        testGetRoles(e, "bob", asList("data1_admin"));
+        testGetRoles(e, "ham", asList("data4_admin"));
+
+        // Clean up
+        e.removeGroupingPolicy("bob", "data1_admin");
+        e.removeGroupingPolicy("ham", "data4_admin");
+
+        // Test addNamedGroupingPoliciesEx with List<List<String>>
+        e.addNamedGroupingPoliciesEx("g", groupingRulesList);
+        testGetRoles(e, "alice", asList("data2_admin"));
+        testGetRoles(e, "bob", asList("data1_admin"));
+        testGetRoles(e, "ham", asList("data4_admin"));
+
+        // Clean up
+        e.removeGroupingPolicy("bob", "data1_admin");
+        e.removeGroupingPolicy("ham", "data4_admin");
+
+        // Test addNamedGroupingPoliciesEx with String[][]
+        e.addNamedGroupingPoliciesEx("g", groupingRules);
+        testGetRoles(e, "alice", asList("data2_admin"));
+        testGetRoles(e, "bob", asList("data1_admin"));
+        testGetRoles(e, "eve", asList("data3_admin"));
+    }
 }

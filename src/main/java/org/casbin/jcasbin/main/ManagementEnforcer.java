@@ -646,6 +646,56 @@ public class ManagementEnforcer extends InternalEnforcer {
     }
 
     /**
+     * addGroupingPoliciesEx adds role inheritance rules to the current policy.
+     * If the rule already exists, the rule will not be added.
+     * But unlike AddGroupingPolicies, other non-existent rules are added instead of returning false directly
+     *
+     * @param rules the "g" policy rules, ptype "g" is implicitly used.
+     * @return succeeds or not.
+     */
+    public boolean addGroupingPoliciesEx(List<List<String>> rules) {
+        return addNamedGroupingPoliciesEx("g", rules);
+    }
+
+    /**
+     * addGroupingPoliciesEx adds role inheritance rules to the current policy.
+     * If the rule already exists, the rule will not be added.
+     * But unlike AddGroupingPolicies, other non-existent rules are added instead of returning false directly
+     *
+     * @param rules the "g" policy rules, ptype "g" is implicitly used.
+     * @return succeeds or not.
+     */
+    public boolean addGroupingPoliciesEx(String[][] rules) {
+        return addGroupingPoliciesEx(Arrays.stream(rules).map(Arrays::asList).collect(Collectors.toList()));
+    }
+
+    /**
+     * addNamedGroupingPoliciesEx adds named role inheritance rules to the current policy.
+     * If the rule already exists, the rule will not be added.
+     * But unlike AddNamedGroupingPolicies, other non-existent rules are added instead of returning false directly
+     *
+     * @param ptype the policy type, can be "g", "g2", "g3", ..
+     * @param rules the "g" policy rules.
+     * @return succeeds or not.
+     */
+    public boolean addNamedGroupingPoliciesEx(String ptype, List<List<String>> rules) {
+        return addPolicies("g", ptype, rules, true);
+    }
+
+    /**
+     * addNamedGroupingPoliciesEx adds named role inheritance rules to the current policy.
+     * If the rule already exists, the rule will not be added.
+     * But unlike AddNamedGroupingPolicies, other non-existent rules are added instead of returning false directly
+     *
+     * @param ptype the policy type, can be "g", "g2", "g3", ..
+     * @param rules the "g" policy rules.
+     * @return succeeds or not.
+     */
+    public boolean addNamedGroupingPoliciesEx(String ptype, String[][] rules) {
+        return addNamedGroupingPoliciesEx(ptype, Arrays.stream(rules).map(Arrays::asList).collect(Collectors.toList()));
+    }
+
+    /**
      * removeGroupingPolicy removes a role inheritance rule from the current policy.
      *
      * @param params the "g" policy rule, ptype "g" is implicitly used.

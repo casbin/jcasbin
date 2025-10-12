@@ -1,6 +1,5 @@
 # jCasbin
 
-[![codebeat badge](https://codebeat.co/badges/c17c9ee1-da42-4db3-8047-9574ad2b23b1)](https://codebeat.co/projects/github-com-casbin-jcasbin-master)
 [![GitHub Actions](https://github.com/casbin/jcasbin/workflows/build/badge.svg)](https://github.com/casbin/jcasbin/actions)
 [![codecov](https://codecov.io/gh/casbin/jcasbin/branch/master/graph/badge.svg?token=pKOEodQ3q9)](https://codecov.io/gh/casbin/jcasbin)
 [![javadoc](https://javadoc.io/badge2/org.casbin/jcasbin/javadoc.svg)](https://javadoc.io/doc/org.casbin/jcasbin)

@@ -4,7 +4,7 @@
 
     <groupId>org.casbin</groupId>
     <artifactId>jcasbin</artifactId>
-    <version>1.7.1</version>
+    <version>0.0.0-SNAPSHOT</version>
 
     <name>JCasbin Authorization Library</name>
     <description>An authorization library that supports access control models like ACL, RBAC, ABAC in Java</description>

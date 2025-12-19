@@ -18,6 +18,8 @@ import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import org.casbin.jcasbin.util.BuiltInFunctions;
+import org.casbin.jcasbin.util.ExpressionEvaluator;
+import org.casbin.jcasbin.util.Util;
 
 import java.util.Map;
 
@@ -33,6 +35,20 @@ public class EvalFunc extends CustomFunction {
     public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
         String eval = FunctionUtils.getStringValue(arg1, env);
         eval = replaceTargets(eval, env);
+        
+        // Validate expression to ensure it only uses standard Casbin operations
+        // This is a security-critical validation to prevent non-standard operations
+        try {
+            ExpressionEvaluator.validateExpression(eval);
+        } catch (IllegalArgumentException e) {
+            // Log at ERROR level for security violations to ensure visibility
+            // Do not log the full expression to avoid exposing potentially malicious content
+            Util.logPrintfError("Security violation - invalid eval expression rejected. " +
+                "Expression contains non-standard Casbin operations that are not allowed.");
+            // Return false to fail safely rather than throwing, which could break policy evaluation
+            return AviatorBoolean.valueOf(false);
+        }
+        
         return AviatorBoolean.valueOf(BuiltInFunctions.eval(eval, env, getAviatorEval()));
     }
 

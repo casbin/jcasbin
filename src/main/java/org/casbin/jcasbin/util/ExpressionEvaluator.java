@@ -80,7 +80,9 @@ public class ExpressionEvaluator {
         java.util.Set<com.googlecode.aviator.Feature> restrictedFeatures = java.util.Collections.emptySet();
         aviatorEval.setOption(Options.FEATURE_SET, restrictedFeatures);
         
-        // Use optimized mode for better performance
+        // Use EVAL optimization level: This provides compile-once execution for expressions.
+        // EVAL is the most basic optimization level that compiles expressions without
+        // aggressive optimizations, providing a balance between safety and performance.
         aviatorEval.setOption(Options.OPTIMIZE_LEVEL, com.googlecode.aviator.AviatorEvaluator.EVAL);
         
         return aviatorEval;

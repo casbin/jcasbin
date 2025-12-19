@@ -42,7 +42,9 @@ public class EvalFunc extends CustomFunction {
             ExpressionEvaluator.validateExpression(eval);
         } catch (IllegalArgumentException e) {
             // Log at ERROR level for security violations to ensure visibility
-            Util.logPrintfError("Security violation - invalid eval expression rejected: {}", e.getMessage());
+            // Do not log the full expression to avoid exposing potentially malicious content
+            Util.logPrintfError("Security violation - invalid eval expression rejected. " +
+                "Expression contains non-standard Casbin operations that are not allowed.");
             // Return false to fail safely rather than throwing, which could break policy evaluation
             return AviatorBoolean.valueOf(false);
         }

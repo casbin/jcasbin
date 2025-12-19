@@ -30,16 +30,17 @@ import java.util.regex.Pattern;
 public class ExpressionEvaluator {
     
     // Pattern to detect potentially unsafe aviatorscript-specific features
+    // Case-insensitive to prevent bypasses with different casing
     private static final Pattern UNSAFE_PATTERN = Pattern.compile(
-        "(?:seq\\.|string\\.|math\\.|" + // aviatorscript namespace calls
-        "include\\(\\s*seq\\.list|" +    // aviatorscript collection operations
-        "lambda\\(|" +                     // lambda expressions
-        "let\\s+|" +                       // let bindings
-        "\\bfn\\s+|" +                     // function definitions
-        "\\bfor\\s*\\(|" +                 // for loops
-        "\\bwhile\\s*\\(|" +               // while loops
-        "\\bnew\\s+|" +                    // object instantiation
-        "\\bimport\\s+)"                   // imports
+        "(?i)(?:seq\\.|string\\.|math\\.|" + // aviatorscript namespace calls (case-insensitive)
+        "include\\(\\s*seq\\.list|" +         // aviatorscript collection operations
+        "lambda\\(|" +                         // lambda expressions
+        "let\\s+|" +                           // let bindings
+        "\\bfn\\s+|" +                         // function definitions
+        "\\bfor\\s*\\(|" +                     // for loops
+        "\\bwhile\\s*\\(|" +                   // while loops
+        "\\bnew\\s+|" +                        // object instantiation
+        "\\bimport\\s+)"                       // imports
     );
     
     /**
@@ -74,10 +75,12 @@ public class ExpressionEvaluator {
             return null;
         }
         
-        // Disable feature/function assignment in runtime for security
-        aviatorEval.setOption(Options.FEATURE_SET, com.googlecode.aviator.Feature.asSet());
+        // Create an empty feature set to disable all extra features for security
+        // This restricts the evaluator to only basic expression evaluation
+        java.util.Set<com.googlecode.aviator.Feature> restrictedFeatures = java.util.Collections.emptySet();
+        aviatorEval.setOption(Options.FEATURE_SET, restrictedFeatures);
         
-        // Use optimized mode
+        // Use optimized mode for better performance
         aviatorEval.setOption(Options.OPTIMIZE_LEVEL, com.googlecode.aviator.AviatorEvaluator.EVAL);
         
         return aviatorEval;

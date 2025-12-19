@@ -68,7 +68,14 @@ public class ExpressionEvaluatorTest {
             "for (i = 0; i < 10; i++)",
             "while (true)",
             "new java.util.ArrayList()",
-            "import java.util.List"
+            "import java.util.List",
+            // Test case-insensitive variants to prevent bypass
+            "Seq.list('A', 'B')",
+            "SEQ.LIST('A', 'B')",
+            "String.StartsWith(r.obj, '/data')",
+            "STRING.ENDSWITH(r.obj, '.txt')",
+            "Math.Abs(r.sub.age)",
+            "MATH.ABS(r.sub.age)"
         };
 
         for (String expr : invalidExpressions) {

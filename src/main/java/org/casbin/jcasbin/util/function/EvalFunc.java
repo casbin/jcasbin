@@ -37,10 +37,13 @@ public class EvalFunc extends CustomFunction {
         eval = replaceTargets(eval, env);
         
         // Validate expression to ensure it only uses standard Casbin operations
+        // This is a security-critical validation to prevent non-standard operations
         try {
             ExpressionEvaluator.validateExpression(eval);
         } catch (IllegalArgumentException e) {
-            Util.logPrintfWarn("Invalid eval expression: {}", e.getMessage());
+            // Log at ERROR level for security violations to ensure visibility
+            Util.logPrintfError("Security violation - invalid eval expression rejected: {}", e.getMessage());
+            // Return false to fail safely rather than throwing, which could break policy evaluation
             return AviatorBoolean.valueOf(false);
         }
         

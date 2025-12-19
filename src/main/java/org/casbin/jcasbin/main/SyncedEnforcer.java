@@ -31,9 +31,24 @@ import java.util.function.Supplier;
  */
 public class SyncedEnforcer extends Enforcer {
 
-    private final static ReadWriteLock READ_WRITE_LOCK = new ReentrantReadWriteLock();
+    private ReadWriteLock readWriteLock;
     private final Object stopAutoLoad = new Object();
     private final AtomicInteger autoLoadRunning = new AtomicInteger(0);
+
+    /**
+     * Get or create the ReadWriteLock. This lazy initialization ensures the lock
+     * is available even when called from parent constructor.
+     */
+    protected ReadWriteLock getReadWriteLock() {
+        if (readWriteLock == null) {
+            synchronized (this) {
+                if (readWriteLock == null) {
+                    readWriteLock = new ReentrantReadWriteLock();
+                }
+            }
+        }
+        return readWriteLock;
+    }
 
     /**
      * ;
@@ -157,7 +172,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public void clearPolicy() {
-        runSynchronized(super::clearPolicy, READ_WRITE_LOCK.writeLock());
+        runSynchronized(super::clearPolicy, getReadWriteLock().writeLock());
     }
 
     /**
@@ -165,7 +180,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public void loadPolicy() {
-        runSynchronized(super::loadPolicy, READ_WRITE_LOCK.writeLock());
+        runSynchronized(super::loadPolicy, getReadWriteLock().writeLock());
     }
 
     /**
@@ -175,7 +190,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public void loadFilteredPolicy(Object filter) {
-        runSynchronized(() -> super.loadFilteredPolicy(filter), READ_WRITE_LOCK.writeLock());
+        runSynchronized(() -> super.loadFilteredPolicy(filter), getReadWriteLock().writeLock());
     }
 
     /**
@@ -184,7 +199,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public void savePolicy() {
-        runSynchronized(super::savePolicy, READ_WRITE_LOCK.readLock());
+        runSynchronized(super::savePolicy, getReadWriteLock().readLock());
     }
 
     /**
@@ -193,7 +208,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public void buildRoleLinks() {
-        runSynchronized(super::buildRoleLinks, READ_WRITE_LOCK.readLock());
+        runSynchronized(super::buildRoleLinks, getReadWriteLock().readLock());
     }
 
     /**
@@ -206,7 +221,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean enforce(Object... rvals) {
-        return runSynchronized(() -> super.enforce(rvals), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.enforce(rvals), getReadWriteLock().readLock());
     }
 
     /**
@@ -220,7 +235,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean enforceWithMatcher(String matcher, Object... rvals) {
-        return runSynchronized(() -> super.enforceWithMatcher(matcher, rvals), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.enforceWithMatcher(matcher, rvals), getReadWriteLock().readLock());
     }
 
     /**
@@ -234,7 +249,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public EnforceResult enforceEx(Object... rvals) {
-        return runSynchronized(() -> super.enforceEx(rvals), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.enforceEx(rvals), getReadWriteLock().readLock());
     }
 
     /**
@@ -249,7 +264,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public EnforceResult enforceExWithMatcher(String matcher, Object... rvals) {
-        return runSynchronized(() -> super.enforceExWithMatcher(matcher, rvals), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.enforceExWithMatcher(matcher, rvals), getReadWriteLock().readLock());
     }
 
     /**
@@ -260,7 +275,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<Boolean> batchEnforce(List<List<String>> rules) {
-        return runSynchronized(() -> super.batchEnforce(rules), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.batchEnforce(rules), getReadWriteLock().readLock());
     }
 
     /**
@@ -272,7 +287,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<Boolean> batchEnforceWithMatcher(String matcher, List<List<String>> rules) {
-        return runSynchronized(() -> super.batchEnforceWithMatcher(matcher, rules), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.batchEnforceWithMatcher(matcher, rules), getReadWriteLock().readLock());
     }
 
     /**
@@ -284,7 +299,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<String> getAllSubjects() {
-        return runSynchronized(super::getAllSubjects, READ_WRITE_LOCK.readLock());
+        return runSynchronized(super::getAllSubjects, getReadWriteLock().readLock());
     }
 
     /**
@@ -297,7 +312,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<String> getAllObjects() {
-        return runSynchronized(super::getAllObjects, READ_WRITE_LOCK.readLock());
+        return runSynchronized(super::getAllObjects, getReadWriteLock().readLock());
     }
 
     /**
@@ -311,7 +326,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<String> getAllNamedObjects(String ptype) {
-        return runSynchronized(() -> super.getAllNamedObjects(ptype), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.getAllNamedObjects(ptype), getReadWriteLock().readLock());
     }
 
     /**
@@ -324,7 +339,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<String> getAllActions() {
-        return runSynchronized(super::getAllActions, READ_WRITE_LOCK.readLock());
+        return runSynchronized(super::getAllActions, getReadWriteLock().readLock());
     }
 
     /**
@@ -338,7 +353,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<String> getAllNamedActions(String ptype) {
-        return runSynchronized(() -> super.getAllNamedActions(ptype), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.getAllNamedActions(ptype), getReadWriteLock().readLock());
     }
 
     /**
@@ -351,7 +366,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<String> getAllRoles() {
-        return runSynchronized(super::getAllRoles, READ_WRITE_LOCK.readLock());
+        return runSynchronized(super::getAllRoles, getReadWriteLock().readLock());
     }
 
     /**
@@ -365,7 +380,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<String> getAllNamedRoles(String ptype) {
-        return runSynchronized(() -> super.getAllNamedRoles(ptype), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.getAllNamedRoles(ptype), getReadWriteLock().readLock());
     }
 
     /**
@@ -375,7 +390,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<List<String>> getPolicy() {
-        return runSynchronized(super::getPolicy, READ_WRITE_LOCK.readLock());
+        return runSynchronized(super::getPolicy, getReadWriteLock().readLock());
     }
 
     /**
@@ -388,7 +403,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<List<String>> getFilteredPolicy(int fieldIndex, String... fieldValues) {
-        return runSynchronized(() -> super.getFilteredPolicy(fieldIndex, fieldValues), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.getFilteredPolicy(fieldIndex, fieldValues), getReadWriteLock().readLock());
     }
 
     /**
@@ -399,7 +414,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<List<String>> getNamedPolicy(String ptype) {
-        return runSynchronized(() -> super.getNamedPolicy(ptype), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.getNamedPolicy(ptype), getReadWriteLock().readLock());
     }
 
     /**
@@ -413,7 +428,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<List<String>> getFilteredNamedPolicy(String ptype, int fieldIndex, String... fieldValues) {
-        return runSynchronized(() -> super.getFilteredNamedPolicy(ptype, fieldIndex, fieldValues), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.getFilteredNamedPolicy(ptype, fieldIndex, fieldValues), getReadWriteLock().readLock());
     }
 
     /**
@@ -423,7 +438,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<List<String>> getGroupingPolicy() {
-        return runSynchronized(super::getGroupingPolicy, READ_WRITE_LOCK.readLock());
+        return runSynchronized(super::getGroupingPolicy, getReadWriteLock().readLock());
     }
 
     /**
@@ -434,7 +449,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<String> getRolesForUser(String name) {
-        return runSynchronized(() -> super.getRolesForUser(name), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.getRolesForUser(name), getReadWriteLock().readLock());
     }
 
     /**
@@ -447,7 +462,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<List<String>> getFilteredGroupingPolicy(int fieldIndex, String... fieldValues) {
-        return runSynchronized(() -> super.getFilteredGroupingPolicy(fieldIndex, fieldValues), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.getFilteredGroupingPolicy(fieldIndex, fieldValues), getReadWriteLock().readLock());
     }
 
     /**
@@ -458,7 +473,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<List<String>> getNamedGroupingPolicy(String ptype) {
-        return runSynchronized(() -> super.getNamedGroupingPolicy(ptype), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.getNamedGroupingPolicy(ptype), getReadWriteLock().readLock());
     }
 
     /**
@@ -472,7 +487,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<List<String>> getFilteredNamedGroupingPolicy(String ptype, int fieldIndex, String... fieldValues) {
-        return runSynchronized(() -> super.getFilteredNamedGroupingPolicy(ptype, fieldIndex, fieldValues), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.getFilteredNamedGroupingPolicy(ptype, fieldIndex, fieldValues), getReadWriteLock().readLock());
     }
 
     /**
@@ -483,7 +498,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean hasPolicy(List<String> params) {
-        return runSynchronized(() -> super.hasPolicy(params), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.hasPolicy(params), getReadWriteLock().readLock());
     }
 
     /**
@@ -494,7 +509,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean hasPolicy(String... params) {
-        return runSynchronized(() -> super.hasPolicy(params), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.hasPolicy(params), getReadWriteLock().readLock());
     }
 
     /**
@@ -506,7 +521,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean hasNamedPolicy(String ptype, List<String> params) {
-        return runSynchronized(() -> super.hasNamedPolicy(ptype, params), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.hasNamedPolicy(ptype, params), getReadWriteLock().readLock());
     }
 
     /**
@@ -518,7 +533,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean hasNamedPolicy(String ptype, String... params) {
-        return runSynchronized(() -> super.hasNamedPolicy(ptype, params), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.hasNamedPolicy(ptype, params), getReadWriteLock().readLock());
     }
 
     /**
@@ -531,7 +546,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addPolicy(List<String> params) {
-        return runSynchronized(() -> super.addPolicy(params), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addPolicy(params), getReadWriteLock().writeLock());
     }
 
 
@@ -545,7 +560,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addPolicies(List<List<String>> rules) {
-        return runSynchronized(() -> super.addPolicies(rules), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addPolicies(rules), getReadWriteLock().writeLock());
     }
 
     /**
@@ -557,7 +572,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean updatePolicy(List<String> params1, List<String> params2) {
-        return runSynchronized(() -> super.updatePolicy(params1, params2), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.updatePolicy(params1, params2), getReadWriteLock().writeLock());
     }
 
     /**
@@ -570,7 +585,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addPolicy(String... params) {
-        return runSynchronized(() -> super.addPolicy(params), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addPolicy(params), getReadWriteLock().writeLock());
     }
 
     /**
@@ -583,7 +598,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addPolicies(String[][] rules) {
-        return runSynchronized(() -> super.addPolicies(rules), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addPolicies(rules), getReadWriteLock().writeLock());
     }
 
     /**
@@ -597,7 +612,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addNamedPolicy(String ptype, List<String> params) {
-        return runSynchronized(() -> super.addNamedPolicy(ptype, params), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addNamedPolicy(ptype, params), getReadWriteLock().writeLock());
     }
 
     /**
@@ -611,7 +626,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addNamedPolicies(String ptype, List<List<String>> rules) {
-        return runSynchronized(() -> super.addNamedPolicies(ptype, rules), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addNamedPolicies(ptype, rules), getReadWriteLock().writeLock());
     }
 
     /**
@@ -625,7 +640,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addNamedPoliciesEx(String ptype, List<List<String>> rules) {
-        return runSynchronized(() -> super.addNamedPoliciesEx(ptype, rules), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addNamedPoliciesEx(ptype, rules), getReadWriteLock().writeLock());
     }
 
     /**
@@ -638,7 +653,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean updateNamedPolicy(String ptype, List<String> params1, List<String> params2) {
-        return runSynchronized(() -> super.updateNamedPolicy(ptype, params1, params2), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.updateNamedPolicy(ptype, params1, params2), getReadWriteLock().writeLock());
     }
 
     /**
@@ -650,7 +665,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean updateGroupingPolicy(List<String> params1, List<String> params2) {
-        return runSynchronized(() -> super.updateGroupingPolicy(params1, params2), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.updateGroupingPolicy(params1, params2), getReadWriteLock().writeLock());
     }
 
     /**
@@ -663,7 +678,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean updateNamedGroupingPolicy(String ptype, List<String> params1, List<String> params2) {
-        return runSynchronized(() -> super.updateNamedGroupingPolicy(ptype, params1, params2), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.updateNamedGroupingPolicy(ptype, params1, params2), getReadWriteLock().writeLock());
     }
 
     /**
@@ -677,7 +692,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addNamedPolicy(String ptype, String... params) {
-        return runSynchronized(() -> super.addNamedPolicy(ptype, params), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addNamedPolicy(ptype, params), getReadWriteLock().writeLock());
     }
 
     /**
@@ -688,7 +703,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean removePolicy(List<String> params) {
-        return runSynchronized(() -> super.removePolicy(params), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.removePolicy(params), getReadWriteLock().writeLock());
     }
 
     /**
@@ -699,7 +714,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean removePolicy(String... params) {
-        return runSynchronized(() -> super.removePolicy(params), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.removePolicy(params), getReadWriteLock().writeLock());
     }
 
     /**
@@ -710,7 +725,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean removePolicies(List<List<String>> rules) {
-        return runSynchronized(() -> super.removePolicies(rules), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.removePolicies(rules), getReadWriteLock().writeLock());
     }
 
     /**
@@ -721,7 +736,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean removePolicies(String[][] rules) {
-        return runSynchronized(() -> super.removePolicies(rules), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.removePolicies(rules), getReadWriteLock().writeLock());
     }
 
     /**
@@ -734,7 +749,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean removeFilteredPolicy(int fieldIndex, String... fieldValues) {
-        return runSynchronized(() -> super.removeFilteredPolicy(fieldIndex, fieldValues), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.removeFilteredPolicy(fieldIndex, fieldValues), getReadWriteLock().writeLock());
     }
 
     /**
@@ -746,7 +761,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean removeNamedPolicy(String ptype, List<String> params) {
-        return runSynchronized(() -> super.removeNamedPolicy(ptype, params), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.removeNamedPolicy(ptype, params), getReadWriteLock().writeLock());
     }
 
     /**
@@ -758,7 +773,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean removeNamedPolicy(String ptype, String... params) {
-        return runSynchronized(() -> super.removeNamedPolicy(ptype, params), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.removeNamedPolicy(ptype, params), getReadWriteLock().writeLock());
     }
 
     /**
@@ -770,7 +785,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean removeNamedPolicies(String ptype, List<List<String>> rules) {
-        return runSynchronized(() -> super.removeNamedPolicies(ptype, rules), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.removeNamedPolicies(ptype, rules), getReadWriteLock().writeLock());
     }
 
     /**
@@ -784,7 +799,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean removeFilteredNamedPolicy(String ptype, int fieldIndex, String... fieldValues) {
-        return runSynchronized(() -> super.removeFilteredNamedPolicy(ptype, fieldIndex, fieldValues), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.removeFilteredNamedPolicy(ptype, fieldIndex, fieldValues), getReadWriteLock().writeLock());
     }
 
     /**
@@ -795,7 +810,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean hasGroupingPolicy(List<String> params) {
-        return runSynchronized(() -> super.hasGroupingPolicy(params), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.hasGroupingPolicy(params), getReadWriteLock().readLock());
     }
 
     /**
@@ -806,7 +821,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean hasGroupingPolicy(String... params) {
-        return runSynchronized(() -> super.hasGroupingPolicy(params), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.hasGroupingPolicy(params), getReadWriteLock().readLock());
     }
 
     /**
@@ -818,7 +833,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean hasNamedGroupingPolicy(String ptype, List<String> params) {
-        return runSynchronized(() -> super.hasNamedGroupingPolicy(ptype, params), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.hasNamedGroupingPolicy(ptype, params), getReadWriteLock().readLock());
     }
 
     /**
@@ -830,7 +845,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean hasNamedGroupingPolicy(String ptype, String... params) {
-        return runSynchronized(() -> super.hasNamedGroupingPolicy(ptype, params), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.hasNamedGroupingPolicy(ptype, params), getReadWriteLock().readLock());
     }
 
     /**
@@ -843,7 +858,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addGroupingPolicy(List<String> params) {
-        return runSynchronized(() -> super.addGroupingPolicy(params), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addGroupingPolicy(params), getReadWriteLock().writeLock());
     }
 
     /**
@@ -856,7 +871,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addGroupingPolicy(String... params) {
-        return runSynchronized(() -> super.addGroupingPolicy(params), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addGroupingPolicy(params), getReadWriteLock().writeLock());
     }
 
     /**
@@ -869,7 +884,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addGroupingPolicies(List<List<String>> rules) {
-        return runSynchronized(() -> super.addGroupingPolicies(rules), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addGroupingPolicies(rules), getReadWriteLock().writeLock());
     }
 
     /**
@@ -882,7 +897,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addGroupingPolicies(String[][] rules) {
-        return runSynchronized(() -> super.addGroupingPolicies(rules), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addGroupingPolicies(rules), getReadWriteLock().writeLock());
     }
 
     /**
@@ -896,7 +911,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addNamedGroupingPolicy(String ptype, List<String> params) {
-        return runSynchronized(() -> super.addNamedGroupingPolicy(ptype, params), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addNamedGroupingPolicy(ptype, params), getReadWriteLock().writeLock());
     }
 
     /**
@@ -910,7 +925,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addNamedGroupingPolicy(String ptype, String... params) {
-        return runSynchronized(() -> super.addNamedGroupingPolicy(ptype, params), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addNamedGroupingPolicy(ptype, params), getReadWriteLock().writeLock());
     }
 
     /**
@@ -924,7 +939,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addNamedGroupingPolicies(String ptype, List<List<String>> rules) {
-        return runSynchronized(() -> super.addNamedGroupingPolicies(ptype, rules), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addNamedGroupingPolicies(ptype, rules), getReadWriteLock().writeLock());
     }
 
     /**
@@ -938,7 +953,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addNamedGroupingPolicies(String ptype, String[][] rules) {
-        return runSynchronized(() -> super.addNamedGroupingPolicies(ptype, rules), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addNamedGroupingPolicies(ptype, rules), getReadWriteLock().writeLock());
     }
 
     /**
@@ -951,7 +966,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addGroupingPoliciesEx(List<List<String>> rules) {
-        return runSynchronized(() -> super.addGroupingPoliciesEx(rules), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addGroupingPoliciesEx(rules), getReadWriteLock().writeLock());
     }
 
     /**
@@ -964,7 +979,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addGroupingPoliciesEx(String[][] rules) {
-        return runSynchronized(() -> super.addGroupingPoliciesEx(rules), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addGroupingPoliciesEx(rules), getReadWriteLock().writeLock());
     }
 
     /**
@@ -978,7 +993,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addNamedGroupingPoliciesEx(String ptype, List<List<String>> rules) {
-        return runSynchronized(() -> super.addNamedGroupingPoliciesEx(ptype, rules), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addNamedGroupingPoliciesEx(ptype, rules), getReadWriteLock().writeLock());
     }
 
     /**
@@ -992,7 +1007,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addNamedGroupingPoliciesEx(String ptype, String[][] rules) {
-        return runSynchronized(() -> super.addNamedGroupingPoliciesEx(ptype, rules), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addNamedGroupingPoliciesEx(ptype, rules), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1003,7 +1018,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean removeGroupingPolicy(List<String> params) {
-        return runSynchronized(() -> super.removeGroupingPolicy(params), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.removeGroupingPolicy(params), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1014,7 +1029,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean removeGroupingPolicy(String... params) {
-        return runSynchronized(() -> super.removeGroupingPolicy(params), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.removeGroupingPolicy(params), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1025,7 +1040,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean removeGroupingPolicies(List<List<String>> rules) {
-        return runSynchronized(() -> super.removeGroupingPolicies(rules), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.removeGroupingPolicies(rules), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1036,7 +1051,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean removeGroupingPolicies(String[][] rules) {
-        return runSynchronized(() -> super.removeGroupingPolicies(rules), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.removeGroupingPolicies(rules), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1049,7 +1064,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean removeFilteredGroupingPolicy(int fieldIndex, String... fieldValues) {
-        return runSynchronized(() -> super.removeFilteredGroupingPolicy(fieldIndex, fieldValues), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.removeFilteredGroupingPolicy(fieldIndex, fieldValues), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1061,7 +1076,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean removeNamedGroupingPolicy(String ptype, List<String> params) {
-        return runSynchronized(() -> super.removeNamedGroupingPolicy(ptype, params), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.removeNamedGroupingPolicy(ptype, params), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1073,7 +1088,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean removeNamedGroupingPolicy(String ptype, String... params) {
-        return runSynchronized(() -> super.removeNamedGroupingPolicy(ptype, params), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.removeNamedGroupingPolicy(ptype, params), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1085,7 +1100,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean removeNamedGroupingPolicies(String ptype, List<List<String>> rules) {
-        return runSynchronized(() -> super.removeNamedGroupingPolicies(ptype, rules), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.removeNamedGroupingPolicies(ptype, rules), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1097,7 +1112,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean removeNamedGroupingPolicies(String ptype, String[][] rules) {
-        return runSynchronized(() -> super.removeNamedGroupingPolicies(ptype, rules), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.removeNamedGroupingPolicies(ptype, rules), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1111,7 +1126,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean removeFilteredNamedGroupingPolicy(String ptype, int fieldIndex, String... fieldValues) {
-        return runSynchronized(() -> super.removeFilteredNamedGroupingPolicy(ptype, fieldIndex, fieldValues), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.removeFilteredNamedGroupingPolicy(ptype, fieldIndex, fieldValues), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1122,7 +1137,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<String> getUsersForRole(String name) {
-        return runSynchronized(() -> super.getUsersForRole(name), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.getUsersForRole(name), getReadWriteLock().readLock());
     }
 
     /**
@@ -1134,7 +1149,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean hasRoleForUser(String name, String role) {
-        return runSynchronized(() -> super.hasRoleForUser(name, role), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.hasRoleForUser(name, role), getReadWriteLock().readLock());
     }
 
     /**
@@ -1147,7 +1162,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addRoleForUser(String user, String role) {
-        return runSynchronized(() -> super.addRoleForUser(user, role), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addRoleForUser(user, role), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1160,7 +1175,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean deleteRoleForUser(String user, String role) {
-        return runSynchronized(() -> super.deleteRoleForUser(user, role), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.deleteRoleForUser(user, role), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1172,7 +1187,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean deleteRolesForUser(String user) {
-        return runSynchronized(() -> super.deleteRolesForUser(user), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.deleteRolesForUser(user), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1184,7 +1199,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean deleteUser(String user) {
-        return runSynchronized(() -> super.deleteUser(user), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.deleteUser(user), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1194,7 +1209,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public void deleteRole(String role) {
-        runSynchronized(() -> super.deleteRole(role), READ_WRITE_LOCK.writeLock());
+        runSynchronized(() -> super.deleteRole(role), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1206,7 +1221,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean deletePermission(String... permission) {
-        return runSynchronized(() -> super.deletePermission(permission), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.deletePermission(permission), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1218,7 +1233,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean deletePermission(List<String> permission) {
-        return runSynchronized(() -> super.deletePermission(permission), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.deletePermission(permission), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1231,7 +1246,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addPermissionForUser(String user, String... permission) {
-        return runSynchronized(() -> super.addPermissionForUser(user, permission), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addPermissionForUser(user, permission), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1244,7 +1259,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addPermissionForUser(String user, List<String> permission) {
-        return runSynchronized(() -> super.addPermissionForUser(user, permission), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addPermissionForUser(user, permission), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1257,7 +1272,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean deletePermissionForUser(String user, String... permission) {
-        return runSynchronized(() -> super.deletePermissionForUser(user, permission), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.deletePermissionForUser(user, permission), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1270,7 +1285,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean deletePermissionForUser(String user, List<String> permission) {
-        return runSynchronized(() -> super.deletePermissionForUser(user, permission), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.deletePermissionForUser(user, permission), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1282,7 +1297,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean deletePermissionsForUser(String user) {
-        return runSynchronized(() -> super.deletePermissionsForUser(user), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.deletePermissionsForUser(user), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1294,7 +1309,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<List<String>> getPermissionsForUser(String user, String... domain) {
-        return runSynchronized(() -> super.getPermissionsForUser(user, domain), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.getPermissionsForUser(user, domain), getReadWriteLock().readLock());
     }
 
     /**
@@ -1307,7 +1322,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<List<String>> getNamedPermissionsForUser(String pType, String user, String... domain) {
-        return runSynchronized(() -> super.getNamedPermissionsForUser(pType, user, domain), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.getNamedPermissionsForUser(pType, user, domain), getReadWriteLock().readLock());
     }
 
     /**
@@ -1319,7 +1334,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean hasPermissionForUser(String user, String... permission) {
-        return runSynchronized(() -> super.hasPermissionForUser(user, permission), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.hasPermissionForUser(user, permission), getReadWriteLock().readLock());
     }
 
     /**
@@ -1331,7 +1346,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean hasPermissionForUser(String user, List<String> permission) {
-        return runSynchronized(() -> super.hasPermissionForUser(user, permission), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.hasPermissionForUser(user, permission), getReadWriteLock().readLock());
     }
 
     /**
@@ -1343,7 +1358,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<String> getUsersForRoleInDomain(String name, String domain) {
-        return runSynchronized(() -> super.getUsersForRoleInDomain(name, domain), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.getUsersForRoleInDomain(name, domain), getReadWriteLock().readLock());
     }
 
     /**
@@ -1355,7 +1370,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<String> getRolesForUserInDomain(String name, String domain) {
-        return runSynchronized(() -> super.getRolesForUserInDomain(name, domain), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.getRolesForUserInDomain(name, domain), getReadWriteLock().readLock());
     }
 
     /**
@@ -1367,7 +1382,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<List<String>> getPermissionsForUserInDomain(String user, String domain) {
-        return runSynchronized(() -> super.getPermissionsForUserInDomain(user, domain), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.getPermissionsForUserInDomain(user, domain), getReadWriteLock().readLock());
     }
 
     /**
@@ -1381,7 +1396,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean addRoleForUserInDomain(String user, String role, String domain) {
-        return runSynchronized(() -> super.addRoleForUserInDomain(user, role, domain), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.addRoleForUserInDomain(user, role, domain), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1395,7 +1410,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public boolean deleteRoleForUserInDomain(String user, String role, String domain) {
-        return runSynchronized(() -> super.deleteRoleForUserInDomain(user, role, domain), READ_WRITE_LOCK.writeLock());
+        return runSynchronized(() -> super.deleteRoleForUserInDomain(user, role, domain), getReadWriteLock().writeLock());
     }
 
     /**
@@ -1414,7 +1429,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<String> getImplicitRolesForUser(String name, String... domain) {
-        return runSynchronized(() -> super.getImplicitRolesForUser(name, domain), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.getImplicitRolesForUser(name, domain), getReadWriteLock().readLock());
     }
 
     /**
@@ -1434,7 +1449,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<List<String>> getImplicitPermissionsForUser(String user, String... domain) {
-        return runSynchronized(() -> super.getImplicitPermissionsForUser(user, domain), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.getImplicitPermissionsForUser(user, domain), getReadWriteLock().readLock());
     }
 
     /**
@@ -1455,7 +1470,7 @@ public class SyncedEnforcer extends Enforcer {
      */
     @Override
     public List<List<String>> getNamedImplicitPermissionsForUser(String pType, String user, String... domain) {
-        return runSynchronized(() -> super.getNamedImplicitPermissionsForUser(pType, user, domain), READ_WRITE_LOCK.readLock());
+        return runSynchronized(() -> super.getNamedImplicitPermissionsForUser(pType, user, domain), getReadWriteLock().readLock());
     }
 
     private <T> T runSynchronized(Supplier<T> action, Lock lock) {

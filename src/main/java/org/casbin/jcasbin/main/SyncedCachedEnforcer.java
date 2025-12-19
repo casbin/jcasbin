@@ -30,7 +30,6 @@ public class SyncedCachedEnforcer extends SyncedEnforcer{
     private Duration expireTime;
     private Cache cache;
     private final AtomicBoolean enableCache = new AtomicBoolean(true);
-    private final static ReadWriteLock READ_WRITE_LOCK = new ReentrantReadWriteLock();
 
     /**
      * Default constructor. Initializes a new SyncedCachedEnforcer with a default cache.
@@ -248,10 +247,10 @@ public class SyncedCachedEnforcer extends SyncedEnforcer{
      */
     private Boolean getCachedResult(String key) {
         try {
-            READ_WRITE_LOCK.readLock().lock();
+            getReadWriteLock().readLock().lock();
             return cache.get(key);
         } finally {
-            READ_WRITE_LOCK.readLock().unlock();
+            getReadWriteLock().readLock().unlock();
         }
     }
 
@@ -261,11 +260,11 @@ public class SyncedCachedEnforcer extends SyncedEnforcer{
      * @param expireTime The expiration time.
      */
     public void setExpireTime(Duration expireTime) {
-        READ_WRITE_LOCK.writeLock().lock();
+        getReadWriteLock().writeLock().lock();
         try {
             this.expireTime = expireTime;
         } finally {
-            READ_WRITE_LOCK.writeLock().unlock();
+            getReadWriteLock().writeLock().unlock();
         }
     }
 
@@ -275,11 +274,11 @@ public class SyncedCachedEnforcer extends SyncedEnforcer{
      * @param cache The custom cache.
      */
     public void setCache(Cache cache) {
-        READ_WRITE_LOCK.writeLock().lock();
+        getReadWriteLock().writeLock().lock();
         try {
             this.cache = cache;
         } finally {
-            READ_WRITE_LOCK.writeLock().unlock();
+            getReadWriteLock().writeLock().unlock();
         }
     }
 

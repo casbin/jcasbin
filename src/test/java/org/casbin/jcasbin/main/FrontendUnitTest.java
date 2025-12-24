@@ -36,8 +36,7 @@ public class FrontendUnitTest {
     String expectedModelStr = new String(Files.readAllBytes(Paths.get("examples/rbac_model.conf"))).replace("\r\n", "\n").replace("\r", "\n");
     assertEquals(expectedModelStr, receivedModelStr);
 
-    String expectedPolicyStr = new String(Files.readAllBytes(Paths.get("examples/rbac_with_hierarchy_policy.csv")));
-    expectedPolicyStr = expectedPolicyStr.replace("\r\n", "\n").replace("\r", "\n");
+    String expectedPolicyStr = new String(Files.readAllBytes(Paths.get("examples/rbac_with_hierarchy_policy.csv"))).replace("\r\n", "\n").replace("\r", "\n");
     expectedPolicyStr = Pattern.compile("\n+").matcher(expectedPolicyStr).replaceAll("\n");
     String[] expectedPolicyItem = expectedPolicyStr.split(",|\n");
     int i = 0;

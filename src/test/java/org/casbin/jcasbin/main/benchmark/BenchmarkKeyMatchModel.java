@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 @BenchmarkMode(Mode.AverageTime)
 public class BenchmarkKeyMatchModel {
     private static Enforcer e = new Enforcer("examples/keymatch_model.conf", "examples/keymatch_policy.csv", false);
+    private static Enforcer e2 = new Enforcer("examples/keymatch2_model.conf", "examples/keymatch2_policy.csv", false);
 
     public static void main(String args[]) throws RunnerException {
         Options opt = new OptionsBuilder()
@@ -46,6 +47,14 @@ public class BenchmarkKeyMatchModel {
     public static void benchmarkKeyMatchModel() {
         for (int i = 0; i < 1000; i++) {
             e.enforce("alice", "/alice_data/resource1", "GET");
+        }
+    }
+
+    @Threads(1)
+    @Benchmark
+    public static void benchmarkKeyMatch2Model() {
+        for (int i = 0; i < 1000; i++) {
+            e2.enforce("alice", "/alice_data/resource1", "GET");
         }
     }
 }

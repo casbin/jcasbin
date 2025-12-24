@@ -21,6 +21,7 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -41,10 +42,11 @@ import java.util.concurrent.TimeUnit;
 @State(value = Scope.Benchmark)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 public class BenchmarkAllModelApi {
-    public static Enforcer smallEnforcer;
-    public static Enforcer mediumEnforcer;
-    public static Enforcer largeEnforcer;
-    public static Enforcer enforcerForAdd;
+    private static final String MODEL_PATH = "examples/rbac_model.conf";
+
+    private Enforcer smallEnforcer;
+    private Enforcer mediumEnforcer;
+    private Enforcer largeEnforcer;
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
@@ -55,135 +57,289 @@ public class BenchmarkAllModelApi {
         new Runner(opt).run();
     }
 
-    static {
-        smallEnforcer = new Enforcer("examples/rbac_model.conf", "", false);
-        mediumEnforcer = new Enforcer("examples/rbac_model.conf", "", false);
-        largeEnforcer = new Enforcer("examples/rbac_model.conf", "", false);
-        enforcerForAdd = new Enforcer("examples/rbac_model.conf", "", false);
+    @Setup(Level.Trial)
+    public void setup() {
+        smallEnforcer = new Enforcer(MODEL_PATH, "", false);
+        mediumEnforcer = new Enforcer(MODEL_PATH, "", false);
+        largeEnforcer = new Enforcer(MODEL_PATH, "", false);
 
-        // 100 roles, 10 resources.
         for (int i = 0; i < 100; i++) {
             smallEnforcer.addPolicy("user" + i, "data" + i / 10, "read");
         }
-        // 1000 roles, 100 resources.
         for (int i = 0; i < 1000; i++) {
             mediumEnforcer.addPolicy("user" + i, "data" + i / 10, "read");
         }
-        // 10000 roles, 1000 resources.
         for (int i = 0; i < 10000; i++) {
             largeEnforcer.addPolicy("user" + i, "data" + i / 10, "read");
         }
     }
 
     @Benchmark
-    public static void addPolicySmall() {
+    public void addPolicySmall(AddState state) {
         for (int i = 0; i < 100; i++) {
-            enforcerForAdd.addPolicy("user" + i, "data" + (int) (Math.random() * 50), "read");
+            int dataIndex = (i * 31 + state.invocationSeed) % 50;
+            state.enforcer.addPolicy("user" + i, "data" + dataIndex, "read");
         }
     }
 
     @Benchmark
-    public static void addPolicyMedium() {
+    public void addPolicyMedium(AddState state) {
         for (int i = 0; i < 1000; i++) {
-            enforcerForAdd.addPolicy("user" + i, "data" + (int) (Math.random() * 500), "read");
+            int dataIndex = (i * 31 + state.invocationSeed) % 500;
+            state.enforcer.addPolicy("user" + i, "data" + dataIndex, "read");
         }
     }
 
     @Benchmark
-    public static void addPolicyLarge() {
+    public void addPolicyLarge(AddState state) {
         for (int i = 0; i < 10000; i++) {
-            enforcerForAdd.addPolicy("user" + i, "data" + (int) (Math.random() * 500), "read");
+            int dataIndex = (i * 31 + state.invocationSeed) % 5000;
+            state.enforcer.addPolicy("user" + i, "data" + dataIndex, "read");
         }
     }
 
 
     @Benchmark
-    public static void hasPolicySmall() {
+    public void hasPolicySmall() {
         for (int i = 0; i < 100; i++) {
-            smallEnforcer.hasPolicy("user" + (int) (Math.random() * 100), "data" + (int) (Math.random() * 10), "read");
+            int userIndex = i;
+            smallEnforcer.hasPolicy("user" + userIndex, "data" + userIndex / 10, "read");
         }
     }
 
     @Benchmark
-    public static void hasPolicyMedium() {
+    public void hasPolicyMedium() {
         for (int i = 0; i < 1000; i++) {
-            mediumEnforcer.hasPolicy("user" + (int) (Math.random() * 1000), "data" + (int) (Math.random() * 100), "read");
+            int userIndex = i;
+            mediumEnforcer.hasPolicy("user" + userIndex, "data" + userIndex / 10, "read");
         }
     }
 
     @Benchmark
-    public static void hasPolicyLarge() {
+    public void hasPolicyLarge() {
         for (int i = 0; i < 10000; i++) {
-            largeEnforcer.hasPolicy("user" + (int) (Math.random() * 10000), "data" + (int) (Math.random() * 1000), "read");
+            int userIndex = i;
+            largeEnforcer.hasPolicy("user" + userIndex, "data" + userIndex / 10, "read");
         }
     }
 
     @Benchmark
-    public static void updatePolicySmall() {
-        for (int i = 0; i < 100; i++) {
-            List<String> oldRule = new ArrayList<>();
-            List<String> newRule = new ArrayList<>();
-            oldRule.add("user" + (int) (Math.random() * 100));
-            oldRule.add("data" + (int) (Math.random() * 10));
-            oldRule.add("read");
-            newRule.add("user" + (int) (Math.random() * 100));
-            newRule.add("data" + (int) (Math.random() * 10));
-            newRule.add("read");
-
-            smallEnforcer.updatePolicy(oldRule, newRule);
+    public void updatePolicySmall(UpdateStateSmall state) {
+        for (int i = 0; i < state.oldRules.size(); i++) {
+            state.enforcer.updatePolicy(state.oldRules.get(i), state.newRules.get(i));
         }
     }
 
     @Benchmark
-    public static void updatePolicyMedium() {
-        for (int i = 0; i < 100; i++) {
-            List<String> oldRule = new ArrayList<>();
-            List<String> newRule = new ArrayList<>();
-            oldRule.add("user" + (int) (Math.random() * 1000));
-            oldRule.add("data" + (int) (Math.random() * 100));
-            oldRule.add("read");
-            newRule.add("user" + (int) (Math.random() * 1000));
-            newRule.add("data" + (int) (Math.random() * 100));
-            newRule.add("read");
-
-            mediumEnforcer.updatePolicy(oldRule, newRule);
+    public void updatePolicyMedium(UpdateStateMedium state) {
+        for (int i = 0; i < state.oldRules.size(); i++) {
+            state.enforcer.updatePolicy(state.oldRules.get(i), state.newRules.get(i));
         }
     }
 
     @Benchmark
-    public static void updatePolicyLarge() {
-        for (int i = 0; i < 100; i++) {
-            List<String> oldRule = new ArrayList<>();
-            List<String> newRule = new ArrayList<>();
-            oldRule.add("user" + (int) (Math.random() * 10000));
-            oldRule.add("data" + (int) (Math.random() * 1000));
-            oldRule.add("read");
-            newRule.add("user" + (int) (Math.random() * 10000));
-            newRule.add("data" + (int) (Math.random() * 1000));
-            newRule.add("read");
-
-            largeEnforcer.updatePolicy(oldRule, newRule);
+    public void updatePolicyLarge(UpdateStateLarge state) {
+        for (int i = 0; i < state.oldRules.size(); i++) {
+            state.enforcer.updatePolicy(state.oldRules.get(i), state.newRules.get(i));
         }
     }
 
     @Benchmark
-    public static void removePolicySmall() {
-        for (int i = 0; i < 100; i++) {
-            smallEnforcer.removePolicy("user" + (int) (Math.random() * 100), "data" + (int) (Math.random() * 10), "read");
+    public void removePolicySmall(RemoveStateSmall state) {
+        for (int i = 0; i < state.users.length; i++) {
+            state.enforcer.removePolicy(state.users[i], state.data[i], "read");
         }
     }
 
     @Benchmark
-    public static void removePolicyMedium() {
-        for (int i = 0; i < 1000; i++) {
-            mediumEnforcer.removePolicy("user" + (int) (Math.random() * 1000), "data" + (int) (Math.random() * 100), "read");
+    public void removePolicyMedium(RemoveStateMedium state) {
+        for (int i = 0; i < state.users.length; i++) {
+            state.enforcer.removePolicy(state.users[i], state.data[i], "read");
         }
     }
 
     @Benchmark
-    public static void removePolicyLarge() {
-        for (int i = 0; i < 10000; i++) {
-            largeEnforcer.removePolicy("user" + (int) (Math.random() * 10000), "data" + (int) (Math.random() * 1000), "read");
+    public void removePolicyLarge(RemoveStateLarge state) {
+        for (int i = 0; i < state.users.length; i++) {
+            state.enforcer.removePolicy(state.users[i], state.data[i], "read");
+        }
+    }
+
+    @State(Scope.Thread)
+    public static class AddState {
+        private Enforcer enforcer;
+        private int invocationSeed;
+
+        @Setup(Level.Trial)
+        public void setup() {
+            enforcer = new Enforcer(MODEL_PATH, "", false);
+        }
+
+        @Setup(Level.Invocation)
+        public void reset() {
+            enforcer.clearPolicy();
+            invocationSeed = invocationSeed * 1103515245 + 12345;
+        }
+    }
+
+    @State(Scope.Thread)
+    public static class UpdateStateSmall {
+        private Enforcer enforcer;
+        private List<List<String>> oldRules;
+        private List<List<String>> newRules;
+
+        @Setup(Level.Trial)
+        public void setup() {
+            enforcer = new Enforcer(MODEL_PATH, "", false);
+        }
+
+        @Setup(Level.Invocation)
+        public void reset() {
+            enforcer.clearPolicy();
+            oldRules = new ArrayList<>(100);
+            newRules = new ArrayList<>(100);
+            for (int i = 0; i < 100; i++) {
+                String user = "user" + i;
+                String oldData = "data" + i / 10;
+                String newData = "data" + (i / 10 + 1);
+                enforcer.addPolicy(user, oldData, "read");
+                oldRules.add(Arrays.asList(user, oldData, "read"));
+                newRules.add(Arrays.asList(user, newData, "read"));
+            }
+        }
+    }
+
+    @State(Scope.Thread)
+    public static class UpdateStateMedium {
+        private Enforcer enforcer;
+        private List<List<String>> oldRules;
+        private List<List<String>> newRules;
+
+        @Setup(Level.Trial)
+        public void setup() {
+            enforcer = new Enforcer(MODEL_PATH, "", false);
+        }
+
+        @Setup(Level.Invocation)
+        public void reset() {
+            enforcer.clearPolicy();
+            oldRules = new ArrayList<>(100);
+            newRules = new ArrayList<>(100);
+            for (int i = 0; i < 100; i++) {
+                int userIndex = i * 10;
+                String user = "user" + userIndex;
+                String oldData = "data" + userIndex / 10;
+                String newData = "data" + (userIndex / 10 + 1);
+                enforcer.addPolicy(user, oldData, "read");
+                oldRules.add(Arrays.asList(user, oldData, "read"));
+                newRules.add(Arrays.asList(user, newData, "read"));
+            }
+        }
+    }
+
+    @State(Scope.Thread)
+    public static class UpdateStateLarge {
+        private Enforcer enforcer;
+        private List<List<String>> oldRules;
+        private List<List<String>> newRules;
+
+        @Setup(Level.Trial)
+        public void setup() {
+            enforcer = new Enforcer(MODEL_PATH, "", false);
+        }
+
+        @Setup(Level.Invocation)
+        public void reset() {
+            enforcer.clearPolicy();
+            oldRules = new ArrayList<>(100);
+            newRules = new ArrayList<>(100);
+            for (int i = 0; i < 100; i++) {
+                int userIndex = i * 100;
+                String user = "user" + userIndex;
+                String oldData = "data" + userIndex / 10;
+                String newData = "data" + (userIndex / 10 + 1);
+                enforcer.addPolicy(user, oldData, "read");
+                oldRules.add(Arrays.asList(user, oldData, "read"));
+                newRules.add(Arrays.asList(user, newData, "read"));
+            }
+        }
+    }
+
+    @State(Scope.Thread)
+    public static class RemoveStateSmall {
+        private Enforcer enforcer;
+        private String[] users;
+        private String[] data;
+
+        @Setup(Level.Trial)
+        public void setup() {
+            enforcer = new Enforcer(MODEL_PATH, "", false);
+            users = new String[100];
+            data = new String[100];
+            for (int i = 0; i < 100; i++) {
+                users[i] = "user" + i;
+                data[i] = "data" + i / 10;
+            }
+        }
+
+        @Setup(Level.Invocation)
+        public void reset() {
+            enforcer.clearPolicy();
+            for (int i = 0; i < users.length; i++) {
+                enforcer.addPolicy(users[i], data[i], "read");
+            }
+        }
+    }
+
+    @State(Scope.Thread)
+    public static class RemoveStateMedium {
+        private Enforcer enforcer;
+        private String[] users;
+        private String[] data;
+
+        @Setup(Level.Trial)
+        public void setup() {
+            enforcer = new Enforcer(MODEL_PATH, "", false);
+            users = new String[1000];
+            data = new String[1000];
+            for (int i = 0; i < 1000; i++) {
+                users[i] = "user" + i;
+                data[i] = "data" + i / 10;
+            }
+        }
+
+        @Setup(Level.Invocation)
+        public void reset() {
+            enforcer.clearPolicy();
+            for (int i = 0; i < users.length; i++) {
+                enforcer.addPolicy(users[i], data[i], "read");
+            }
+        }
+    }
+
+    @State(Scope.Thread)
+    public static class RemoveStateLarge {
+        private Enforcer enforcer;
+        private String[] users;
+        private String[] data;
+
+        @Setup(Level.Trial)
+        public void setup() {
+            enforcer = new Enforcer(MODEL_PATH, "", false);
+            users = new String[10000];
+            data = new String[10000];
+            for (int i = 0; i < 10000; i++) {
+                users[i] = "user" + i;
+                data[i] = "data" + i / 10;
+            }
+        }
+
+        @Setup(Level.Invocation)
+        public void reset() {
+            enforcer.clearPolicy();
+            for (int i = 0; i < users.length; i++) {
+                enforcer.addPolicy(users[i], data[i], "read");
+            }
         }
     }
 }

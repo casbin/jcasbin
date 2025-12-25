@@ -26,20 +26,17 @@ import java.util.concurrent.TimeUnit;
 
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Mode.AverageTime)
-public class BenchmarkACLModel {
-    @State(Scope.Benchmark)
-    public static class BenchmarkState {
-        private Enforcer e;
+public class BenchmarkRBACModelSingle {
+    private static Enforcer e;
 
-        @Setup(Level.Trial)
-        public void setup() {
-            e = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv", false);
-        }
+    static {
+        e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv", false);
+        e.buildRoleLinks();
     }
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
-            .include(BenchmarkACLModel.class.getName())
+            .include(BenchmarkRBACModelSingle.class.getName())
             .exclude("Pref")
             .warmupIterations(3)
             .measurementIterations(5)
@@ -55,7 +52,9 @@ public class BenchmarkACLModel {
 
     @Threads(1)
     @Benchmark
-    public void benchmarkACLModel(BenchmarkState state) {
-        state.e.enforce("alice", "data1", "read");
+    public void benchmarkRBACModelSingle() {
+        for (int i = 0; i < 1000; i++) {
+            e.enforce("alice", "data2", "read");
+        }
     }
 }

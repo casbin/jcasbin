@@ -27,7 +27,19 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Mode.AverageTime)
 public class BenchmarkRBACModelMedium {
-    private static Enforcer e = new Enforcer("examples/rbac_model.conf", "", false);
+    private static Enforcer e;
+
+    static {
+        e = new Enforcer("examples/rbac_model.conf", "", false);
+        e.enableAutoBuildRoleLinks(false);
+        for (int i = 0; i < 1000; i++) {
+            e.addPolicy(String.format("group%d", i), String.format("data%d", i / 10), "read");
+        }
+        for (int i = 0; i < 10000; i++) {
+            e.addGroupingPolicy(String.format("user%d", i), String.format("group%d", i / 10));
+        }
+        e.buildRoleLinks();
+    }
 
     public static void main(String args[]) throws RunnerException {
         Options opt = new OptionsBuilder()
@@ -43,22 +55,9 @@ public class BenchmarkRBACModelMedium {
 
     @Threads(1)
     @Benchmark
-    public static void benchmarkRBACModelMedium() {
+    public void benchmarkRBACModelMedium() {
         for (int i = 0; i < 10000; i++) {
             e.enforce("user5001", "data150", "read");
         }
-    }
-
-    static {
-        e.enableAutoBuildRoleLinks(false);
-        // 1000 roles, 100 resources.
-        e.enableAutoBuildRoleLinks(false);
-        for (int i=0;i<1000;i++) {
-            e.addPolicy(String.format("group%d", i), String.format("data%d", i/10), "read");
-        }
-        for (int i=0;i<10000;i++) {
-            e.addGroupingPolicy(String.format("user%d", i), String.format("group%d", i/10));
-        }
-        e.buildRoleLinks();
     }
 }

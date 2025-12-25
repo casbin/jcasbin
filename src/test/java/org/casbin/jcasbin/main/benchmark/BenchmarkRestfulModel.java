@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  * Benchmark for RESTful (KeyMatch) model.
  * Data scale: 5 rules (3 users).
  */
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
 @BenchmarkMode(Mode.AverageTime)
 public class BenchmarkRestfulModel {
     private static Enforcer e;

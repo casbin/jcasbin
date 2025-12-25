@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  * Benchmark for Deny-override model.
  * Data scale: 6 rules (2 users, 1 role).
  */
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
 @BenchmarkMode(Mode.AverageTime)
 public class BenchmarkDenyOverrideModel {
     private static Enforcer e;

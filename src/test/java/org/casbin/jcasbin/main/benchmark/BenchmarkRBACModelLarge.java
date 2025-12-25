@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  * Benchmark for RBAC model (Large).
  * Data scale: 110000 rules (100000 users, 10000 roles).
  */
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
 @BenchmarkMode(Mode.AverageTime)
 public class BenchmarkRBACModelLarge {
     @State(Scope.Benchmark)

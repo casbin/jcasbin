@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  * Benchmark for RBAC model with resource roles.
  * Data scale: 6 rules (2 users, 2 roles).
  */
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
 @BenchmarkMode(Mode.AverageTime)
 public class BenchmarkRBACModelWithResourceRoles {
     private static Enforcer e;

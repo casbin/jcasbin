@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  * Benchmark for RBAC model with domains.
  * Data scale: 6 rules (2 users, 1 role, 2 domains).
  */
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
 @BenchmarkMode(Mode.AverageTime)
 public class BenchmarkRBACModelWithDomains {
     private static Enforcer e;

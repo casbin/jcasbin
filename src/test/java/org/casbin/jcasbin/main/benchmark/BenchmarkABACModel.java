@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  * Benchmark for ABAC model.
  * Data scale: 0 rules (0 user).
  */
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
 @BenchmarkMode(Mode.AverageTime)
 public class BenchmarkABACModel {
     private static Enforcer e;

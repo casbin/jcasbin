@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  * Benchmark for Priority model.
  * Data scale: 9 rules (2 users, 2 roles).
  */
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
 @BenchmarkMode(Mode.AverageTime)
 public class BenchmarkPriorityModel {
     private static Enforcer e;

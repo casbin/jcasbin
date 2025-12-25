@@ -27,8 +27,17 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Mode.AverageTime)
 public class BenchmarkKeyMatchModel {
-    private static Enforcer e = new Enforcer("examples/keymatch_model.conf", "examples/keymatch_policy.csv", false);
-    private static Enforcer e2 = new Enforcer("examples/keymatch2_model.conf", "examples/keymatch2_policy.csv", false);
+    @State(Scope.Benchmark)
+    public static class BenchmarkState {
+        private Enforcer e;
+        private Enforcer e2;
+
+        @Setup(Level.Trial)
+        public void setup() {
+            e = new Enforcer("examples/keymatch_model.conf", "examples/keymatch_policy.csv", false);
+            e2 = new Enforcer("examples/keymatch2_model.conf", "examples/keymatch2_policy.csv", false);
+        }
+    }
 
     public static void main(String args[]) throws RunnerException {
         Options opt = new OptionsBuilder()
@@ -44,17 +53,13 @@ public class BenchmarkKeyMatchModel {
 
     @Threads(1)
     @Benchmark
-    public static void benchmarkKeyMatchModel() {
-        for (int i = 0; i < 1000; i++) {
-            e.enforce("alice", "/alice_data/resource1", "GET");
-        }
+    public void benchmarkKeyMatchModel(BenchmarkState state) {
+        state.e.enforce("alice", "/alice_data/resource1", "GET");
     }
 
     @Threads(1)
     @Benchmark
-    public static void benchmarkKeyMatch2Model() {
-        for (int i = 0; i < 1000; i++) {
-            e2.enforce("alice", "/alice_data/resource1", "GET");
-        }
+    public void benchmarkKeyMatch2Model(BenchmarkState state) {
+        state.e2.enforce("alice", "/alice_data/resource1", "GET");
     }
 }

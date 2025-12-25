@@ -31,20 +31,22 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Mode.AverageTime)
 public class BenchmarkRBACModelLarge {
-    private static Enforcer e;
+    @State(Scope.Benchmark)
+    public static class BenchmarkState {
+        private Enforcer e;
 
-    static {
-        e = new Enforcer("examples/rbac_model.conf", "", false);
-        e.enableAutoBuildRoleLinks(false);
-        // 10000 roles, 1000 resources.
-        for (int i = 0; i < 10000; i++) {
-            e.addPolicy(String.format("group%d", i), String.format("data%d", i / 10), "read");
+        @Setup(Level.Trial)
+        public void setup() {
+            e = new Enforcer("examples/rbac_model.conf", "", false);
+            e.enableAutoBuildRoleLinks(false);
+            for (int i = 0; i < 10000; i++) {
+                e.addPolicy(String.format("group%d", i), String.format("data%d", i / 10), "read");
+            }
+            for (int i = 0; i < 100000; i++) {
+                e.addGroupingPolicy(String.format("user%d", i), String.format("group%d", i / 10));
+            }
+            e.buildRoleLinks();
         }
-        // 100000 users.
-        for (int i = 0; i < 100000; i++) {
-            e.addGroupingPolicy(String.format("user%d", i), String.format("group%d", i / 10));
-        }
-        e.buildRoleLinks();
     }
 
     public static void main(String[] args) throws RunnerException {
@@ -61,9 +63,9 @@ public class BenchmarkRBACModelLarge {
 
     @Threads(1)
     @Benchmark
-    public void benchmarkRBACModelLarge() {
+    public void benchmarkRBACModelLarge(BenchmarkState state) {
         for (int i = 0; i < 100000; i++) {
-            e.enforce("user50001", "data1500", "read");
+            state.e.enforce("user50001", "data1500", "read");
         }
     }
 }

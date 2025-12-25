@@ -24,28 +24,42 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Benchmark for RBAC model with domains.
+ * Data scale: 6 rules (2 users, 1 role, 2 domains).
+ */
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Mode.AverageTime)
 public class BenchmarkRBACModelWithDomains {
-    private static Enforcer e = new Enforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv", false);
+    private static Enforcer e;
 
-    public static void main(String args[]) throws RunnerException {
+    static {
+        e = new Enforcer("examples/rbac_with_domains_model.conf", "", false);
+        e.enableAutoBuildRoleLinks(false);
+        e.addPolicy("admin", "domain1", "data1", "read");
+        e.addPolicy("admin", "domain1", "data1", "write");
+        e.addPolicy("admin", "domain2", "data2", "read");
+        e.addPolicy("admin", "domain2", "data2", "write");
+        e.addGroupingPolicy("alice", "admin", "domain1");
+        e.addGroupingPolicy("bob", "admin", "domain2");
+        e.buildRoleLinks();
+    }
+
+    public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
-            .include(BenchmarkRBACModelWithDomains.class.getName())
-            .exclude("Pref")
-            .warmupIterations(3)
-            .measurementIterations(3)
-            .addProfiler(GCProfiler.class)
-            .forks(1)
-            .build();
+                .include(BenchmarkRBACModelWithDomains.class.getName())
+                .exclude("Pref")
+                .warmupIterations(3)
+                .measurementIterations(5)
+                .addProfiler(GCProfiler.class)
+                .forks(2)
+                .build();
         new Runner(opt).run();
     }
 
     @Threads(1)
     @Benchmark
-    public static void benchmarkRBACModelWithDomains() {
-        for (int i = 0; i < 1000; i++) {
-            e.enforce("alice", "domain1", "data1", "read");
-        }
+    public void benchmarkRBACModelWithDomains() {
+        e.enforce("alice", "domain1", "data1", "read");
     }
 }

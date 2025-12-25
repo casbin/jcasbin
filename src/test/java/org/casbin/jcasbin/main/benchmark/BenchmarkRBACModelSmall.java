@@ -56,8 +56,6 @@ public class BenchmarkRBACModelSmall {
     @Threads(1)
     @Benchmark
     public void benchmarkRBACModelSmall() {
-        for (int i = 0; i < 1000; i++) {
-            e.enforce("user501", "data9", "read");
-        }
+        e.enforce("user501", "data9", "read");
     }
 }

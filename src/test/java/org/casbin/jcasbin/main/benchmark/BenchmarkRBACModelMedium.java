@@ -56,8 +56,6 @@ public class BenchmarkRBACModelMedium {
     @Threads(1)
     @Benchmark
     public void benchmarkRBACModelMedium() {
-        for (int i = 0; i < 10000; i++) {
-            e.enforce("user5001", "data150", "read");
-        }
+        e.enforce("user5001", "data150", "read");
     }
 }

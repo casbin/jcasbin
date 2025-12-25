@@ -52,8 +52,6 @@ public class BenchmarkBasicModel {
     @Threads(1)
     @Benchmark
     public void benchmarkBasicModel() {
-        for (int i = 0; i < 1000; i++) {
-            e.enforce("alice", "data1", "read");
-        }
+        e.enforce("alice", "data1", "read");
     }
 }

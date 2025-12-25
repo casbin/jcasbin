@@ -53,8 +53,6 @@ public class BenchmarkRBACModelSingle {
     @Threads(1)
     @Benchmark
     public void benchmarkRBACModelSingle() {
-        for (int i = 0; i < 1000; i++) {
-            e.enforce("alice", "data2", "read");
-        }
+        e.enforce("alice", "data2", "read");
     }
 }

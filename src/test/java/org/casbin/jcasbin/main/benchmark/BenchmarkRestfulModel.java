@@ -24,28 +24,41 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Benchmark for RESTful (KeyMatch) model.
+ * Data scale: 5 rules (3 users).
+ */
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Mode.AverageTime)
-public class BenchmarkRBACModelWithDeny {
-    private static Enforcer e = new Enforcer("examples/rbac_with_deny_model.conf", "examples/rbac_with_deny_policy.csv", false);
+public class BenchmarkRestfulModel {
+    private static Enforcer e;
 
-    public static void main(String args[]) throws RunnerException {
+    static {
+        e = new Enforcer("examples/keymatch_model.conf", "", false);
+        e.enableAutoBuildRoleLinks(false);
+        e.addPolicy("alice", "/alice_data/*", "GET");
+        e.addPolicy("alice", "/alice_data/resource1", "POST");
+        e.addPolicy("bob", "/alice_data/resource2", "GET");
+        e.addPolicy("bob", "/bob_data/*", "POST");
+        e.addPolicy("cathy", "/cathy_data", "(GET)|(POST)");
+        e.buildRoleLinks();
+    }
+
+    public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
-            .include(BenchmarkRBACModelWithDeny.class.getName())
-            .exclude("Pref")
-            .warmupIterations(3)
-            .measurementIterations(3)
-            .addProfiler(GCProfiler.class)
-            .forks(1)
-            .build();
+                .include(BenchmarkRestfulModel.class.getName())
+                .exclude("Pref")
+                .warmupIterations(3)
+                .measurementIterations(5)
+                .addProfiler(GCProfiler.class)
+                .forks(2)
+                .build();
         new Runner(opt).run();
     }
 
     @Threads(1)
     @Benchmark
-    public static void benchmarkRBACModelWithDeny() {
-        for (int i = 0; i < 1000; i++) {
-            e.enforce("alice", "data1", "read");
-        }
+    public void benchmarkRestfulModel() {
+        e.enforce("alice", "/alice_data/resource1", "GET");
     }
 }

@@ -24,42 +24,42 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Benchmark for Deny-override model.
+ * Data scale: 6 rules (2 users, 1 role).
+ */
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Mode.AverageTime)
-public class BenchmarkKeyMatchModel {
-    @State(Scope.Benchmark)
-    public static class BenchmarkState {
-        private Enforcer e;
-        private Enforcer e2;
+public class BenchmarkDenyOverrideModel {
+    private static Enforcer e;
 
-        @Setup(Level.Trial)
-        public void setup() {
-            e = new Enforcer("examples/keymatch_model.conf", "examples/keymatch_policy.csv", false);
-            e2 = new Enforcer("examples/keymatch2_model.conf", "examples/keymatch2_policy.csv", false);
-        }
+    static {
+        e = new Enforcer("examples/rbac_with_deny_model.conf", "", false);
+        e.enableAutoBuildRoleLinks(false);
+        e.addPolicy("alice", "data1", "read", "allow");
+        e.addPolicy("bob", "data2", "write", "allow");
+        e.addPolicy("data2_admin", "data2", "read", "allow");
+        e.addPolicy("data2_admin", "data2", "write", "allow");
+        e.addPolicy("alice", "data2", "write", "deny");
+        e.addGroupingPolicy("alice", "data2_admin");
+        e.buildRoleLinks();
     }
 
-    public static void main(String args[]) throws RunnerException {
+    public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
-            .include(BenchmarkKeyMatchModel.class.getName())
-            .exclude("Pref")
-            .warmupIterations(3)
-            .measurementIterations(3)
-            .addProfiler(GCProfiler.class)
-            .forks(1)
-            .build();
+                .include(BenchmarkDenyOverrideModel.class.getName())
+                .exclude("Pref")
+                .warmupIterations(3)
+                .measurementIterations(5)
+                .addProfiler(GCProfiler.class)
+                .forks(2)
+                .build();
         new Runner(opt).run();
     }
 
     @Threads(1)
     @Benchmark
-    public void benchmarkKeyMatchModel(BenchmarkState state) {
-        state.e.enforce("alice", "/alice_data/resource1", "GET");
-    }
-
-    @Threads(1)
-    @Benchmark
-    public void benchmarkKeyMatch2Model(BenchmarkState state) {
-        state.e2.enforce("alice", "/alice_data/resource1", "GET");
+    public void benchmarkDenyOverrideModel() {
+        e.enforce("alice", "data1", "read");
     }
 }

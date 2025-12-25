@@ -24,28 +24,46 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Benchmark for Priority model.
+ * Data scale: 9 rules (2 users, 2 roles).
+ */
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Mode.AverageTime)
 public class BenchmarkPriorityModel {
-    private static Enforcer e = new Enforcer("examples/priority_model.conf", "examples/priority_policy.csv", false);
+    private static Enforcer e;
 
-    public static void main(String args[]) throws RunnerException {
+    static {
+        e = new Enforcer("examples/priority_model.conf", "", false);
+        e.enableAutoBuildRoleLinks(false);
+        e.addPolicy("alice", "data1", "read", "allow");
+        e.addPolicy("data1_deny_group", "data1", "read", "deny");
+        e.addPolicy("data1_deny_group", "data1", "write", "deny");
+        e.addPolicy("alice", "data1", "write", "allow");
+        e.addGroupingPolicy("alice", "data1_deny_group");
+
+        e.addPolicy("data2_allow_group", "data2", "read", "allow");
+        e.addPolicy("bob", "data2", "read", "deny");
+        e.addPolicy("bob", "data2", "write", "deny");
+        e.addGroupingPolicy("bob", "data2_allow_group");
+        e.buildRoleLinks();
+    }
+
+    public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
-            .include(BenchmarkPriorityModel.class.getName())
-            .exclude("Pref")
-            .warmupIterations(3)
-            .measurementIterations(3)
-            .addProfiler(GCProfiler.class)
-            .forks(1)
-            .build();
+                .include(BenchmarkPriorityModel.class.getName())
+                .exclude("Pref")
+                .warmupIterations(3)
+                .measurementIterations(5)
+                .addProfiler(GCProfiler.class)
+                .forks(2)
+                .build();
         new Runner(opt).run();
     }
 
     @Threads(1)
     @Benchmark
-    public static void benchmarkPriorityModel() {
-        for (int i = 0; i < 1000; i++) {
-            e.enforce("alice", "data1", "read");
-        }
+    public void benchmarkPriorityModel() {
+        e.enforce("alice", "data1", "read");
     }
 }

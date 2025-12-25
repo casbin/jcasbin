@@ -24,41 +24,46 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Benchmark for RBAC model (Large).
+ * Data scale: 110000 rules (100000 users, 10000 roles).
+ */
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Mode.AverageTime)
 public class BenchmarkRBACModelLarge {
-    private static Enforcer e = new Enforcer("examples/rbac_model.conf", "", false);
+    private static Enforcer e;
 
-    public static void main(String args[]) throws RunnerException {
+    static {
+        e = new Enforcer("examples/rbac_model.conf", "", false);
+        e.enableAutoBuildRoleLinks(false);
+        // 10000 roles, 1000 resources.
+        for (int i = 0; i < 10000; i++) {
+            e.addPolicy(String.format("group%d", i), String.format("data%d", i / 10), "read");
+        }
+        // 100000 users.
+        for (int i = 0; i < 100000; i++) {
+            e.addGroupingPolicy(String.format("user%d", i), String.format("group%d", i / 10));
+        }
+        e.buildRoleLinks();
+    }
+
+    public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
-            .include(BenchmarkRBACModelLarge.class.getName())
-            .exclude("Pref")
-            .warmupIterations(1)
-            .measurementIterations(1)
-            .addProfiler(GCProfiler.class)
-            .forks(1)
-            .build();
+                .include(BenchmarkRBACModelLarge.class.getName())
+                .exclude("Pref")
+                .warmupIterations(3)
+                .measurementIterations(5)
+                .addProfiler(GCProfiler.class)
+                .forks(2)
+                .build();
         new Runner(opt).run();
     }
 
     @Threads(1)
     @Benchmark
-    public static void benchmarkRBACModelLarge() {
+    public void benchmarkRBACModelLarge() {
         for (int i = 0; i < 100000; i++) {
             e.enforce("user50001", "data1500", "read");
         }
-    }
-
-    static {
-        e.enableAutoBuildRoleLinks(false);
-        // 10000 roles, 1000 resources.
-        e.enableAutoBuildRoleLinks(false);
-        for (int i=0;i<10000;i++) {
-            e.addPolicy(String.format("group%d", i), String.format("data%d", i/10), "read");
-        }
-        for (int i=0;i<100000;i++) {
-            e.addGroupingPolicy(String.format("user%d", i), String.format("group%d", i/10));
-        }
-        e.buildRoleLinks();
     }
 }

@@ -14,6 +14,7 @@
 
 package org.casbin.jcasbin.rbac;
 
+import org.casbin.jcasbin.detector.Detector;
 import org.casbin.jcasbin.util.SyncedLRUCache;
 import org.casbin.jcasbin.util.Util;
 
@@ -27,6 +28,7 @@ public class DefaultRoleManager implements RoleManager {
 
     BiPredicate<String, String> matchingFunc;
     private SyncedLRUCache<String, Boolean> matchingFuncCache;
+    private Detector detector;
 
     /**
      * DefaultRoleManager is the constructor for creating an instance of the default RoleManager
@@ -79,6 +81,15 @@ public class DefaultRoleManager implements RoleManager {
      * @param domainMatchingFunc the domain matching function.
      */
     public void addDomainMatchingFunc(String name, BiPredicate<String, String> domainMatchingFunc) {
+    }
+
+    /**
+     * setDetector sets the detector for cycle detection in role inheritance.
+     *
+     * @param detector the detector instance to use for cycle detection.
+     */
+    public void setDetector(Detector detector) {
+        this.detector = detector;
     }
 
     private void rebuild() {
@@ -161,6 +172,17 @@ public class DefaultRoleManager implements RoleManager {
         Role user = getRole(name1);
         Role role = getRole(name2);
         user.addRole(role);
+        
+        // If detector is set, check for cycles after adding the link
+        if (detector != null) {
+            String errorMsg = detector.check(this);
+            if (errorMsg != null && !errorMsg.isEmpty()) {
+                // Rollback the operation
+                user.removeRole(role);
+                // Throw exception with the error description
+                throw new IllegalArgumentException(errorMsg);
+            }
+        }
     }
 
     /**

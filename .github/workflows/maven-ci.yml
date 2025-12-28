@@ -42,6 +42,7 @@ jobs:
           node-version: 20
 
       - name: Semantic Release
+        if: github.repository == 'casbin/jcasbin' && github.event_name == 'push'
         run: |
           npm install -g @conveyal/maven-semantic-release semantic-release
           semantic-release --prepare @conveyal/maven-semantic-release --publish @semantic-release/github,@conveyal/maven-semantic-release --verify-conditions @semantic-release/github,@conveyal/maven-semantic-release

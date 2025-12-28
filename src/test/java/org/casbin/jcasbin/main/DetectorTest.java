@@ -273,18 +273,20 @@ public class DetectorTest {
         Detector detector = new DefaultDetector();
         rm.setDetector(detector);
         
+        final int CHAIN_LENGTH = 10;
+        
         // Create chain: r0 -> r1 -> r2 -> ... -> r9
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < CHAIN_LENGTH - 1; i++) {
             rm.addLink("r" + i, "r" + (i + 1));
         }
         
         // Verify chain works
-        assertTrue("r0 should reach r9", rm.hasLink("r0", "r9"));
-        assertTrue("r5 should reach r9", rm.hasLink("r5", "r9"));
+        assertTrue("r0 should reach r9", rm.hasLink("r0", "r" + (CHAIN_LENGTH - 1)));
+        assertTrue("r5 should reach r9", rm.hasLink("r5", "r" + (CHAIN_LENGTH - 1)));
         
         // Adding cycle should fail
         try {
-            rm.addLink("r9", "r0");
+            rm.addLink("r" + (CHAIN_LENGTH - 1), "r0");
             fail("Expected IllegalArgumentException due to cycle");
         } catch (IllegalArgumentException e) {
             assertTrue("Exception message should contain 'Cycle detected'", 

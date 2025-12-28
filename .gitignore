@@ -27,4 +27,3 @@ target-bench/
 .idea/
 *.iml
 jmh-result.json
-benchmark_pom.xml

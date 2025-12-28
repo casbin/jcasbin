@@ -52,7 +52,9 @@ public class BenchmarkEnforce {
         enforcer.enableAutoBuildRoleLinks(false);
 
         if ("small".equals(dataScale)) {
-             loadSmallData(modelType);
+             // Small: 1000 users, 100 roles (users/10), 10 resources (roles/10)
+             // Aligned with Go benchmark "small" case
+             generateDynamicData(1000); 
         } else if ("medium".equals(dataScale)) {
             generateDynamicData(10000);
         } else if ("large".equals(dataScale)) {
@@ -182,54 +184,40 @@ public class BenchmarkEnforce {
             String sub, obj, act;
             boolean expectAllow = (i % 2 == 0);
 
-            if ("small".equals(dataScale)) {
-                if ("rbac_with_domains".equals(modelType)) {
-                    // domain aware request
-                    // sub, dom, obj, act
-                    // We only support 3-arg enforce in this simplified benchmark or need 4-arg?
-                    // Enforcer.enforce(Object... rvals)
-                    // We will pack args into array.
-                    // For small data: alice, domain1, data1, read -> allow
-                    if (expectAllow) {
-                        // sub="alice", dom="domain1", obj="data1", act="read"
-                        // But we store as String[]
-                        requests.add(new String[]{"alice", "domain1", "data1", "read"});
-                    } else {
-                        requests.add(new String[]{"alice", "domain1", "data_none", "read"});
-                    }
-                    continue; 
-                } 
-                
-                if (expectAllow) {
-                    sub = "alice"; obj = "data1"; act = "read";
-                } else {
-                    sub = "alice"; obj = "data_none"; act = "read";
-                }
-            } else {
-                // Medium/Large
-                int userIdx = i % (("medium".equals(dataScale) ? 10000 : 100000));
-                
-                if (expectAllow) {
-                    int roleCount = ("medium".equals(dataScale) ? 1000 : 10000);
-                    int groupIdx = userIdx % roleCount;
-                    int dataIdx = groupIdx % (roleCount/10 + 1);
-                    
-                    sub = "user" + userIdx;
-                    obj = "data" + dataIdx;
-                    act = "read";
-                } else {
-                    sub = "user" + userIdx;
-                    obj = "data_invalid";
-                    act = "read";
-                }
-
-                if ("rbac_with_domains".equals(modelType)) {
-                    requests.add(new String[]{sub, "domain1", obj, act});
-                    continue;
-                }
-            }
+            // Calculate scale parameters for dynamic generation
+            // Small: 1000 users, Medium: 10000, Large: 100000
+            int totalUsers = "small".equals(dataScale) ? 1000 : 
+                             ("medium".equals(dataScale) ? 10000 : 100000);
             
-            requests.add(new String[]{sub, obj, act});
+            // Generate request based on scale
+            int userIdx = i % totalUsers;
+            
+            if (expectAllow) {
+                // Role count is users / 10
+                int roleCount = totalUsers / 10;
+                // Ensure at least 1 role
+                if (roleCount < 1) roleCount = 1;
+                
+                int groupIdx = userIdx % roleCount;
+                // Resource count is roles / 10 (or users / 100)
+                // Logic in generateDynamicData: obj = "data" + (i % (roleCount/10 + 1))
+                // We must match that logic to hit a policy
+                int dataIdx = groupIdx % (roleCount/10 + 1);
+                
+                sub = "user" + userIdx;
+                obj = "data" + dataIdx;
+                act = "read";
+            } else {
+                sub = "user" + userIdx;
+                obj = "data_invalid";
+                act = "read";
+            }
+
+            if ("rbac_with_domains".equals(modelType)) {
+                requests.add(new String[]{sub, "domain1", obj, act});
+            } else {
+                requests.add(new String[]{sub, obj, act});
+            }
         }
     }
     

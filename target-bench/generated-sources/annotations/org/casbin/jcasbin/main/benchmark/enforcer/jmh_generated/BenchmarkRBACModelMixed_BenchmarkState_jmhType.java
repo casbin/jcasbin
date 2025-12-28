@@ -1,0 +1,4 @@
+package org.casbin.jcasbin.main.benchmark.enforcer.jmh_generated;
+public class BenchmarkRBACModelMixed_BenchmarkState_jmhType extends BenchmarkRBACModelMixed_BenchmarkState_jmhType_B3 {
+}
+

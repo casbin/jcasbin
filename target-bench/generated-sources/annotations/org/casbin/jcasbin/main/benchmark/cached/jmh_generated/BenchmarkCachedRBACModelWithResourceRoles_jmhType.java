@@ -1,0 +1,4 @@
+package org.casbin.jcasbin.main.benchmark.cached.jmh_generated;
+public class BenchmarkCachedRBACModelWithResourceRoles_jmhType extends BenchmarkCachedRBACModelWithResourceRoles_jmhType_B3 {
+}
+

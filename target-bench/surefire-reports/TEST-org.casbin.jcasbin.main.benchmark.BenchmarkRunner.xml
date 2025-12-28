@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite tests="1" failures="0" name="org.casbin.jcasbin.main.benchmark.BenchmarkRunner" time="497.348" errors="0" skipped="0">
+  <properties>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <property name="java.vm.version" value="17.0.8+9-LTS-211"/>
+    <property name="sun.boot.library.path" value="D:\Codinglibrary\Java\jdk17\bin"/>
+    <property name="maven.multiModuleProjectDirectory" value="F:\Casbin_game\jcasbin"/>
+    <property name="java.vm.vendor" value="Oracle Corporation"/>
+    <property name="java.vendor.url" value="https://java.oracle.com/"/>
+    <property name="guice.disable.misplaced.annotation.check" value="true"/>
+    <property name="path.separator" value=";"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="user.script" value=""/>
+    <property name="user.country" value="CN"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="test" value="BenchmarkRunner"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="user.dir" value="F:\Casbin_game\jcasbin"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="java.runtime.version" value="17.0.8+9-LTS-211"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.io.tmpdir" value="C:\Users\Sphirai\AppData\Local\Temp\"/>
+    <property name="line.separator" value="
+"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="user.variant" value=""/>
+    <property name="os.name" value="Windows 11"/>
+    <property name="classworlds.conf" value="d:\Codinglibrary\forJava\apache-maven-3.8.8\bin\m2.conf"/>
+    <property name="sun.jnu.encoding" value="GBK"/>
+    <property name="java.library.path" value="D:\Codinglibrary\Java\jdk17\bin;C:\Windows\Sun\Java\bin;C:\Windows\system32;C:\Windows;D:\\Codinglibrary\\Java\\jdk17\\bin;C:\\Users\\Sphirai\\.trae\\tools\\maven\\latest\\bin;C:\\Users\\Sphirai\\.trae\\tools\\gradle\\latest\\bin;D:\\Program\\go\\bin;F:\\goprojects\\bin;c:\\Users\\Sphirai\\.trae\\sdks\\workspaces\\06f57995\\versions\\node\\current;c:\\Users\\Sphirai\\.trae\\sdks\\versions\\node\\current;C:\Program Files\WindowsApps\Microsoft.PowerShell_7.5.4.0_x64__8wekyb3d8bbwe;D:\Codinglibrary\Java\jdk17\bin;C:\Users\Sphirai\.trae\tools\maven\latest\bin;C:\Users\Sphirai\.trae\tools\gradle\latest\bin;D:\Program\go\bin;F:\goprojects\bin;c:\Users\Sphirai\.trae\sdks\workspaces\06f57995\versions\node\current;c:\Users\Sphirai\.trae\sdks\versions\node\current;D:\Codinglibrary\Java\jdk17\bin;C:\Program Files\Common Files\Oracle\Java\javapath;c:\program files\nvidia gpu computing toolkit\cuda\v12.6\bin;c:\program files\nvidia gpu computing toolkit\cuda\v12.6\libnvvp;d:\program\vmware\bin\;c:\windows\system32;c:\windows;c:\windows\system32\wbem;c:\windows\system32\windowspowershell\v1.0\;c:\windows\system32\openssh\;c:\program files\dotnet\;d:\program\go\bin;d:\program\r-4.2.1\bin;d:\program\rtools42;d:\program\rtools42\usr\bin;d:\program\graphviz\bin;d:\program\notepad++;d:\program\putty\;c:\program files\miktex\miktex\bin\x64\;d:\program\latex\texlive\2024\bin\windows;d:\program\git lfs;d:\program\mingw64\bin\;d:\program\openssl-win64\bin\;d:\program\vivo\pcsuite\;c:\users\sphirai\appdata\local\packages\pythonsoftwarefoundation.python.3.12_qbz5n2kfra8p0\localcache\local-packages\python312\scripts;c:\programdata\chocolatey\bin;c:\program files\llvm\bin;c:\program files (x86)\llvm\bin;c:\program files\nodejs\;c:\program files\tortoisesvn\bin;c:\windows\system32;c:\windows;c:\windows\system32\wbem;c:\windows\system32\windowspowershell\v1.0\;c:\windows\system32\openssh\;d:\program\cursor\resources\app\bin;d:\codinglibrary\forjava\apache-maven-3.8.8\bin;d:\codinglibrary\forjava\apache-tomcat-9.0.104\bin;d:\codinglibrary\forjava\apache-tomcat-9.0.104\lib;d:\codinglibrary\java\scripts;c:\windows\system32;c:\windows;c:\windows\system32\wbem;c:\windows\system32\windowspowershell\v1.0\;c:\windows\system32\openssh\;d:\program\fgit;d:\program\gow\bin;d:\program\git\git\cmd;c:\program files\nvidia corporation\nsight compute 2024.3.0\;c:\program files\mysql\mysql server 8.0\bin;c:\program files\nvidia corporation\nvidia nvdlisr;d:\program\gs10.06.0\bin;c:\program files\nvidia corporation\nvidia app\nvdlisr;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;D:\Program\adb;C:\Windows\System32\Wbem;D:\Codinglibrary\forJava\elasticsearch-8.10.0\bin;D:\Codinglibrary\forJava\docker\resources\bin;D:\Codinglibrary\forJava\redis\;;C:\Program Files (x86)\gnupg\bin;C:\Windows\System32\Wbem;C:\Program Files\MySQL\MySQL Shell 8.0\bin\;d:\Program\Trae\bin;C:\Users\Sphirai\AppData\Local\Microsoft\WindowsApps\;D:\Program\GoLand 2023.2.2\bin;D:\Program\PyCharm 2023.2.2\bin;D:\Program\IntelliJ IDEA 2023.2.2\bin;C:\Users\Sphirai\go\bin\;F:\Java\bin\;D:\Program\latex\texlive\2024\bin\windows\;D:\Program\Microsoft VS Code\bin\;D:\Program\mingw64\bin\;C:\Users\Sphirai\AppData\Roaming\npm;C:\Users\Sphirai\AppData\Local\Pandoc\;C:\Users\Sphirai\AppData\Local\Microsoft\WindowsApps;D:\Program\cursor\resources\app\bin;C:\Users\Sphirai\.dotnet\tools;C:\Windows\System32\Wbem;C:\Users\Sphirai\AppData\Local\GitHubDesktop\bin;D:\Program\IDEA\IntelliJ IDEA 2025.3.1\bin;c:\Users\Sphirai\.trae\extensions\vscjava.vscode-java-debug-0.58.4-universal\bundled\scripts\noConfigScripts;c:\Users\Sphirai\.trae\extensions\ms-python.debugpy-2025.18.0-win32-x64\bundled\scripts\noConfigScripts;."/>
+    <property name="maven.conf" value="d:\Codinglibrary\forJava\apache-maven-3.8.8/conf"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="java.class.version" value="61.0"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="os.version" value="10.0"/>
+    <property name="library.jansi.path" value="d:\Codinglibrary\forJava\apache-maven-3.8.8\lib\jansi-native"/>
+    <property name="user.home" value="C:\Users\Sphirai"/>
+    <property name="user.timezone" value="Asia/Shanghai"/>
+    <property name="file.encoding" value="GBK"/>
+    <property name="java.specification.version" value="17"/>
+    <property name="user.name" value="Sphirai"/>
+    <property name="java.class.path" value="d:\Codinglibrary\forJava\apache-maven-3.8.8\boot\plexus-classworlds-2.6.0.jar"/>
+    <property name="java.vm.specification.version" value="17"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="sun.java.command" value="org.codehaus.plexus.classworlds.launcher.Launcher -f benchmark_pom.xml test -Dtest=BenchmarkRunner"/>
+    <property name="java.home" value="D:\Codinglibrary\Java\jdk17"/>
+    <property name="user.language" value="zh"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="java.version" value="17.0.8"/>
+    <property name="native.encoding" value="GBK"/>
+    <property name="java.vendor" value="Oracle Corporation"/>
+    <property name="sun.stderr.encoding" value="ms936"/>
+    <property name="maven.home" value="d:\Codinglibrary\forJava\apache-maven-3.8.8"/>
+    <property name="file.separator" value="\"/>
+    <property name="java.version.date" value="2023-07-18"/>
+    <property name="java.vendor.url.bug" value="https://bugreport.java.com/bugreport/"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="sun.stdout.encoding" value="ms936"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+  </properties>
+  <testcase classname="org.casbin.jcasbin.main.benchmark.BenchmarkRunner" name="testBenchmark" time="497.348"/>
+</testsuite>

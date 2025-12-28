@@ -1,0 +1,4 @@
+package org.casbin.jcasbin.main.benchmark.cached.jmh_generated;
+public class BenchmarkCachedKeyMatchModel_BenchmarkState_jmhType extends BenchmarkCachedKeyMatchModel_BenchmarkState_jmhType_B3 {
+}
+

@@ -7,7 +7,7 @@ on:
       - '**.md'
 
 permissions:
-  contents: read
+  contents: write
   # Write permission needed if commenting on PRs is enabled
   pull-requests: write
 

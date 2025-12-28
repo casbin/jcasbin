@@ -24,6 +24,34 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Benchmark for ACL (Access Control List) model.
+ * 
+ * <p>This benchmark tests basic ACL authorization performance with a simple subject-object-action policy.
+ * The scenario uses deterministic policy generation to ensure reproducible results across runs.
+ * 
+ * <p><b>Data Scale:</b>
+ * <ul>
+ *   <li>Total rules: 2</li>
+ *   <li>Total users: 2</li>
+ * </ul>
+ * 
+ * <p><b>Policy Structure:</b>
+ * <pre>
+ * p, alice, data1, read
+ * p, bob, data2, write
+ * </pre>
+ * 
+ * <p><b>Test Case:</b> Enforce "alice", "data1", "read"
+ * 
+ * <p><b>Recommended JMH Options:</b>
+ * <pre>
+ * -f 2 -wi 3 -i 5 -t 1
+ * (2 forks, 3 warmup iterations, 5 measurement iterations, 1 thread)
+ * </pre>
+ * 
+ * @see <a href="https://casbin.org/docs/en/supported-models#acl">Casbin ACL Model</a>
+ */
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Mode.AverageTime)
 public class BenchmarkBasicModel {
@@ -34,9 +62,10 @@ public class BenchmarkBasicModel {
             .include(BenchmarkBasicModel.class.getName())
             .exclude("Pref")
             .warmupIterations(3)
-            .measurementIterations(3)
+            .measurementIterations(5)
             .addProfiler(GCProfiler.class)
-            .forks(1)
+            .forks(2)
+            .threads(1)
             .build();
         new Runner(opt).run();
     }
@@ -44,8 +73,6 @@ public class BenchmarkBasicModel {
     @Threads(1)
     @Benchmark
     public static void benchmarkBasicModel() {
-        for (int i = 0; i < 1000; i++) {
-            e.enforce("alice", "data1", "read");
-        }
+        e.enforce("alice", "data1", "read");
     }
 }

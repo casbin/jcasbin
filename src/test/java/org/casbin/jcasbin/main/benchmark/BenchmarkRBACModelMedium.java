@@ -24,6 +24,38 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Benchmark for RBAC model with medium-scale data.
+ * 
+ * <p>This benchmark tests RBAC authorization performance with a medium dataset.
+ * The scenario uses deterministic policy generation to ensure reproducible results across runs.
+ * 
+ * <p><b>Data Scale:</b>
+ * <ul>
+ *   <li>Total rules: 11000 (1000 role policies + 10000 user-role assignments)</li>
+ *   <li>Total users: 10000</li>
+ *   <li>Total roles: 1000</li>
+ *   <li>Total resources: 100</li>
+ * </ul>
+ * 
+ * <p><b>Generation Logic:</b>
+ * <ul>
+ *   <li>For each role i (0-999): p, group{i}, data{i/10}, read</li>
+ *   <li>For each user i (0-9999): g, user{i}, group{i/10}</li>
+ *   <li>Each 10 roles are bound to 1 resource</li>
+ *   <li>Each 10 users are bound to 1 role</li>
+ * </ul>
+ * 
+ * <p><b>Test Case:</b> Enforce "user5001", "data150", "read"
+ * 
+ * <p><b>Recommended JMH Options:</b>
+ * <pre>
+ * -f 2 -wi 3 -i 5 -t 1
+ * (2 forks, 3 warmup iterations, 5 measurement iterations, 1 thread)
+ * </pre>
+ * 
+ * @see <a href="https://casbin.org/docs/en/supported-models#rbac">Casbin RBAC Model</a>
+ */
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Mode.AverageTime)
 public class BenchmarkRBACModelMedium {
@@ -34,9 +66,10 @@ public class BenchmarkRBACModelMedium {
             .include(BenchmarkRBACModelMedium.class.getName())
             .exclude("Pref")
             .warmupIterations(3)
-            .measurementIterations(1)
+            .measurementIterations(5)
             .addProfiler(GCProfiler.class)
-            .forks(1)
+            .forks(2)
+            .threads(1)
             .build();
         new Runner(opt).run();
     }
@@ -44,19 +77,17 @@ public class BenchmarkRBACModelMedium {
     @Threads(1)
     @Benchmark
     public static void benchmarkRBACModelMedium() {
-        for (int i = 0; i < 10000; i++) {
-            e.enforce("user5001", "data150", "read");
-        }
+        e.enforce("user5001", "data150", "read");
     }
 
     static {
         e.enableAutoBuildRoleLinks(false);
         // 1000 roles, 100 resources.
-        e.enableAutoBuildRoleLinks(false);
-        for (int i=0;i<1000;i++) {
+        for (int i = 0; i < 1000; i++) {
             e.addPolicy(String.format("group%d", i), String.format("data%d", i/10), "read");
         }
-        for (int i=0;i<10000;i++) {
+        // 10000 users.
+        for (int i = 0; i < 10000; i++) {
             e.addGroupingPolicy(String.format("user%d", i), String.format("group%d", i/10));
         }
         e.buildRoleLinks();

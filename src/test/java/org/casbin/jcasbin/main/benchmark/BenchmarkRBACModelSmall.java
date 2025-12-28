@@ -24,6 +24,38 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Benchmark for RBAC model with small-scale data.
+ * 
+ * <p>This benchmark tests RBAC authorization performance with a small dataset.
+ * The scenario uses deterministic policy generation to ensure reproducible results across runs.
+ * 
+ * <p><b>Data Scale:</b>
+ * <ul>
+ *   <li>Total rules: 1100 (100 role policies + 1000 user-role assignments)</li>
+ *   <li>Total users: 1000</li>
+ *   <li>Total roles: 100</li>
+ *   <li>Total resources: 10</li>
+ * </ul>
+ * 
+ * <p><b>Generation Logic:</b>
+ * <ul>
+ *   <li>For each role i (0-99): p, group{i}, data{i/10}, read</li>
+ *   <li>For each user i (0-999): g, user{i}, group{i/10}</li>
+ *   <li>Each 10 roles are bound to 1 resource</li>
+ *   <li>Each 10 users are bound to 1 role</li>
+ * </ul>
+ * 
+ * <p><b>Test Case:</b> Enforce "user501", "data9", "read"
+ * 
+ * <p><b>Recommended JMH Options:</b>
+ * <pre>
+ * -f 2 -wi 3 -i 5 -t 1
+ * (2 forks, 3 warmup iterations, 5 measurement iterations, 1 thread)
+ * </pre>
+ * 
+ * @see <a href="https://casbin.org/docs/en/supported-models#rbac">Casbin RBAC Model</a>
+ */
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Mode.AverageTime)
 public class BenchmarkRBACModelSmall {
@@ -34,9 +66,10 @@ public class BenchmarkRBACModelSmall {
             .include(BenchmarkRBACModelSmall.class.getName())
             .exclude("Pref")
             .warmupIterations(3)
-            .measurementIterations(1)
+            .measurementIterations(5)
             .addProfiler(GCProfiler.class)
-            .forks(1)
+            .forks(2)
+            .threads(1)
             .build();
         new Runner(opt).run();
     }
@@ -44,9 +77,7 @@ public class BenchmarkRBACModelSmall {
     @Threads(1)
     @Benchmark
     public static void benchmarkRBACModelSmall() {
-        for (int i = 0; i < 1000; i++) {
-            e.enforce("user501", "data9", "read");
-        }
+        e.enforce("user501", "data9", "read");
     }
 
     static {

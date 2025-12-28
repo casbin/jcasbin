@@ -28,14 +28,14 @@ jobs:
     - name: Run Benchmark
       env:
         BENCHMARK_MODE: SMOKE
-      run: mvn -f benchmark_pom.xml clean test -Dtest=BenchmarkRunner
+      run: mvn -f benchmark_pom.xml clean test -Dtest=BenchmarkRunner -Djmh.output="target/jmh-result.json"
 
     - name: Store benchmark result
       uses: benchmark-action/github-action-benchmark@v1
       with:
         name: JCasbin Benchmark (Dev)
         tool: 'jmh'
-        output-file-path: jmh-result.json
+        output-file-path: target/jmh-result.json
         github-token: ${{ secrets.GITHUB_TOKEN }}
         auto-push: true
         # Use a separate directory for dev benchmarks to avoid polluting production data

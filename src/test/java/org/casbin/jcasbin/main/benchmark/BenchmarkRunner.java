@@ -32,10 +32,16 @@ public class BenchmarkRunner {
 
         System.out.println(">>> Benchmark Mode: " + mode + " <<<");
 
+        // Check for JMH output path override
+        String jmhOutput = System.getProperty("jmh.output");
+        if (jmhOutput == null || jmhOutput.isEmpty()) {
+            jmhOutput = "jmh-result.json";
+        }
+
         ChainedOptionsBuilder opt = new OptionsBuilder()
             .include("org.casbin.jcasbin.main.benchmark.*")
             .resultFormat(org.openjdk.jmh.results.format.ResultFormatType.JSON)
-            .result("jmh-result.json");
+            .result(jmhOutput);
 
         switch (mode.toUpperCase()) {
             case "SMOKE":

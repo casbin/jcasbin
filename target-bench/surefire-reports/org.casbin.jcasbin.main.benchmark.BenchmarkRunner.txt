@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: org.casbin.jcasbin.main.benchmark.BenchmarkRunner
--------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 497.424 sec

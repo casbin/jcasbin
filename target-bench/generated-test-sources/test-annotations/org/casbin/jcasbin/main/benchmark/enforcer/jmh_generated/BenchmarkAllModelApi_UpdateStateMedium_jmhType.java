@@ -1,4 +1,0 @@
-package org.casbin.jcasbin.main.benchmark.enforcer.jmh_generated;
-public class BenchmarkAllModelApi_UpdateStateMedium_jmhType extends BenchmarkAllModelApi_UpdateStateMedium_jmhType_B3 {
-}
-

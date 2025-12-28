@@ -1,4 +1,0 @@
-package org.casbin.jcasbin.main.benchmark.enforcer.jmh_generated;
-public class BenchmarkAllModelApi_RemoveStateMedium_jmhType extends BenchmarkAllModelApi_RemoveStateMedium_jmhType_B3 {
-}
-

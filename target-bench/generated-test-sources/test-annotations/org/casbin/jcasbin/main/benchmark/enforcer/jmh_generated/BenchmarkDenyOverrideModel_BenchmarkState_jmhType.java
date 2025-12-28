@@ -1,4 +1,0 @@
-package org.casbin.jcasbin.main.benchmark.enforcer.jmh_generated;
-public class BenchmarkDenyOverrideModel_BenchmarkState_jmhType extends BenchmarkDenyOverrideModel_BenchmarkState_jmhType_B3 {
-}
-

@@ -1,4 +1,0 @@
-package org.casbin.jcasbin.main.benchmark.cached.jmh_generated;
-public class BenchmarkCachedRBACModelSmall_BenchmarkState_jmhType extends BenchmarkCachedRBACModelSmall_BenchmarkState_jmhType_B3 {
-}
-

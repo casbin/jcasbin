@@ -1,4 +1,0 @@
-package org.casbin.jcasbin.main.benchmark.enforcer.jmh_generated;
-public class BenchmarkRBACModelWithDeny_BenchmarkState_jmhType extends BenchmarkRBACModelWithDeny_BenchmarkState_jmhType_B3 {
-}
-

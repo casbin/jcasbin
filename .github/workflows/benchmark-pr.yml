@@ -38,4 +38,3 @@ jobs:
           alert-threshold: '150%'
           comment-on-alert: true
           fail-on-alert: true
-          summary-emp: true

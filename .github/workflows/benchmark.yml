@@ -28,7 +28,7 @@ jobs:
     - name: Run Benchmark
       env:
         BENCHMARK_MODE: SMOKE
-      run: mvn clean test -Dtest=BenchmarkRunner -f benchmark_pom.xml
+      run: mvn clean test -Dtest=BenchmarkRunner
 
     - name: Store benchmark result
       uses: benchmark-action/github-action-benchmark@v1

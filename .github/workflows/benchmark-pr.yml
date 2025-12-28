@@ -2,13 +2,13 @@ name: Benchmark PR Check
 
 on:
   pull_request:
-    branches: [ master, 'benchmark/pr10' ] # Added benchmark/pr10 for testing purposes as per current context
+    branches: [ master, 'benchmark/pr10' ] # Include dev branch for testing
     paths-ignore:
       - '**.md'
 
 permissions:
   contents: read
-  # PR 模式下通常只需要读权限，或者写评论权限（如果开启 comment-on-alert）
+  # Write permission needed if commenting on PRs is enabled
   pull-requests: write
 
 jobs:
@@ -27,9 +27,8 @@ jobs:
 
       - name: Run JMH Benchmark (SMOKE Mode)
         env:
-          BENCHMARK_MODE: SMOKE # ⚡️ 快速模式：约 2-3 分钟，验证代码没崩
-        # 确保你的 pom.xml 已经包含了 JMH 依赖，否则这里会报错
-        # Added -Djmh.output to match previous fix for avoiding checkout conflicts
+          BENCHMARK_MODE: SMOKE # SMOKE: Fast check (~2-3 min) for PR verification
+        # Output to target/ to avoid checkout conflicts during gh-pages deployment
         run: mvn test -Dtest=BenchmarkRunner -Djmh.output="target/jmh-result.json"
 
       - name: Report Benchmark Result
@@ -38,10 +37,10 @@ jobs:
           name: JCasbin Benchmark
           tool: 'jmh'
           output-file-path: target/jmh-result.json
-          # 🚨 关键配置：PR 模式下绝对不要 Push！
-          auto-push: false
-          save-data-file: false
-          # 可以在 PR 下方留言报告性能变化（可选）
+          # Auto-push enabled for testing graph generation in this PR
+          auto-push: true
+          save-data-file: true
           comment-on-alert: true
           fail-on-alert: false
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          benchmark-data-dir-path: bench

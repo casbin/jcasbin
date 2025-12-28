@@ -2,12 +2,12 @@ name: Benchmark Push & Publish
 
 on:
   push:
-    branches: [ master ] # 只有合入 master 才跑
+    branches: [ master ]
     paths-ignore:
       - '**.md'
 
 permissions:
-  contents: write    # 必须有写权限才能更新 gh-pages
+  contents: write    # Write permission needed for updating gh-pages
   deployments: write
 
 jobs:
@@ -26,10 +26,9 @@ jobs:
 
       - name: Run JMH Benchmark (AGILE Mode)
         env:
-          # 🚀 正式模式：运行时间较长，数据更准
-          # 如果不想跑太久（STRICT约15分钟），用 AGILE (约5分钟)
+          # AGILE: Balanced mode (~5 min) for continuous monitoring
           BENCHMARK_MODE: AGILE
-        # Added -Djmh.output to match previous fix for avoiding checkout conflicts
+        # Output to target/ to avoid checkout conflicts during gh-pages deployment
         run: mvn test -Dtest=BenchmarkRunner -Djmh.output="target/jmh-result.json"
 
       - name: Publish Benchmark Result
@@ -38,9 +37,9 @@ jobs:
           name: JCasbin Benchmark
           tool: 'jmh'
           output-file-path: target/jmh-result.json
-          # ✅ 关键配置：Push 模式下开启推送
+          # Enable auto-push to update benchmark charts on gh-pages
           auto-push: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          benchmark-data-dir-path: bench # 正式路径
+          benchmark-data-dir-path: bench
           alert-threshold: '150%'
           fail-on-alert: false

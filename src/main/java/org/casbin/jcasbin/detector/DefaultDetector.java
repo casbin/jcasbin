@@ -78,8 +78,12 @@ public class DefaultDetector implements Detector {
                 List<String> parentRoles = drm.getRoles(roleName);
                 graph.put(roleName, new ArrayList<>(parentRoles));
             }
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException("Failed to access DefaultRoleManager internals", e);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException("Failed to access 'allRoles' field in DefaultRoleManager via reflection. " +
+                    "The field may have been renamed or removed.", e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Failed to access 'allRoles' field in DefaultRoleManager via reflection. " +
+                    "Permission denied to access the field.", e);
         }
         
         return graph;

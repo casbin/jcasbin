@@ -323,4 +323,69 @@ public class DetectorTest {
                       e.getMessage().contains("Cycle detected"));
         }
     }
+
+    @Test
+    public void testIdempotencyWithExistingLink() {
+        // Test that adding an existing link multiple times is idempotent
+        // and doesn't break when detector is enabled
+        DefaultRoleManager rm = new DefaultRoleManager(10);
+        Detector detector = new DefaultDetector();
+        rm.setDetector(detector);
+        
+        // Add initial valid links
+        rm.addLink("A", "B");
+        rm.addLink("B", "C");
+        
+        // Verify initial state
+        assertTrue("A should have link to B", rm.hasLink("A", "B"));
+        assertTrue("A should have link to C", rm.hasLink("A", "C"));
+        
+        // Add the same link again (should be idempotent)
+        rm.addLink("A", "B");
+        
+        // Verify the link still exists
+        assertTrue("A should still have link to B after re-adding", rm.hasLink("A", "B"));
+        assertTrue("A should still have link to C after re-adding", rm.hasLink("A", "C"));
+        
+        // Try to create a cycle with an existing link in the path
+        rm.addLink("C", "D");
+        assertTrue("C should have link to D", rm.hasLink("C", "D"));
+        
+        // Re-add an existing link (A->B) should still be idempotent
+        rm.addLink("A", "B");
+        
+        // Verify all links still exist
+        assertTrue("A should still have link to B", rm.hasLink("A", "B"));
+        assertTrue("B should still have link to C", rm.hasLink("B", "C"));
+        assertTrue("C should still have link to D", rm.hasLink("C", "D"));
+    }
+
+    @Test
+    public void testIdempotencyDoesNotPreventCycleDetection() {
+        // Test that the idempotency check doesn't interfere with cycle detection
+        // when trying to add a new link that would create a cycle
+        DefaultRoleManager rm = new DefaultRoleManager(10);
+        Detector detector = new DefaultDetector();
+        rm.setDetector(detector);
+        
+        // Create a valid chain
+        rm.addLink("A", "B");
+        rm.addLink("B", "C");
+        
+        // Try to create a cycle (new link, not existing)
+        try {
+            rm.addLink("C", "A");
+            fail("Expected IllegalArgumentException due to cycle");
+        } catch (IllegalArgumentException e) {
+            assertTrue("Exception message should contain 'Cycle detected'", 
+                      e.getMessage().contains("Cycle detected"));
+        }
+        
+        // Verify the cycle was not added
+        assertFalse("C should not have link to A", rm.hasLink("C", "A"));
+        
+        // Verify existing links are intact
+        assertTrue("A should still have link to B", rm.hasLink("A", "B"));
+        assertTrue("B should still have link to C", rm.hasLink("B", "C"));
+    }
 }

@@ -171,6 +171,12 @@ public class DefaultRoleManager implements RoleManager {
     public void addLink(String name1, String name2, String... domain) {
         Role user = getRole(name1);
         Role role = getRole(name2);
+        
+        // Check if the link already exists to avoid breaking idempotency on rollback
+        if (user.roles.containsKey(name2)) {
+            return;
+        }
+        
         user.addRole(role);
         
         // If detector is set, check for cycles after adding the link

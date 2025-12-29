@@ -14,7 +14,9 @@
 
 package org.casbin.jcasbin.rbac;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public interface RoleManager {
     /**
@@ -75,4 +77,15 @@ public interface RoleManager {
      * printRoles prints all the roles to log.
      */
     void printRoles();
+
+    /**
+     * getRoleGraph returns the dependency graph (adjacency list) of roles.
+     * Each key represents a role name, and the corresponding value is a list of role names
+     * that the key role inherits from (parent roles).
+     * 
+     * @return a map representing the role inheritance graph, or an empty map if not supported.
+     */
+    default Map<String, List<String>> getRoleGraph() {
+        return Collections.emptyMap();
+    }
 }

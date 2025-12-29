@@ -268,4 +268,21 @@ public class DefaultRoleManager implements RoleManager {
     public void printRoles() {
         Util.logPrintfInfo("{}", this);
     }
+
+    /**
+     * getRoleGraph returns the dependency graph (adjacency list) of roles.
+     * Each key represents a role name, and the corresponding value is a list of role names
+     * that the key role inherits from (parent roles).
+     * 
+     * @return a defensive copy of the role inheritance graph
+     */
+    @Override
+    public Map<String, List<String>> getRoleGraph() {
+        Map<String, List<String>> graph = new HashMap<>();
+        for (String roleName : allRoles.keySet()) {
+            List<String> parentRoles = getRoles(roleName);
+            graph.put(roleName, new ArrayList<>(parentRoles));
+        }
+        return graph;
+    }
 }

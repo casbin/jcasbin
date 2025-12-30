@@ -24,6 +24,41 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Benchmark for RBAC model with domains/tenants.
+ * 
+ * <p>This benchmark tests RBAC authorization performance with multi-tenancy support.
+ * Domains (also called tenants) allow isolating permissions across different organizational units.
+ * The scenario uses deterministic policy generation to ensure reproducible results across runs.
+ * 
+ * <p><b>Data Scale:</b>
+ * <ul>
+ *   <li>Total rules: 6 (4 policies + 2 user-role assignments)</li>
+ *   <li>Total users: 2 (alice, bob)</li>
+ *   <li>Total roles: 1 (admin)</li>
+ *   <li>Total domains: 2 (domain1, domain2)</li>
+ * </ul>
+ * 
+ * <p><b>Policy Structure:</b>
+ * <pre>
+ * p, admin, domain1, data1, read
+ * p, admin, domain1, data1, write
+ * p, admin, domain2, data2, read
+ * p, admin, domain2, data2, write
+ * g, alice, admin, domain1
+ * g, bob, admin, domain2
+ * </pre>
+ * 
+ * <p><b>Test Case:</b> Enforce "alice", "domain1", "data1", "read"
+ * 
+ * <p><b>Recommended JMH Options:</b>
+ * <pre>
+ * -f 2 -wi 3 -i 5 -t 1
+ * (2 forks, 3 warmup iterations, 5 measurement iterations, 1 thread)
+ * </pre>
+ * 
+ * @see <a href="https://casbin.org/docs/en/rbac-with-domains">Casbin RBAC with Domains</a>
+ */
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Mode.AverageTime)
 public class BenchmarkRBACModelWithDomains {
@@ -34,9 +69,10 @@ public class BenchmarkRBACModelWithDomains {
             .include(BenchmarkRBACModelWithDomains.class.getName())
             .exclude("Pref")
             .warmupIterations(3)
-            .measurementIterations(3)
+            .measurementIterations(5)
             .addProfiler(GCProfiler.class)
-            .forks(1)
+            .forks(2)
+            .threads(1)
             .build();
         new Runner(opt).run();
     }
@@ -44,8 +80,6 @@ public class BenchmarkRBACModelWithDomains {
     @Threads(1)
     @Benchmark
     public static void benchmarkRBACModelWithDomains() {
-        for (int i = 0; i < 1000; i++) {
-            e.enforce("alice", "domain1", "data1", "read");
-        }
+        e.enforce("alice", "domain1", "data1", "read");
     }
 }

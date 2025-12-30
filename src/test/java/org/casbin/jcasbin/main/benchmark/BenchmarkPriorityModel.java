@@ -24,6 +24,44 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Benchmark for priority-based model.
+ * 
+ * <p>This benchmark tests priority-based authorization performance.
+ * The priority model allows policy evaluation based on explicit priority ordering,
+ * where higher priority policies override lower priority ones.
+ * The scenario uses deterministic policy generation to ensure reproducible results across runs.
+ * 
+ * <p><b>Data Scale:</b>
+ * <ul>
+ *   <li>Total rules: 9 (7 policies + 2 role assignments)</li>
+ *   <li>Total users: 2 (alice, bob)</li>
+ *   <li>Total roles: 2 (data1_deny_group, data2_allow_group)</li>
+ * </ul>
+ * 
+ * <p><b>Policy Structure:</b>
+ * <pre>
+ * p, alice, data1, read, allow
+ * p, data1_deny_group, data1, read, deny
+ * p, data1_deny_group, data1, write, deny
+ * p, alice, data1, write, allow
+ * g, alice, data1_deny_group
+ * p, data2_allow_group, data2, read, allow
+ * p, bob, data2, read, deny
+ * p, bob, data2, write, deny
+ * g, bob, data2_allow_group
+ * </pre>
+ * 
+ * <p><b>Test Case:</b> Enforce "alice", "data1", "read"
+ * 
+ * <p><b>Recommended JMH Options:</b>
+ * <pre>
+ * -f 2 -wi 3 -i 5 -t 1
+ * (2 forks, 3 warmup iterations, 5 measurement iterations, 1 thread)
+ * </pre>
+ * 
+ * @see <a href="https://casbin.org/docs/en/syntax-for-models#policy-effect">Casbin Priority Model</a>
+ */
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Mode.AverageTime)
 public class BenchmarkPriorityModel {
@@ -34,9 +72,10 @@ public class BenchmarkPriorityModel {
             .include(BenchmarkPriorityModel.class.getName())
             .exclude("Pref")
             .warmupIterations(3)
-            .measurementIterations(3)
+            .measurementIterations(5)
             .addProfiler(GCProfiler.class)
-            .forks(1)
+            .forks(2)
+            .threads(1)
             .build();
         new Runner(opt).run();
     }
@@ -44,8 +83,6 @@ public class BenchmarkPriorityModel {
     @Threads(1)
     @Benchmark
     public static void benchmarkPriorityModel() {
-        for (int i = 0; i < 1000; i++) {
-            e.enforce("alice", "data1", "read");
-        }
+        e.enforce("alice", "data1", "read");
     }
 }

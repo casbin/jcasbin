@@ -25,10 +25,38 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Benchmark for ABAC (Attribute-Based Access Control) model.
+ * 
+ * <p>This benchmark tests ABAC authorization performance using attribute-based expressions.
+ * ABAC allows access decisions based on attributes of the subject, resource, and environment
+ * without requiring explicit policies for each permission combination.
+ * The scenario uses deterministic policy generation to ensure reproducible results across runs.
+ * 
+ * <p><b>Data Scale:</b>
+ * <ul>
+ *   <li>Total rules: 0</li>
+ *   <li>Total users: 0</li>
+ * </ul>
+ * 
+ * <p><b>Authorization Logic:</b>
+ * The model uses attribute matching defined in the ABAC model configuration.
+ * Access is granted when the resource owner matches the requesting user.
+ * 
+ * <p><b>Test Case:</b> Enforce "alice", data1 (owned by "alice"), "read"
+ * 
+ * <p><b>Recommended JMH Options:</b>
+ * <pre>
+ * -f 2 -wi 3 -i 5 -t 1
+ * (2 forks, 3 warmup iterations, 5 measurement iterations, 1 thread)
+ * </pre>
+ * 
+ * @see <a href="https://casbin.org/docs/en/abac">Casbin ABAC Model</a>
+ */
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Mode.AverageTime)
 public class BenchmarkABACModel {
-    private static Enforcer e = new Enforcer("examples/abac_model.conf", "",false);
+    private static Enforcer e = new Enforcer("examples/abac_model.conf", "", false);
     private static ModelUnitTest.TestResource data1 = new ModelUnitTest.TestResource("data1", "alice");
 
     public static void main(String args[]) throws RunnerException {
@@ -36,9 +64,10 @@ public class BenchmarkABACModel {
             .include(BenchmarkABACModel.class.getName())
             .exclude("Pref")
             .warmupIterations(3)
-            .measurementIterations(3)
+            .measurementIterations(5)
             .addProfiler(GCProfiler.class)
-            .forks(1)
+            .forks(2)
+            .threads(1)
             .build();
         new Runner(opt).run();
     }
@@ -46,8 +75,6 @@ public class BenchmarkABACModel {
     @Threads(1)
     @Benchmark
     public static void benchmarkABACModel() {
-        for (int i = 0; i < 1000; i++) {
-            e.enforce("alice", data1, "read");
-        }
+        e.enforce("alice", data1, "read");
     }
 }

@@ -24,6 +24,39 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Benchmark for RESTful/KeyMatch model.
+ * 
+ * <p>This benchmark tests RESTful authorization performance with pattern matching.
+ * The KeyMatch model allows flexible URL pattern matching for RESTful APIs,
+ * supporting wildcards and path parameters.
+ * The scenario uses deterministic policy generation to ensure reproducible results across runs.
+ * 
+ * <p><b>Data Scale:</b>
+ * <ul>
+ *   <li>Total rules: 5</li>
+ *   <li>Total users: 3 (alice, bob, cathy)</li>
+ * </ul>
+ * 
+ * <p><b>Policy Structure:</b>
+ * <pre>
+ * p, alice, /alice_data/*, GET
+ * p, alice, /alice_data/resource1, POST
+ * p, bob, /alice_data/resource2, GET
+ * p, bob, /bob_data/*, POST
+ * p, cathy, /cathy_data, (GET)|(POST)
+ * </pre>
+ * 
+ * <p><b>Test Case:</b> Enforce "alice", "/alice_data/resource1", "GET"
+ * 
+ * <p><b>Recommended JMH Options:</b>
+ * <pre>
+ * -f 2 -wi 3 -i 5 -t 1
+ * (2 forks, 3 warmup iterations, 5 measurement iterations, 1 thread)
+ * </pre>
+ * 
+ * @see <a href="https://casbin.org/docs/en/function#keymatch">Casbin KeyMatch Functions</a>
+ */
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Mode.AverageTime)
 public class BenchmarkKeyMatchModel {
@@ -34,9 +67,10 @@ public class BenchmarkKeyMatchModel {
             .include(BenchmarkKeyMatchModel.class.getName())
             .exclude("Pref")
             .warmupIterations(3)
-            .measurementIterations(3)
+            .measurementIterations(5)
             .addProfiler(GCProfiler.class)
-            .forks(1)
+            .forks(2)
+            .threads(1)
             .build();
         new Runner(opt).run();
     }
@@ -44,8 +78,6 @@ public class BenchmarkKeyMatchModel {
     @Threads(1)
     @Benchmark
     public static void benchmarkKeyMatchModel() {
-        for (int i = 0; i < 1000; i++) {
-            e.enforce("alice", "/alice_data/resource1", "GET");
-        }
+        e.enforce("alice", "/alice_data/resource1", "GET");
     }
 }

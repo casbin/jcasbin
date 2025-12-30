@@ -14,7 +14,6 @@
 
 package org.casbin.jcasbin.detector;
 
-import org.casbin.jcasbin.rbac.DefaultRoleManager;
 import org.casbin.jcasbin.rbac.RoleManager;
 
 import java.util.*;
@@ -32,15 +31,8 @@ public class DefaultDetector implements Detector {
      */
     @Override
     public String check(RoleManager rm) {
-        if (!(rm instanceof DefaultRoleManager)) {
-            throw new IllegalArgumentException("DefaultDetector only supports DefaultRoleManager");
-        }
-        
-        DefaultRoleManager drm = (DefaultRoleManager) rm;
-        
         // Build adjacency list from the role manager
-        // Using local data structures to avoid sharing references with RoleManager's internal state
-        Map<String, List<String>> graph = buildGraph(drm);
+        Map<String, List<String>> graph = rm.getRoleGraph();
         
         // Perform DFS to detect cycles
         Set<String> visited = new HashSet<>();
@@ -59,35 +51,6 @@ public class DefaultDetector implements Detector {
         return null;
     }
     
-    /**
-     * Builds a directed graph (adjacency list) from the DefaultRoleManager.
-     * Each role points to the roles it inherits (its parent roles).
-     */
-    private Map<String, List<String>> buildGraph(DefaultRoleManager drm) {
-        Map<String, List<String>> graph = new HashMap<>();
-        
-        try {
-            // Use reflection to access the package-private allRoles field
-            java.lang.reflect.Field allRolesField = DefaultRoleManager.class.getDeclaredField("allRoles");
-            allRolesField.setAccessible(true);
-            @SuppressWarnings("unchecked")
-            Map<String, ?> allRoles = (Map<String, ?>) allRolesField.get(drm);
-            
-            // Iterate through all roles and get their parent roles
-            for (String roleName : allRoles.keySet()) {
-                List<String> parentRoles = drm.getRoles(roleName);
-                graph.put(roleName, new ArrayList<>(parentRoles));
-            }
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException("Failed to access 'allRoles' field in DefaultRoleManager via reflection. " +
-                    "The field may have been renamed or removed.", e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException("Failed to access 'allRoles' field in DefaultRoleManager via reflection. " +
-                    "Permission denied to access the field.", e);
-        }
-        
-        return graph;
-    }
     
     /**
      * Performs depth-first search to detect cycles in the graph using an iterative approach.

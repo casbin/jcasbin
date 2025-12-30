@@ -214,9 +214,10 @@ public class DefaultDetectorTest {
         assertTrue("Result should contain 'Cycle detected'", result.contains("Cycle detected:"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testUnsupportedRoleManager() {
-        // Test with a RoleManager that is not DefaultRoleManager
+        // Test with a RoleManager that uses the default getRoleGraph() implementation
+        // The default implementation returns an empty map, so no cycles should be detected
         RoleManager rm = new RoleManager() {
             @Override
             public void clear() {}
@@ -247,7 +248,8 @@ public class DefaultDetectorTest {
         };
         
         Detector detector = new DefaultDetector();
-        detector.check(rm); // Should throw IllegalArgumentException
+        String result = detector.check(rm);
+        assertNull("Expected no cycle with default getRoleGraph() implementation", result);
     }
 
     @Test

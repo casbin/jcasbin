@@ -14,6 +14,8 @@
 
 package org.casbin.jcasbin.main;
 
+import org.casbin.jcasbin.exception.CasbinEmptyConditionException;
+import org.casbin.jcasbin.exception.CasbinObjectConditionException;
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
 import org.casbin.jcasbin.rbac.DefaultRoleManager;
 import org.casbin.jcasbin.rbac.DomainManager;
@@ -239,5 +241,69 @@ public class RbacAPIUnitTest {
 
         testGetImplicitUsersForRole(e, "book_group", asList("/book/*", "/book/:id", "/book2/{id}"));
         testGetImplicitUsersForRole(e, "pen_group", asList("/pen/:id", "/pen2/{id}"));
+    }
+
+    private void testGetAllowedObjectConditions(Enforcer e, String user, String action, String prefix, List<String> expectedConditions, Class<? extends Exception> expectedException) {
+        try {
+            List<String> actualConditions = e.getAllowedObjectConditions(user, action, prefix);
+            
+            if (expectedException != null) {
+                fail("Expected exception " + expectedException.getSimpleName() + " but got result: " + actualConditions);
+            }
+            
+            // Sort both lists for comparison
+            Comparator<String> comparator = String::compareTo;
+            actualConditions.sort(comparator);
+            expectedConditions.sort(comparator);
+            
+            if (!Util.arrayEquals(expectedConditions, actualConditions)) {
+                fail("Allowed object conditions: " + actualConditions + ", supposed to be " + expectedConditions);
+            }
+        } catch (Exception ex) {
+            if (expectedException == null) {
+                fail("Unexpected exception: " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
+            } else if (!expectedException.isInstance(ex)) {
+                fail("Expected exception " + expectedException.getSimpleName() + " but got " + ex.getClass().getSimpleName());
+            }
+            // Expected exception was thrown - test passes
+        }
+    }
+
+    @Test
+    public void testGetAllowedObjectConditions() {
+        Enforcer e = new Enforcer("examples/object_conditions_model.conf", "examples/object_conditions_policy.csv");
+        
+        testGetAllowedObjectConditions(e, "alice", "read", "r.obj.", asList("price < 25", "category_id = 2"), null);
+        testGetAllowedObjectConditions(e, "admin", "read", "r.obj.", asList("category_id = 2"), null);
+        testGetAllowedObjectConditions(e, "bob", "write", "r.obj.", asList("author = bob"), null);
+
+        // test CasbinEmptyConditionException
+        testGetAllowedObjectConditions(e, "alice", "write", "r.obj.", asList(), CasbinEmptyConditionException.class);
+        testGetAllowedObjectConditions(e, "bob", "read", "r.obj.", asList(), CasbinEmptyConditionException.class);
+
+        // test CasbinObjectConditionException
+        // should: e.addPolicy("alice", "r.obj.price > 50", "read")
+        boolean ok = e.addPolicy("alice", "price > 50", "read");
+        if (ok) {
+            testGetAllowedObjectConditions(e, "alice", "read", "r.obj.", asList(), CasbinObjectConditionException.class);
+        }
+
+        // test prefix
+        e.clearPolicy();
+        try {
+            e.getRoleManager().deleteLink("alice", "admin");
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+        ok = e.addPolicies(asList(
+            asList("alice", "r.book.price < 25", "read"),
+            asList("admin", "r.book.category_id = 2", "read"),
+            asList("bob", "r.book.author = bob", "write")
+        ));
+        if (ok) {
+            testGetAllowedObjectConditions(e, "alice", "read", "r.book.", asList("price < 25"), null);
+            testGetAllowedObjectConditions(e, "admin", "read", "r.book.", asList("category_id = 2"), null);
+            testGetAllowedObjectConditions(e, "bob", "write", "r.book.", asList("author = bob"), null);
+        }
     }
 }

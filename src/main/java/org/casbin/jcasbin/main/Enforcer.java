@@ -14,7 +14,9 @@
 
 package org.casbin.jcasbin.main;
 
+import org.casbin.jcasbin.exception.CasbinEmptyConditionException;
 import org.casbin.jcasbin.exception.CasbinNameNotExistException;
+import org.casbin.jcasbin.exception.CasbinObjectConditionException;
 import org.casbin.jcasbin.model.Assertion;
 import org.casbin.jcasbin.model.FunctionMap;
 import org.casbin.jcasbin.model.Model;
@@ -612,6 +614,48 @@ public class Enforcer extends ManagementEnforcer {
             res.addAll(this.getPermissionsForUserInDomain(n, domain));
         }
         return res;
+    }
+
+    /**
+     * getAllowedObjectConditions returns a list of object conditions that the user can access.
+     * For example: conditions = e.getAllowedObjectConditions("alice", "read", "r.obj.")
+     * Note:
+     * <p>
+     * 0. prefix: You can customize the prefix of the object conditions, and "r.obj." is commonly used as a prefix.
+     * After removing the prefix, the remaining part is the condition of the object.
+     * If there is an obj policy that does not meet the prefix requirement, a CasbinObjectConditionException will be thrown.
+     * <p>
+     * 1. If the 'objectConditions' list is empty, a CasbinEmptyConditionException will be thrown.
+     * This exception is thrown because some data adapters' ORM return full table data by default
+     * when they receive an empty condition, which tends to behave contrary to expectations (e.g. GORM).
+     * If you are using an adapter that does not behave like this, you can choose to ignore this exception.
+     *
+     * @param user   the user.
+     * @param action the action.
+     * @param prefix the prefix of the object condition.
+     * @return a list of object conditions.
+     * @throws CasbinObjectConditionException if an object condition does not meet the prefix requirement.
+     * @throws CasbinEmptyConditionException  if the list of object conditions is empty.
+     */
+    public List<String> getAllowedObjectConditions(String user, String action, String prefix) {
+        List<List<String>> permissions = getImplicitPermissionsForUser(user);
+
+        List<String> objectConditions = new ArrayList<>();
+        for (List<String> policy : permissions) {
+            // policy {sub, obj, act}
+            if (policy.size() > 2 && policy.get(2).equals(action)) {
+                if (!policy.get(1).startsWith(prefix)) {
+                    throw new CasbinObjectConditionException("need to meet the prefix required by the object condition");
+                }
+                objectConditions.add(policy.get(1).substring(prefix.length()));
+            }
+        }
+
+        if (objectConditions.isEmpty()) {
+            throw new CasbinEmptyConditionException("GetAllowedObjectConditions have an empty condition");
+        }
+
+        return objectConditions;
     }
 
     /**

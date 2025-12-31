@@ -252,9 +252,8 @@ public class RbacAPIUnitTest {
             }
             
             // Sort both lists for comparison
-            Comparator<String> comparator = String::compareTo;
-            actualConditions.sort(comparator);
-            expectedConditions.sort(comparator);
+            actualConditions.sort(String::compareTo);
+            expectedConditions.sort(String::compareTo);
             
             if (!Util.arrayEquals(expectedConditions, actualConditions)) {
                 fail("Allowed object conditions: " + actualConditions + ", supposed to be " + expectedConditions);
@@ -282,7 +281,7 @@ public class RbacAPIUnitTest {
         testGetAllowedObjectConditions(e, "bob", "read", "r.obj.", asList(), CasbinEmptyConditionException.class);
 
         // test CasbinObjectConditionException
-        // should: e.addPolicy("alice", "r.obj.price > 50", "read")
+        // Adding a policy without the required prefix should throw an exception
         boolean ok = e.addPolicy("alice", "price > 50", "read");
         if (ok) {
             testGetAllowedObjectConditions(e, "alice", "read", "r.obj.", asList(), CasbinObjectConditionException.class);

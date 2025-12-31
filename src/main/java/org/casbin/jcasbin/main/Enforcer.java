@@ -652,7 +652,7 @@ public class Enforcer extends ManagementEnforcer {
         }
 
         if (objectConditions.isEmpty()) {
-            throw new CasbinEmptyConditionException("GetAllowedObjectConditions have an empty condition");
+            throw new CasbinEmptyConditionException("GetAllowedObjectConditions returned empty conditions");
         }
 
         return objectConditions;

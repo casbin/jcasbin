@@ -250,6 +250,14 @@ public class RbacAPIUnitTest {
         testGetAllowedObjectConditions(e, "admin", "read", "r.obj.", asList("category_id = 2"));
         testGetAllowedObjectConditions(e, "bob", "write", "r.obj.", asList("author = bob"));
         
+        // Test null parameter validation
+        testGetAllowedObjectConditionsWithException(e, null, "read", "r.obj.", 
+            IllegalArgumentException.class);
+        testGetAllowedObjectConditionsWithException(e, "alice", null, "r.obj.", 
+            IllegalArgumentException.class);
+        testGetAllowedObjectConditionsWithException(e, "alice", "read", null, 
+            IllegalArgumentException.class);
+        
         // Test ErrEmptyCondition
         testGetAllowedObjectConditionsWithException(e, "alice", "write", "r.obj.", 
             org.casbin.jcasbin.exception.CasbinEmptyConditionException.class);

@@ -669,6 +669,10 @@ public class Enforcer extends ManagementEnforcer {
      * @throws CasbinEmptyConditionException if the objectConditions list is empty.
      */
     public List<String> getAllowedObjectConditions(String user, String action, String prefix) {
+        if (user == null || action == null || prefix == null) {
+            throw new IllegalArgumentException("user, action, and prefix cannot be null");
+        }
+        
         List<List<String>> permissions = getImplicitPermissionsForUser(user);
         
         List<String> objectConditions = new ArrayList<>();
@@ -683,7 +687,7 @@ public class Enforcer extends ManagementEnforcer {
         }
         
         if (objectConditions.isEmpty()) {
-            throw new CasbinEmptyConditionException("GetAllowedObjectConditions have an empty condition");
+            throw new CasbinEmptyConditionException("GetAllowedObjectConditions has an empty condition");
         }
         
         return objectConditions;

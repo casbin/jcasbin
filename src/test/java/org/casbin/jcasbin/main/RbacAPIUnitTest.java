@@ -285,12 +285,12 @@ public class RbacAPIUnitTest {
         testGetAllowedObjectConditions(e, "bob", "write", "r.book.", asList("author = bob"));
     }
     
-    static void testGetAllowedObjectConditions(Enforcer e, String user, String action, String prefix, List<String> expectedConditions) {
+    private void testGetAllowedObjectConditions(Enforcer e, String user, String action, String prefix, List<String> expectedConditions) {
         List<String> actualConditions = e.getAllowedObjectConditions(user, action, prefix);
         assertEquals(expectedConditions, actualConditions);
     }
     
-    static void testGetAllowedObjectConditionsWithException(Enforcer e, String user, String action, String prefix, Class<? extends RuntimeException> expectedExceptionClass) {
+    private void testGetAllowedObjectConditionsWithException(Enforcer e, String user, String action, String prefix, Class<? extends RuntimeException> expectedExceptionClass) {
         try {
             e.getAllowedObjectConditions(user, action, prefix);
             fail("Expected exception " + expectedExceptionClass.getName() + " was not thrown");

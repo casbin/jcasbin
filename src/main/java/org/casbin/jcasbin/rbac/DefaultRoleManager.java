@@ -168,7 +168,7 @@ public class DefaultRoleManager implements RoleManager {
      * inherits role: name2. domain is a prefix to the roles.
      */
     @Override
-    public void addLink(String name1, String name2, String... domain) {
+    public synchronized void addLink(String name1, String name2, String... domain) {
         Role user = getRole(name1);
         Role role = getRole(name2);
         

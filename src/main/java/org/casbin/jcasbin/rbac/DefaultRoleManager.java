@@ -95,9 +95,29 @@ public class DefaultRoleManager implements RoleManager {
     private void rebuild() {
         Map<String, Role> roles = new HashMap<>(this.allRoles);
         this.clear();
-        roles.values().forEach(user -> {
-            user.getAllRoles().keySet().forEach(roleName -> addLink(user.getName(), roleName, DEFAULT_DOMAIN));
-        });
+        
+        // Temporarily disable detector to avoid O(N^2) complexity during rebuild
+        Detector originalDetector = this.detector;
+        this.detector = null;
+        
+        try {
+            roles.values().forEach(user -> {
+                user.getAllRoles().keySet().forEach(roleName -> addLink(user.getName(), roleName, DEFAULT_DOMAIN));
+            });
+            
+            // Restore detector and perform single check at the end
+            this.detector = originalDetector;
+            if (this.detector != null) {
+                String errorMsg = this.detector.check(this);
+                if (errorMsg != null && !errorMsg.isEmpty()) {
+                    throw new IllegalArgumentException(errorMsg);
+                }
+            }
+        } catch (IllegalArgumentException e) {
+            // Restore detector before re-throwing
+            this.detector = originalDetector;
+            throw e;
+        }
     }
 
     boolean match(String str, String pattern) {

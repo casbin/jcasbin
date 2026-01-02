@@ -33,12 +33,14 @@ jobs:
           echo "base_short=${BASE_SHA:0:7}" >> $GITHUB_OUTPUT
           echo "head_short=${HEAD_SHA:0:7}" >> $GITHUB_OUTPUT
 
-      # Run benchmark on PR branch
+      # Run benchmark on PR branch (with reduced iterations for faster feedback)
       - name: Run benchmark on PR branch
         run: |
           mvn clean compile test-compile
+          # Run JMH with reduced iterations for faster PR feedback
+          # Uses: 2 warmup iterations, 3 measurement iterations instead of default 5,5
           java -cp "target/test-classes:target/classes:$(mvn dependency:build-classpath -DincludeScope=test -Dmdep.outputFile=/dev/stdout -q)" \
-            org.casbin.jcasbin.main.benchmark.EnforcerBenchmarkTest 2>&1 | tee pr-bench.txt
+            org.openjdk.jmh.Main ".*EnforcerBenchmarkTest.*" -wi 2 -i 3 -f 1 -r 1 -w 1 -rf json -rff pr-results.json 2>&1 | tee pr-bench.txt
 
       # Checkout base branch and run benchmark
       - name: Checkout base branch
@@ -48,12 +50,15 @@ jobs:
           clean: false
           path: base
 
+      # Run benchmark on base branch (with reduced iterations for faster feedback)
       - name: Run benchmark on base branch
         working-directory: base
         run: |
           mvn clean compile test-compile
+          # Run JMH with reduced iterations for faster PR feedback
+          # Uses: 2 warmup iterations, 3 measurement iterations instead of default 5,5
           java -cp "target/test-classes:target/classes:$(mvn dependency:build-classpath -DincludeScope=test -Dmdep.outputFile=/dev/stdout -q)" \
-            org.casbin.jcasbin.main.benchmark.EnforcerBenchmarkTest 2>&1 | tee ../base-bench.txt
+            org.openjdk.jmh.Main ".*EnforcerBenchmarkTest.*" -wi 2 -i 3 -f 1 -r 1 -w 1 -rf json -rff ../base-results.json 2>&1 | tee ../base-bench.txt
 
       # Compare benchmarks
       - name: Parse and compare benchmarks
@@ -62,6 +67,35 @@ jobs:
           cat > compare_benchmarks.py << 'PYTHON_SCRIPT'
           import re
           import sys
+          import json
+          import os
+          
+          def parse_jmh_json(filename):
+              """Parse JMH JSON output and extract throughput results."""
+              if not os.path.exists(filename):
+                  return {}
+              
+              results = {}
+              try:
+                  with open(filename, 'r') as f:
+                      data = json.load(f)
+                  
+                  for benchmark in data:
+                      benchmark_name = benchmark.get('benchmark', '')
+                      # Extract just the method name
+                      method_name = benchmark_name.split('.')[-1] if '.' in benchmark_name else benchmark_name
+                      
+                      # Get primary metric (throughput)
+                      primary_metric = benchmark.get('primaryMetric', {})
+                      score = primary_metric.get('score', 0)
+                      error = primary_metric.get('scoreError', 0)
+                      
+                      if score > 0:
+                          results[method_name] = {'score': score, 'error': error}
+              except (json.JSONDecodeError, KeyError, ValueError) as e:
+                  print(f"Error parsing JSON {filename}: {e}", file=sys.stderr)
+              
+              return results
           
           def parse_jmh_output(filename):
               """Parse JMH benchmark output and extract throughput results."""
@@ -144,9 +178,14 @@ jobs:
               
               return '\n'.join(lines)
           
-          # Main execution
-          base_results = parse_jmh_output('base-bench.txt')
-          pr_results = parse_jmh_output('pr-bench.txt')
+          # Main execution - try JSON first, fallback to text parsing
+          base_results = parse_jmh_json('base-results.json')
+          if not base_results:
+              base_results = parse_jmh_output('base-bench.txt')
+          
+          pr_results = parse_jmh_json('pr-results.json')
+          if not pr_results:
+              pr_results = parse_jmh_output('pr-bench.txt')
           
           comparison_table = format_comparison(base_results, pr_results)
           

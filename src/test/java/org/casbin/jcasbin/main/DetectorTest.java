@@ -43,6 +43,9 @@ public class DetectorTest {
         assertTrue("u1 should have link to g1", rm.hasLink("u1", "g1"));
         assertTrue("u1 should have link to g2", rm.hasLink("u1", "g2"));
         assertTrue("u1 should have link to g3", rm.hasLink("u1", "g3"));
+        
+        // checkCycles should not throw exception for valid hierarchy
+        rm.checkCycles();
     }
 
     @Test
@@ -68,6 +71,9 @@ public class DetectorTest {
         assertTrue("u1 should have link to g3", rm.hasLink("u1", "g3"));
         assertTrue("u2 should have link to g3", rm.hasLink("u2", "g3"));
         assertTrue("u3 should have link to g3", rm.hasLink("u3", "g3"));
+        
+        // checkCycles should not throw exception for valid hierarchy
+        rm.checkCycles();
     }
 
     @Test
@@ -77,27 +83,23 @@ public class DetectorTest {
         Detector detector = new DefaultDetector();
         rm.setDetector(detector);
         
-        // Add first two valid links
+        // Add all links including the one that creates a cycle
         rm.addLink("A", "B");
         rm.addLink("B", "C");
+        rm.addLink("C", "A");  // Creates a cycle, but addLink doesn't throw
         
-        // Adding the third link should create a cycle and throw exception
+        // Verify the link was added
+        assertTrue("C should have link to A", rm.hasLink("C", "A"));
+        
+        // checkCycles should throw exception when called
         try {
-            rm.addLink("C", "A");
+            rm.checkCycles();
             fail("Expected IllegalArgumentException due to cycle detection");
         } catch (IllegalArgumentException e) {
             // Expected exception
             assertTrue("Exception message should contain 'Cycle detected'", 
                       e.getMessage().contains("Cycle detected"));
         }
-        
-        // Verify the illegal link was rolled back
-        assertFalse("C should not have link to A after rollback", 
-                   rm.hasLink("C", "A"));
-        
-        // Verify the previous valid links still exist
-        assertTrue("A should still have link to B", rm.hasLink("A", "B"));
-        assertTrue("B should still have link to C", rm.hasLink("B", "C"));
     }
 
     @Test
@@ -107,20 +109,18 @@ public class DetectorTest {
         Detector detector = new DefaultDetector();
         rm.setDetector(detector);
         
+        // addLink doesn't throw, just adds the link
+        rm.addLink("A", "A");
+        
+        // checkCycles should throw exception
         try {
-            rm.addLink("A", "A");
+            rm.checkCycles();
             fail("Expected IllegalArgumentException due to self-loop");
         } catch (IllegalArgumentException e) {
             // Expected exception
             assertTrue("Exception message should contain 'Cycle detected'", 
                       e.getMessage().contains("Cycle detected"));
         }
-        
-        // Verify the self-loop was not added by checking internal state
-        // Since hasLink("A", "A") always returns true by design (reflexivity),
-        // we verify by checking that A has no roles
-        assertEquals("A should have no parent roles after rollback", 
-                    0, rm.getRoles("A").size());
     }
 
     @Test
@@ -131,20 +131,21 @@ public class DetectorTest {
         rm.setDetector(detector);
         
         rm.addLink("A", "B");
+        rm.addLink("B", "A");  // Creates a cycle, but addLink doesn't throw
         
+        // Verify both links were added
+        assertTrue("A should have link to B", rm.hasLink("A", "B"));
+        assertTrue("B should have link to A", rm.hasLink("B", "A"));
+        
+        // checkCycles should throw exception
         try {
-            rm.addLink("B", "A");
+            rm.checkCycles();
             fail("Expected IllegalArgumentException due to cycle");
         } catch (IllegalArgumentException e) {
             // Expected exception
             assertTrue("Exception message should contain 'Cycle detected'", 
                       e.getMessage().contains("Cycle detected"));
         }
-        
-        // Verify rollback
-        assertTrue("A should still have link to B", rm.hasLink("A", "B"));
-        assertFalse("B should not have link to A after rollback", 
-                   rm.hasLink("B", "A"));
     }
 
     @Test
@@ -154,16 +155,20 @@ public class DetectorTest {
         Detector detector = new DefaultDetector();
         rm.setDetector(detector);
         
-        // Build a complex structure
+        // Build a complex structure with a cycle
         rm.addLink("u1", "g1");
         rm.addLink("u2", "g1");
         rm.addLink("g1", "g2");
         rm.addLink("g2", "g3");
         rm.addLink("u3", "g3");
+        rm.addLink("g3", "g1");  // Creates a cycle
         
-        // Try to create a cycle: g3 -> g1
+        // Verify the link was added
+        assertTrue("g3 should have link to g1", rm.hasLink("g3", "g1"));
+        
+        // checkCycles should throw exception
         try {
-            rm.addLink("g3", "g1");
+            rm.checkCycles();
             fail("Expected IllegalArgumentException due to cycle");
         } catch (IllegalArgumentException e) {
             // Expected exception
@@ -171,40 +176,9 @@ public class DetectorTest {
                       e.getMessage().contains("Cycle detected"));
         }
         
-        // Verify the illegal link was rolled back
-        assertFalse("g3 should not have link to g1 after rollback", 
-                   rm.hasLink("g3", "g1"));
-        
         // Verify existing structure is intact
         assertTrue("u1 should still reach g3", rm.hasLink("u1", "g3"));
         assertTrue("u2 should still reach g3", rm.hasLink("u2", "g3"));
-    }
-
-    @Test
-    public void testStateAfterRollback() {
-        // Test that after rollback, the state is consistent
-        DefaultRoleManager rm = new DefaultRoleManager(10);
-        Detector detector = new DefaultDetector();
-        rm.setDetector(detector);
-        
-        // Create chain: A -> B -> C
-        rm.addLink("A", "B");
-        rm.addLink("B", "C");
-        
-        // Try to create cycle
-        try {
-            rm.addLink("C", "A");
-        } catch (IllegalArgumentException e) {
-            // Expected
-        }
-        
-        // Add a new valid link should work
-        rm.addLink("D", "A");
-        assertTrue("D should have link to A", rm.hasLink("D", "A"));
-        assertTrue("D should reach C through A->B->C", rm.hasLink("D", "C"));
-        
-        // The rolled-back link should still not exist
-        assertFalse("C should still not have link to A", rm.hasLink("C", "A"));
     }
 
     @Test
@@ -219,12 +193,15 @@ public class DetectorTest {
         // Disable detector
         rm.setDetector(null);
         
-        // Now cycles should be allowed
+        // Now cycles can be created and checkCycles won't throw
         rm.addLink("B", "A");
         
-        // Both links should exist (no cycle detection)
+        // Both links should exist
         assertTrue("A should have link to B", rm.hasLink("A", "B"));
         assertTrue("B should have link to A", rm.hasLink("B", "A"));
+        
+        // checkCycles should not throw when detector is null
+        rm.checkCycles();  // Should not throw
     }
 
     @Test
@@ -240,6 +217,9 @@ public class DetectorTest {
         // Should not throw exception
         assertTrue("A should have link to B", rm.hasLink("A", "B"));
         assertTrue("B should have link to A", rm.hasLink("B", "A"));
+        
+        // checkCycles should not throw when detector is not set
+        rm.checkCycles();  // Should not throw
     }
 
     @Test
@@ -264,6 +244,9 @@ public class DetectorTest {
         // Components should be independent
         assertFalse("u1 should not reach g4", rm.hasLink("u1", "g4"));
         assertFalse("u2 should not reach g2", rm.hasLink("u2", "g2"));
+        
+        // checkCycles should not throw for valid disconnected components
+        rm.checkCycles();
     }
 
     @Test
@@ -284,9 +267,15 @@ public class DetectorTest {
         assertTrue("r0 should reach r9", rm.hasLink("r0", "r" + (CHAIN_LENGTH - 1)));
         assertTrue("r5 should reach r9", rm.hasLink("r5", "r" + (CHAIN_LENGTH - 1)));
         
-        // Adding cycle should fail
+        // checkCycles should not throw for valid chain
+        rm.checkCycles();
+        
+        // Add a link that creates a cycle
+        rm.addLink("r" + (CHAIN_LENGTH - 1), "r0");
+        
+        // checkCycles should throw after adding cycle
         try {
-            rm.addLink("r" + (CHAIN_LENGTH - 1), "r0");
+            rm.checkCycles();
             fail("Expected IllegalArgumentException due to cycle");
         } catch (IllegalArgumentException e) {
             assertTrue("Exception message should contain 'Cycle detected'", 
@@ -314,9 +303,15 @@ public class DetectorTest {
         // Verify the structure
         assertTrue("user should reach admin through editor", rm.hasLink("user", "admin"));
         
-        // Try to create a cycle
+        // checkCycles should not throw for valid diamond structure
+        rm.checkCycles();
+        
+        // Add a link that creates a cycle
+        rm.addLink("admin", "user");
+        
+        // checkCycles should throw after adding cycle
         try {
-            rm.addLink("admin", "user");
+            rm.checkCycles();
             fail("Expected IllegalArgumentException due to cycle");
         } catch (IllegalArgumentException e) {
             assertTrue("Exception message should contain 'Cycle detected'", 
@@ -327,7 +322,6 @@ public class DetectorTest {
     @Test
     public void testIdempotencyWithExistingLink() {
         // Test that adding an existing link multiple times is idempotent
-        // and doesn't break when detector is enabled
         DefaultRoleManager rm = new DefaultRoleManager(10);
         Detector detector = new DefaultDetector();
         rm.setDetector(detector);
@@ -347,7 +341,10 @@ public class DetectorTest {
         assertTrue("A should still have link to B after re-adding", rm.hasLink("A", "B"));
         assertTrue("A should still have link to C after re-adding", rm.hasLink("A", "C"));
         
-        // Try to create a cycle with an existing link in the path
+        // checkCycles should not throw for valid chain
+        rm.checkCycles();
+        
+        // Add another link
         rm.addLink("C", "D");
         assertTrue("C should have link to D", rm.hasLink("C", "D"));
         
@@ -358,12 +355,14 @@ public class DetectorTest {
         assertTrue("A should still have link to B", rm.hasLink("A", "B"));
         assertTrue("B should still have link to C", rm.hasLink("B", "C"));
         assertTrue("C should still have link to D", rm.hasLink("C", "D"));
+        
+        // checkCycles should still not throw
+        rm.checkCycles();
     }
 
     @Test
     public void testIdempotencyDoesNotPreventCycleDetection() {
         // Test that the idempotency check doesn't interfere with cycle detection
-        // when trying to add a new link that would create a cycle
         DefaultRoleManager rm = new DefaultRoleManager(10);
         Detector detector = new DefaultDetector();
         rm.setDetector(detector);
@@ -372,20 +371,19 @@ public class DetectorTest {
         rm.addLink("A", "B");
         rm.addLink("B", "C");
         
-        // Try to create a cycle (new link, not existing)
+        // Add a link that creates a cycle
+        rm.addLink("C", "A");
+        
+        // Verify the link was added
+        assertTrue("C should have link to A", rm.hasLink("C", "A"));
+        
+        // checkCycles should throw exception
         try {
-            rm.addLink("C", "A");
+            rm.checkCycles();
             fail("Expected IllegalArgumentException due to cycle");
         } catch (IllegalArgumentException e) {
             assertTrue("Exception message should contain 'Cycle detected'", 
                       e.getMessage().contains("Cycle detected"));
         }
-        
-        // Verify the cycle was not added
-        assertFalse("C should not have link to A", rm.hasLink("C", "A"));
-        
-        // Verify existing links are intact
-        assertTrue("A should still have link to B", rm.hasLink("A", "B"));
-        assertTrue("B should still have link to C", rm.hasLink("B", "C"));
     }
 }

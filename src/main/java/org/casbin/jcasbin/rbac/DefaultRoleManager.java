@@ -92,32 +92,31 @@ public class DefaultRoleManager implements RoleManager {
         this.detector = detector;
     }
 
+    /**
+     * checkCycles performs a one-time cycle detection check on the current role graph.
+     * This should be called after bulk policy loading to detect any cycles.
+     *
+     * @throws IllegalArgumentException if a cycle is detected in the role inheritance graph.
+     */
+    public void checkCycles() {
+        if (this.detector != null) {
+            String errorMsg = this.detector.check(this);
+            if (errorMsg != null && !errorMsg.isEmpty()) {
+                throw new IllegalArgumentException(errorMsg);
+            }
+        }
+    }
+
     private void rebuild() {
         Map<String, Role> roles = new HashMap<>(this.allRoles);
         this.clear();
         
-        // Temporarily disable detector to avoid O(N^2) complexity during rebuild
-        Detector originalDetector = this.detector;
-        this.detector = null;
+        roles.values().forEach(user -> {
+            user.getAllRoles().keySet().forEach(roleName -> addLink(user.getName(), roleName, DEFAULT_DOMAIN));
+        });
         
-        try {
-            roles.values().forEach(user -> {
-                user.getAllRoles().keySet().forEach(roleName -> addLink(user.getName(), roleName, DEFAULT_DOMAIN));
-            });
-            
-            // Restore detector and perform single check at the end
-            this.detector = originalDetector;
-            if (this.detector != null) {
-                String errorMsg = this.detector.check(this);
-                if (errorMsg != null && !errorMsg.isEmpty()) {
-                    throw new IllegalArgumentException(errorMsg);
-                }
-            }
-        } catch (IllegalArgumentException e) {
-            // Restore detector before re-throwing
-            this.detector = originalDetector;
-            throw e;
-        }
+        // Perform cycle check at the end
+        checkCycles();
     }
 
     boolean match(String str, String pattern) {
@@ -192,23 +191,12 @@ public class DefaultRoleManager implements RoleManager {
         Role user = getRole(name1);
         Role role = getRole(name2);
         
-        // Check if the link already exists to avoid breaking idempotency on rollback
+        // Check if the link already exists to maintain idempotency
         if (user.roles.containsKey(name2)) {
             return;
         }
         
         user.addRole(role);
-        
-        // If detector is set, check for cycles after adding the link
-        if (detector != null) {
-            String errorMsg = detector.check(this);
-            if (errorMsg != null && !errorMsg.isEmpty()) {
-                // Rollback the operation
-                user.removeRole(role);
-                // Throw exception with the error description
-                throw new IllegalArgumentException(errorMsg);
-            }
-        }
     }
 
     /**

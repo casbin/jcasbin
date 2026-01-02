@@ -25,13 +25,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@BenchmarkMode(Mode.Throughput)
-@Warmup(iterations = 3, time = 1)
+@BenchmarkMode({Mode.Throughput, Mode.AverageTime})
+@Warmup(iterations = 5, time = 1)
 @Measurement(iterations = 5, time = 1)
 @Threads(1)
 @Fork(1)
 @State(value = Scope.Benchmark)
-@OutputTimeUnit(TimeUnit.SECONDS)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
 public class CachedEnforcerBenchmarkTest {
 
     public static class TestResource {
@@ -71,38 +71,57 @@ public class CachedEnforcerBenchmarkTest {
         rawEnforce("alice", "data1", "read");
     }
 
+    private CachedEnforcer cachedBasicModelEnforcer;
+
+    @Setup(Level.Trial)
+    public void setupCachedBasicModel() {
+        cachedBasicModelEnforcer = new CachedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv");
+    }
+
     @Benchmark
     public void benchmarkCachedBasicModel() {
-        CachedEnforcer e = new CachedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv");
-        e.enforce("alice", "data1", "read");
+        cachedBasicModelEnforcer.enforce("alice", "data1", "read");
+    }
+
+    private CachedEnforcer cachedRBACModelEnforcer;
+
+    @Setup(Level.Trial)
+    public void setupCachedRBACModel() {
+        cachedRBACModelEnforcer = new CachedEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
     }
 
     @Benchmark
     public void benchmarkCachedRBACModel() {
-        CachedEnforcer e = new CachedEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
-        e.enforce("alice", "data2", "read");
+        cachedRBACModelEnforcer.enforce("alice", "data2", "read");
     }
 
-    @Benchmark
-    public void benchmarkCachedRBACModelSmall() {
-        CachedEnforcer e = new CachedEnforcer("examples/rbac_model.conf", "");
+    private CachedEnforcer cachedRBACModelSmallEnforcer;
+
+    @Setup(Level.Trial)
+    public void setupCachedRBACModelSmall() {
+        cachedRBACModelSmallEnforcer = new CachedEnforcer("examples/rbac_model.conf", "");
 
         // 100 roles, 10 resources.
         for (int i = 0; i < 100; i++) {
-            e.addPolicy(String.format("group%d", i), String.format("data%d", i / 10), "read");
+            cachedRBACModelSmallEnforcer.addPolicy(String.format("group%d", i), String.format("data%d", i / 10), "read");
         }
 
         // 1000 users.
         for (int i = 0; i < 1000; i++) {
-            e.addGroupingPolicy(String.format("user%d", i), String.format("group%d", i / 10));
+            cachedRBACModelSmallEnforcer.addGroupingPolicy(String.format("user%d", i), String.format("group%d", i / 10));
         }
-
-        e.enforce("user501", "data9", "read");
     }
 
     @Benchmark
-    public void benchmarkCachedRBACModelMedium() {
-        CachedEnforcer e = new CachedEnforcer("examples/rbac_model.conf", "");
+    public void benchmarkCachedRBACModelSmall() {
+        cachedRBACModelSmallEnforcer.enforce("user501", "data9", "read");
+    }
+
+    private CachedEnforcer cachedRBACModelMediumEnforcer;
+
+    @Setup(Level.Trial)
+    public void setupCachedRBACModelMedium() {
+        cachedRBACModelMediumEnforcer = new CachedEnforcer("examples/rbac_model.conf", "");
 
         // 1000 roles, 100 resources.
         List<List<String>> pPolicies = new ArrayList<>();
@@ -113,7 +132,7 @@ public class CachedEnforcerBenchmarkTest {
             policy.add("read");
             pPolicies.add(policy);
         }
-        e.addPolicies(pPolicies);
+        cachedRBACModelMediumEnforcer.addPolicies(pPolicies);
 
         // 10000 users.
         List<List<String>> gPolicies = new ArrayList<>();
@@ -123,14 +142,19 @@ public class CachedEnforcerBenchmarkTest {
             policy.add(String.format("group%d", i / 10));
             gPolicies.add(policy);
         }
-        e.addGroupingPolicies(gPolicies);
-
-        e.enforce("user5001", "data150", "read");
+        cachedRBACModelMediumEnforcer.addGroupingPolicies(gPolicies);
     }
 
     @Benchmark
-    public void benchmarkCachedRBACModelLarge() {
-        CachedEnforcer e = new CachedEnforcer("examples/rbac_model.conf", "");
+    public void benchmarkCachedRBACModelMedium() {
+        cachedRBACModelMediumEnforcer.enforce("user5001", "data150", "read");
+    }
+
+    private CachedEnforcer cachedRBACModelLargeEnforcer;
+
+    @Setup(Level.Trial)
+    public void setupCachedRBACModelLarge() {
+        cachedRBACModelLargeEnforcer = new CachedEnforcer("examples/rbac_model.conf", "");
 
         // 10000 roles, 1000 resources.
         List<List<String>> pPolicies = new ArrayList<>();
@@ -141,7 +165,7 @@ public class CachedEnforcerBenchmarkTest {
             policy.add("read");
             pPolicies.add(policy);
         }
-        e.addPolicies(pPolicies);
+        cachedRBACModelLargeEnforcer.addPolicies(pPolicies);
 
         // 100000 users.
         List<List<String>> gPolicies = new ArrayList<>();
@@ -151,46 +175,86 @@ public class CachedEnforcerBenchmarkTest {
             policy.add(String.format("group%d", i / 10));
             gPolicies.add(policy);
         }
-        e.addGroupingPolicies(gPolicies);
+        cachedRBACModelLargeEnforcer.addGroupingPolicies(gPolicies);
+    }
 
-        e.enforce("user50001", "data1500", "read");
+    @Benchmark
+    public void benchmarkCachedRBACModelLarge() {
+        cachedRBACModelLargeEnforcer.enforce("user50001", "data1500", "read");
+    }
+
+    private CachedEnforcer cachedRBACModelWithResourceRolesEnforcer;
+
+    @Setup(Level.Trial)
+    public void setupCachedRBACModelWithResourceRoles() {
+        cachedRBACModelWithResourceRolesEnforcer = new CachedEnforcer("examples/rbac_with_resource_roles_model.conf", "examples/rbac_with_resource_roles_policy.csv");
     }
 
     @Benchmark
     public void benchmarkCachedRBACModelWithResourceRoles() {
-        CachedEnforcer e = new CachedEnforcer("examples/rbac_with_resource_roles_model.conf", "examples/rbac_with_resource_roles_policy.csv");
-        e.enforce("alice", "data1", "read");
+        cachedRBACModelWithResourceRolesEnforcer.enforce("alice", "data1", "read");
+    }
+
+    private CachedEnforcer cachedRBACModelWithDomainsEnforcer;
+
+    @Setup(Level.Trial)
+    public void setupCachedRBACModelWithDomains() {
+        cachedRBACModelWithDomainsEnforcer = new CachedEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv");
     }
 
     @Benchmark
     public void benchmarkCachedRBACModelWithDomains() {
-        CachedEnforcer e = new CachedEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv");
-        e.enforce("alice", "domain1", "data1", "read");
+        cachedRBACModelWithDomainsEnforcer.enforce("alice", "domain1", "data1", "read");
+    }
+
+    private CachedEnforcer cachedABACModelEnforcer;
+    private TestResource cachedABACTestResource;
+
+    @Setup(Level.Trial)
+    public void setupCachedABACModel() {
+        cachedABACModelEnforcer = new CachedEnforcer("examples/abac_model.conf", "");
+        cachedABACTestResource = newTestResource("data1", "alice");
     }
 
     @Benchmark
     public void benchmarkCachedABACModel() {
-        CachedEnforcer e = new CachedEnforcer("examples/abac_model.conf", "");
-        TestResource data1 = newTestResource("data1", "alice");
-        e.enforce("alice", data1, "read");
+        cachedABACModelEnforcer.enforce("alice", cachedABACTestResource, "read");
+    }
+
+    private CachedEnforcer cachedKeyMatchModelEnforcer;
+
+    @Setup(Level.Trial)
+    public void setupCachedKeyMatchModel() {
+        cachedKeyMatchModelEnforcer = new CachedEnforcer("examples/keymatch_model.conf", "examples/keymatch_policy.csv");
     }
 
     @Benchmark
     public void benchmarkCachedKeyMatchModel() {
-        CachedEnforcer e = new CachedEnforcer("examples/keymatch_model.conf", "examples/keymatch_policy.csv");
-        e.enforce("alice", "/alice_data/resource1", "GET");
+        cachedKeyMatchModelEnforcer.enforce("alice", "/alice_data/resource1", "GET");
+    }
+
+    private CachedEnforcer cachedRBACModelWithDenyEnforcer;
+
+    @Setup(Level.Trial)
+    public void setupCachedRBACModelWithDeny() {
+        cachedRBACModelWithDenyEnforcer = new CachedEnforcer("examples/rbac_with_deny_model.conf", "examples/rbac_with_deny_policy.csv");
     }
 
     @Benchmark
     public void benchmarkCachedRBACModelWithDeny() {
-        CachedEnforcer e = new CachedEnforcer("examples/rbac_with_deny_model.conf", "examples/rbac_with_deny_policy.csv");
-        e.enforce("alice", "data1", "read");
+        cachedRBACModelWithDenyEnforcer.enforce("alice", "data1", "read");
+    }
+
+    private CachedEnforcer cachedPriorityModelEnforcer;
+
+    @Setup(Level.Trial)
+    public void setupCachedPriorityModel() {
+        cachedPriorityModelEnforcer = new CachedEnforcer("examples/priority_model.conf", "examples/priority_policy.csv");
     }
 
     @Benchmark
     public void benchmarkCachedPriorityModel() {
-        CachedEnforcer e = new CachedEnforcer("examples/priority_model.conf", "examples/priority_policy.csv");
-        e.enforce("alice", "data1", "read");
+        cachedPriorityModelEnforcer.enforce("alice", "data1", "read");
     }
 
     @Benchmark
@@ -231,7 +295,10 @@ public class CachedEnforcerBenchmarkTest {
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
-                .include(CachedEnforcerBenchmarkTest.class.getName())
+                .include(CachedEnforcerBenchmarkTest.class.getSimpleName())
+                .forks(1)
+                .warmupIterations(5)
+                .measurementIterations(5)
                 .build();
         new Runner(opt).run();
     }

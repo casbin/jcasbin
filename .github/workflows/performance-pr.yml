@@ -39,8 +39,9 @@ jobs:
           mvn clean compile test-compile
           # Run JMH with reduced iterations for faster PR feedback
           # Uses: 2 warmup iterations, 3 measurement iterations instead of default 5,5
+          # Pattern targets only EnforcerBenchmarkTest, not CachedEnforcerBenchmarkTest
           java -cp "target/test-classes:target/classes:$(mvn dependency:build-classpath -DincludeScope=test -Dmdep.outputFile=/dev/stdout -q)" \
-            org.openjdk.jmh.Main ".*EnforcerBenchmarkTest.*" -wi 2 -i 3 -f 1 -r 1 -w 1 -rf json -rff pr-results.json 2>&1 | tee pr-bench.txt
+            org.openjdk.jmh.Main "^.*\\.EnforcerBenchmarkTest\\." -wi 2 -i 3 -f 1 -r 1 -w 1 -rf json -rff pr-results.json 2>&1 | tee pr-bench.txt
 
       # Checkout base branch and run benchmark
       - name: Checkout base branch
@@ -57,8 +58,9 @@ jobs:
           mvn clean compile test-compile
           # Run JMH with reduced iterations for faster PR feedback
           # Uses: 2 warmup iterations, 3 measurement iterations instead of default 5,5
+          # Pattern targets only EnforcerBenchmarkTest, not CachedEnforcerBenchmarkTest
           java -cp "target/test-classes:target/classes:$(mvn dependency:build-classpath -DincludeScope=test -Dmdep.outputFile=/dev/stdout -q)" \
-            org.openjdk.jmh.Main ".*EnforcerBenchmarkTest.*" -wi 2 -i 3 -f 1 -r 1 -w 1 -rf json -rff ../base-results.json 2>&1 | tee ../base-bench.txt
+            org.openjdk.jmh.Main "^.*\\.EnforcerBenchmarkTest\\." -wi 2 -i 3 -f 1 -r 1 -w 1 -rf json -rff ../base-results.json 2>&1 | tee ../base-bench.txt
 
       # Compare benchmarks
       - name: Parse and compare benchmarks
@@ -100,13 +102,22 @@ jobs:
           def parse_jmh_output(filename):
               """Parse JMH benchmark output and extract throughput results."""
               results = {}
-              with open(filename, 'r') as f:
-                  content = f.read()
+              
+              if not os.path.exists(filename):
+                  return {}
+              
+              try:
+                  with open(filename, 'r') as f:
+                      content = f.read()
+              except (IOError, OSError) as e:
+                  print(f"Error reading file {filename}: {e}", file=sys.stderr)
+                  return {}
                   
               # Match benchmark results with throughput mode
               # Format: Benchmark                                                Mode  Cnt      Score     Error   Units
               #         org.casbin...benchmarkXXX                              thrpt    5  12345.678 ± 123.456  ops/ms
-              pattern = r'(\S+)\s+thrpt\s+\d+\s+([\d.]+)\s+[±]\s+([\d.]+)\s+ops/ms'
+              # Using flexible pattern for plus-minus symbol to handle different encodings
+              pattern = r'(\S+)\s+thrpt\s+\d+\s+([\d.]+)\s+[±+\-]\s+([\d.]+)\s+ops/ms'
               
               for match in re.finditer(pattern, content):
                   benchmark_name = match.group(1)

@@ -1,0 +1,209 @@
+name: Performance Comparison for Pull Requests
+
+on:
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  benchmark-pr:
+    name: Performance benchmark comparison
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+
+      # Save commit SHAs for display
+      - name: Save commit info
+        id: commits
+        run: |
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          echo "base_short=${BASE_SHA:0:7}" >> $GITHUB_OUTPUT
+          echo "head_short=${HEAD_SHA:0:7}" >> $GITHUB_OUTPUT
+
+      # Run benchmark on PR branch
+      - name: Run benchmark on PR branch
+        run: |
+          mvn clean compile test-compile
+          java -cp "target/test-classes:target/classes:$(mvn dependency:build-classpath -DincludeScope=test -Dmdep.outputFile=/dev/stdout -q)" \
+            org.casbin.jcasbin.main.benchmark.EnforcerBenchmarkTest 2>&1 | tee pr-bench.txt
+
+      # Checkout base branch and run benchmark
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          clean: false
+          path: base
+
+      - name: Run benchmark on base branch
+        working-directory: base
+        run: |
+          mvn clean compile test-compile
+          java -cp "target/test-classes:target/classes:$(mvn dependency:build-classpath -DincludeScope=test -Dmdep.outputFile=/dev/stdout -q)" \
+            org.casbin.jcasbin.main.benchmark.EnforcerBenchmarkTest 2>&1 | tee ../base-bench.txt
+
+      # Compare benchmarks
+      - name: Parse and compare benchmarks
+        id: compare
+        run: |
+          cat > compare_benchmarks.py << 'PYTHON_SCRIPT'
+          import re
+          import sys
+          
+          def parse_jmh_output(filename):
+              """Parse JMH benchmark output and extract throughput results."""
+              results = {}
+              with open(filename, 'r') as f:
+                  content = f.read()
+                  
+              # Match benchmark results with throughput mode
+              # Format: Benchmark                                                Mode  Cnt      Score     Error   Units
+              #         org.casbin...benchmarkXXX                              thrpt    5  12345.678 ± 123.456  ops/ms
+              pattern = r'(\S+)\s+thrpt\s+\d+\s+([\d.]+)\s+[±]\s+([\d.]+)\s+ops/ms'
+              
+              for match in re.finditer(pattern, content):
+                  benchmark_name = match.group(1)
+                  score = float(match.group(2))
+                  error = float(match.group(3))
+                  
+                  # Extract just the method name
+                  method_name = benchmark_name.split('.')[-1] if '.' in benchmark_name else benchmark_name
+                  results[method_name] = {'score': score, 'error': error}
+              
+              return results
+          
+          def format_comparison(base_results, pr_results):
+              """Format benchmark comparison as markdown table."""
+              if not base_results and not pr_results:
+                  return "⚠️ No benchmark results found in either base or PR branch."
+              
+              if not base_results:
+                  return "⚠️ No benchmark results found in base branch."
+              
+              if not pr_results:
+                  return "⚠️ No benchmark results found in PR branch."
+              
+              # Combine all benchmark names
+              all_benchmarks = sorted(set(list(base_results.keys()) + list(pr_results.keys())))
+              
+              lines = []
+              lines.append("| Benchmark | Base (ops/ms) | PR (ops/ms) | Change | Status |")
+              lines.append("|-----------|---------------|-------------|--------|--------|")
+              
+              for benchmark in all_benchmarks:
+                  base = base_results.get(benchmark)
+                  pr = pr_results.get(benchmark)
+                  
+                  if base and pr:
+                      base_score = base['score']
+                      pr_score = pr['score']
+                      
+                      # Calculate percentage change
+                      if base_score > 0:
+                          change_pct = ((pr_score - base_score) / base_score) * 100
+                          change_str = f"{change_pct:+.2f}%"
+                          
+                          # Determine status emoji
+                          if change_pct > 5:
+                              status = "🚀 Faster"
+                          elif change_pct < -5:
+                              status = "🐌 Slower"
+                          else:
+                              status = "➡️ Similar"
+                      else:
+                          change_str = "N/A"
+                          status = "⚠️"
+                      
+                      base_str = f"{base_score:.2f} ± {base['error']:.2f}"
+                      pr_str = f"{pr_score:.2f} ± {pr['error']:.2f}"
+                  elif base:
+                      base_str = f"{base['score']:.2f} ± {base['error']:.2f}"
+                      pr_str = "❌ Missing"
+                      change_str = "N/A"
+                      status = "⚠️"
+                  else:
+                      base_str = "❌ Missing"
+                      pr_str = f"{pr['score']:.2f} ± {pr['error']:.2f}"
+                      change_str = "N/A"
+                      status = "🆕 New"
+                  
+                  lines.append(f"| {benchmark} | {base_str} | {pr_str} | {change_str} | {status} |")
+              
+              return '\n'.join(lines)
+          
+          # Main execution
+          base_results = parse_jmh_output('base-bench.txt')
+          pr_results = parse_jmh_output('pr-bench.txt')
+          
+          comparison_table = format_comparison(base_results, pr_results)
+          
+          # Save to file for GitHub comment
+          with open('comparison.md', 'w') as f:
+              f.write(comparison_table)
+          
+          print(comparison_table)
+          PYTHON_SCRIPT
+          
+          python3 compare_benchmarks.py
+
+      # Post comment with results
+      - name: Post benchmark comparison comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let comparison = '';
+            try {
+              comparison = fs.readFileSync('comparison.md', 'utf8');
+            } catch (error) {
+              comparison = '⚠️ Failed to read comparison results.';
+            }
+
+            const commentBody = `## 📊 Benchmark Comparison
+
+            Comparing base branch (\`${{ steps.commits.outputs.base_short }}\`) vs PR branch (\`${{ steps.commits.outputs.head_short }}\`)
+
+            ${comparison}
+
+            <sub>🤖 This comment will be automatically updated with the latest benchmark results.</sub>`;
+
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('📊 Benchmark Comparison')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: commentBody
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            }

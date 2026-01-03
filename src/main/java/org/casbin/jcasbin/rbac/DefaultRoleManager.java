@@ -14,6 +14,7 @@
 
 package org.casbin.jcasbin.rbac;
 
+import org.casbin.jcasbin.detector.Detector;
 import org.casbin.jcasbin.util.SyncedLRUCache;
 import org.casbin.jcasbin.util.Util;
 
@@ -27,6 +28,7 @@ public class DefaultRoleManager implements RoleManager {
 
     BiPredicate<String, String> matchingFunc;
     private SyncedLRUCache<String, Boolean> matchingFuncCache;
+    private Detector detector;
 
     /**
      * DefaultRoleManager is the constructor for creating an instance of the default RoleManager
@@ -81,12 +83,40 @@ public class DefaultRoleManager implements RoleManager {
     public void addDomainMatchingFunc(String name, BiPredicate<String, String> domainMatchingFunc) {
     }
 
+    /**
+     * setDetector sets the detector for cycle detection in role inheritance.
+     *
+     * @param detector the detector instance to use for cycle detection.
+     */
+    public void setDetector(Detector detector) {
+        this.detector = detector;
+    }
+
+    /**
+     * checkCycles performs a one-time cycle detection check on the current role graph.
+     * This should be called after bulk policy loading to detect any cycles.
+     *
+     * @throws IllegalArgumentException if a cycle is detected in the role inheritance graph.
+     */
+    public void checkCycles() {
+        if (this.detector != null) {
+            String errorMsg = this.detector.check(this);
+            if (errorMsg != null && !errorMsg.isEmpty()) {
+                throw new IllegalArgumentException(errorMsg);
+            }
+        }
+    }
+
     private void rebuild() {
         Map<String, Role> roles = new HashMap<>(this.allRoles);
         this.clear();
+        
         roles.values().forEach(user -> {
             user.getAllRoles().keySet().forEach(roleName -> addLink(user.getName(), roleName, DEFAULT_DOMAIN));
         });
+        
+        // Perform cycle check at the end
+        checkCycles();
     }
 
     boolean match(String str, String pattern) {
@@ -157,9 +187,15 @@ public class DefaultRoleManager implements RoleManager {
      * inherits role: name2. domain is a prefix to the roles.
      */
     @Override
-    public void addLink(String name1, String name2, String... domain) {
+    public synchronized void addLink(String name1, String name2, String... domain) {
         Role user = getRole(name1);
         Role role = getRole(name2);
+        
+        // Check if the link already exists to maintain idempotency
+        if (user.roles.containsKey(name2)) {
+            return;
+        }
+        
         user.addRole(role);
     }
 

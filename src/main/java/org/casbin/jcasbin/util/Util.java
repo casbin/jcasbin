@@ -184,8 +184,9 @@ public class Util {
             String leftOperand = matcher.group(1);
             String rightOperand = matcher.group(2);
             
-            // If right operand starts with '(', it's a tuple literal - convert to tuple() function
-            if (rightOperand.startsWith("(") && rightOperand.endsWith(")")) {
+            // If right operand is a parenthesized expression with commas (tuple literal),
+            // convert to tuple() function. Otherwise, keep parentheses as-is for grouping.
+            if (rightOperand.startsWith("(") && rightOperand.endsWith(")") && rightOperand.contains(",")) {
                 rightOperand = "tuple" + rightOperand;
             }
             

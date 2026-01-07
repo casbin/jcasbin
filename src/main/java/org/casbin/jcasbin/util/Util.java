@@ -35,7 +35,7 @@ public class Util {
     public static boolean enableLog = true;
     private static Pattern evalReg = Pattern.compile("\\beval\\(([^),]*)\\)");
 
-    private static final Pattern IN_SYNTAX_PATTERN = Pattern.compile("([a-zA-Z0-9_.()\"]*) +in +([a-zA-Z0-9_.()\"]*)");
+    private static final Pattern IN_SYNTAX_PATTERN = Pattern.compile("([^\\s]+?) +in +(\\([^)]*\\)|\\S+)");
 
     private static Pattern escapeAssertionRegex = Pattern.compile("\\b(r|p)[0-9]*\\.");
 
@@ -181,7 +181,16 @@ public class Util {
     private static String replaceInSyntaxWithInclude(Matcher matcher) {
         StringBuffer sb = new StringBuffer();
         do {
-            matcher.appendReplacement(sb, "include($2, $1)");
+            String leftOperand = matcher.group(1);
+            String rightOperand = matcher.group(2);
+            
+            // If right operand is a parenthesized expression with commas (tuple literal),
+            // convert to tuple() function. Otherwise, keep parentheses as-is for grouping.
+            if (rightOperand.startsWith("(") && rightOperand.endsWith(")") && rightOperand.contains(",")) {
+                rightOperand = "tuple" + rightOperand;
+            }
+            
+            matcher.appendReplacement(sb, Matcher.quoteReplacement("include(" + rightOperand + ", " + leftOperand + ")"));
         } while (matcher.find());
         matcher.appendTail(sb);
         return sb.toString();

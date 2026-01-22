@@ -192,9 +192,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.googlecode.aviator</groupId>
+            <groupId>io.github.aviatorscript</groupId>
             <artifactId>aviator</artifactId>
-            <version>5.4.3</version>
+            <version>5.8.0</version>
         </dependency>
 
         <dependency>

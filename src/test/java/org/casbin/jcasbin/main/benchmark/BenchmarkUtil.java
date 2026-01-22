@@ -20,6 +20,12 @@ package org.casbin.jcasbin.main.benchmark;
  */
 public class BenchmarkUtil {
     
+    /** Default number of warmup iterations */
+    private static final int DEFAULT_WARMUP_ITERATIONS = 3;
+    
+    /** Default number of measurement iterations */
+    private static final int DEFAULT_MEASUREMENT_ITERATIONS = 5;
+    
     /**
      * Functional interface for benchmark operations.
      */
@@ -67,6 +73,6 @@ public class BenchmarkUtil {
      * @param operation The operation to benchmark
      */
     public static void runBenchmark(String name, BenchmarkOperation operation) {
-        runBenchmark(name, 3, 5, operation);
+        runBenchmark(name, DEFAULT_WARMUP_ITERATIONS, DEFAULT_MEASUREMENT_ITERATIONS, operation);
     }
 }

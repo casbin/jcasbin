@@ -207,30 +207,30 @@ public class CachedEnforcerBenchmarkTest {
 
     @Test
     public void benchmarkCachedRBACModelMediumParallel() {
-        CachedEnforcer e = new CachedEnforcer("examples/rbac_model.conf", "");
-
-        // 10000 roles, 1000 resources.
-        List<List<String>> pPolicies = new ArrayList<>();
-        for (int i = 0; i < 10000; i++) {
-            List<String> policy = new ArrayList<>();
-            policy.add(String.format("group%d", i));
-            policy.add(String.format("data%d", i / 10));
-            policy.add("read");
-            pPolicies.add(policy);
-        }
-        e.addPolicies(pPolicies);
-
-        // 100000 users.
-        List<List<String>> gPolicies = new ArrayList<>();
-        for (int i = 0; i < 100000; i++) {
-            List<String> policy = new ArrayList<>();
-            policy.add(String.format("user%d", i));
-            policy.add(String.format("group%d", i / 10));
-            gPolicies.add(policy);
-        }
-        e.addGroupingPolicies(gPolicies);
-
         BenchmarkUtil.runBenchmark("Cached RBAC Model Medium Parallel", () -> {
+            CachedEnforcer e = new CachedEnforcer("examples/rbac_model.conf", "");
+
+            // 10000 roles, 1000 resources.
+            List<List<String>> pPolicies = new ArrayList<>();
+            for (int i = 0; i < 10000; i++) {
+                List<String> policy = new ArrayList<>();
+                policy.add(String.format("group%d", i));
+                policy.add(String.format("data%d", i / 10));
+                policy.add("read");
+                pPolicies.add(policy);
+            }
+            e.addPolicies(pPolicies);
+
+            // 100000 users.
+            List<List<String>> gPolicies = new ArrayList<>();
+            for (int i = 0; i < 100000; i++) {
+                List<String> policy = new ArrayList<>();
+                policy.add(String.format("user%d", i));
+                policy.add(String.format("group%d", i / 10));
+                gPolicies.add(policy);
+            }
+            e.addGroupingPolicies(gPolicies);
+
             e.enforce("user5001", "data150", "read");
         });
     }

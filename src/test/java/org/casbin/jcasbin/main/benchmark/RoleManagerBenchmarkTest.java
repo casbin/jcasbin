@@ -193,11 +193,10 @@ public class RoleManagerBenchmarkTest {
 
     @Test
     public void benchmarkConcurrentHasLinkWithMatching() {
-        Enforcer e = new Enforcer("examples/rbac_with_pattern_model.conf", "examples/rbac_with_pattern_policy.csv");
-        e.addNamedMatchingFunc("g2", "keyMatch2", BuiltInFunctions::keyMatch2);
-        RoleManager rm = e.getRoleManager();
-
         BenchmarkUtil.runBenchmark("Concurrent HasLink With Matching", () -> {
+            Enforcer e = new Enforcer("examples/rbac_with_pattern_model.conf", "examples/rbac_with_pattern_policy.csv");
+            e.addNamedMatchingFunc("g2", "keyMatch2", BuiltInFunctions::keyMatch2);
+            RoleManager rm = e.getRoleManager();
             rm.hasLink("alice", "/book/123");
         });
     }

@@ -194,7 +194,7 @@
         <dependency>
             <groupId>io.github.aviatorscript</groupId>
             <artifactId>aviator</artifactId>
-            <version>5.8.0</version>
+            <version>5.9.0</version>
         </dependency>
 
         <dependency>

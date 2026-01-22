@@ -16,23 +16,11 @@ package org.casbin.jcasbin.main.benchmark;
 
 import org.casbin.jcasbin.main.Enforcer;
 import org.casbin.jcasbin.util.BuiltInFunctions;
-import org.openjdk.jmh.annotations.*;
-import org.openjdk.jmh.runner.Runner;
-import org.openjdk.jmh.runner.RunnerException;
-import org.openjdk.jmh.runner.options.Options;
-import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-@BenchmarkMode(Mode.Throughput)
-@Warmup(iterations = 3, time = 1)
-@Measurement(iterations = 5, time = 1)
-@Threads(1)
-@Fork(1)
-@State(value = Scope.Benchmark)
-@OutputTimeUnit(TimeUnit.SECONDS)
 public class EnforcerBenchmarkTest {
 
     public static class TestResource {
@@ -89,157 +77,178 @@ public class EnforcerBenchmarkTest {
         return new TestSubject(name, age);
     }
 
-    @Benchmark
+    @Test
     public void benchmarkRaw() {
-        rawEnforce("alice", "data1", "read");
+        BenchmarkUtil.runBenchmark("Raw Enforce", () -> {
+            rawEnforce("alice", "data1", "read");
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkBasicModel() {
-        Enforcer e = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv");
-        e.enforce("alice", "data1", "read");
+        BenchmarkUtil.runBenchmark("Basic Model", () -> {
+            Enforcer e = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv");
+            e.enforce("alice", "data1", "read");
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkRBACModel() {
-        Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
-        e.enforce("alice", "data2", "read");
+        BenchmarkUtil.runBenchmark("RBAC Model", () -> {
+            Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
+            e.enforce("alice", "data2", "read");
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkRBACModelSmall() {
-        Enforcer e = new Enforcer("examples/rbac_model.conf", "");
+        BenchmarkUtil.runBenchmark("RBAC Model Small", () -> {
+            Enforcer e = new Enforcer("examples/rbac_model.conf", "");
 
-        // 100 roles, 10 resources.
-        for (int i = 0; i < 100; i++) {
-            e.addPolicy(String.format("group%d", i), String.format("data%d", i / 10), "read");
-        }
+            // 100 roles, 10 resources.
+            for (int i = 0; i < 100; i++) {
+                e.addPolicy(String.format("group%d", i), String.format("data%d", i / 10), "read");
+            }
 
-        // 1000 users.
-        for (int i = 0; i < 1000; i++) {
-            e.addGroupingPolicy(String.format("user%d", i), String.format("group%d", i / 10));
-        }
+            // 1000 users.
+            for (int i = 0; i < 1000; i++) {
+                e.addGroupingPolicy(String.format("user%d", i), String.format("group%d", i / 10));
+            }
 
-        e.enforce("user501", "data9", "read");
+            e.enforce("user501", "data9", "read");
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkRBACModelMedium() {
-        Enforcer e = new Enforcer("examples/rbac_model.conf", "");
+        BenchmarkUtil.runBenchmark("RBAC Model Medium", () -> {
+            Enforcer e = new Enforcer("examples/rbac_model.conf", "");
 
-        // 1000 roles, 100 resources.
-        List<List<String>> pPolicies = new ArrayList<>();
-        for (int i = 0; i < 1000; i++) {
-            List<String> policy = new ArrayList<>();
-            policy.add(String.format("group%d", i));
-            policy.add(String.format("data%d", i / 10));
-            policy.add("read");
-            pPolicies.add(policy);
-        }
-        e.addPolicies(pPolicies);
+            // 1000 roles, 100 resources.
+            List<List<String>> pPolicies = new ArrayList<>();
+            for (int i = 0; i < 1000; i++) {
+                List<String> policy = new ArrayList<>();
+                policy.add(String.format("group%d", i));
+                policy.add(String.format("data%d", i / 10));
+                policy.add("read");
+                pPolicies.add(policy);
+            }
+            e.addPolicies(pPolicies);
 
-        // 10000 users.
-        List<List<String>> gPolicies = new ArrayList<>();
-        for (int i = 0; i < 10000; i++) {
-            List<String> policy = new ArrayList<>();
-            policy.add(String.format("user%d", i));
-            policy.add(String.format("group%d", i / 10));
-            gPolicies.add(policy);
-        }
-        e.addGroupingPolicies(gPolicies);
+            // 10000 users.
+            List<List<String>> gPolicies = new ArrayList<>();
+            for (int i = 0; i < 10000; i++) {
+                List<String> policy = new ArrayList<>();
+                policy.add(String.format("user%d", i));
+                policy.add(String.format("group%d", i / 10));
+                gPolicies.add(policy);
+            }
+            e.addGroupingPolicies(gPolicies);
 
-        e.enforce("user5001", "data99", "read");
+            e.enforce("user5001", "data99", "read");
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkRBACModelLarge() {
-        Enforcer e = new Enforcer("examples/rbac_model.conf", "");
+        BenchmarkUtil.runBenchmark("RBAC Model Large", () -> {
+            Enforcer e = new Enforcer("examples/rbac_model.conf", "");
 
-        // 10000 roles, 1000 resources.
-        List<List<String>> pPolicies = new ArrayList<>();
-        for (int i = 0; i < 10000; i++) {
-            List<String> policy = new ArrayList<>();
-            policy.add(String.format("group%d", i));
-            policy.add(String.format("data%d", i / 10));
-            policy.add("read");
-            pPolicies.add(policy);
-        }
-        e.addPolicies(pPolicies);
+            // 10000 roles, 1000 resources.
+            List<List<String>> pPolicies = new ArrayList<>();
+            for (int i = 0; i < 10000; i++) {
+                List<String> policy = new ArrayList<>();
+                policy.add(String.format("group%d", i));
+                policy.add(String.format("data%d", i / 10));
+                policy.add("read");
+                pPolicies.add(policy);
+            }
+            e.addPolicies(pPolicies);
 
-        // 100000 users.
-        List<List<String>> gPolicies = new ArrayList<>();
-        for (int i = 0; i < 100000; i++) {
-            List<String> policy = new ArrayList<>();
-            policy.add(String.format("user%d", i));
-            policy.add(String.format("group%d", i / 10));
-            gPolicies.add(policy);
-        }
-        e.addGroupingPolicies(gPolicies);
+            // 100000 users.
+            List<List<String>> gPolicies = new ArrayList<>();
+            for (int i = 0; i < 100000; i++) {
+                List<String> policy = new ArrayList<>();
+                policy.add(String.format("user%d", i));
+                policy.add(String.format("group%d", i / 10));
+                gPolicies.add(policy);
+            }
+            e.addGroupingPolicies(gPolicies);
 
-        e.enforce("user50001", "data999", "read");
+            e.enforce("user50001", "data999", "read");
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkRBACModelWithResourceRoles() {
-        Enforcer e = new Enforcer("examples/rbac_with_resource_roles_model.conf", "examples/rbac_with_resource_roles_policy.csv");
-        e.enforce("alice", "data1", "read");
+        BenchmarkUtil.runBenchmark("RBAC Model With Resource Roles", () -> {
+            Enforcer e = new Enforcer("examples/rbac_with_resource_roles_model.conf", "examples/rbac_with_resource_roles_policy.csv");
+            e.enforce("alice", "data1", "read");
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkRBACModelWithDomains() {
-        Enforcer e = new Enforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv");
-        e.enforce("alice", "domain1", "data1", "read");
+        BenchmarkUtil.runBenchmark("RBAC Model With Domains", () -> {
+            Enforcer e = new Enforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv");
+            e.enforce("alice", "domain1", "data1", "read");
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkABACModel() {
-        Enforcer e = new Enforcer("examples/abac_model.conf", "");
-        TestResource data1 = newTestResource("data1", "alice");
-        e.enforce("alice", data1, "read");
+        BenchmarkUtil.runBenchmark("ABAC Model", () -> {
+            Enforcer e = new Enforcer("examples/abac_model.conf", "");
+            TestResource data1 = newTestResource("data1", "alice");
+            e.enforce("alice", data1, "read");
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkABACRuleModel() {
-        Enforcer e = new Enforcer("examples/abac_rule_model.conf", "");
-        TestSubject sub = newTestSubject("alice", 18);
+        BenchmarkUtil.runBenchmark("ABAC Rule Model", () -> {
+            Enforcer e = new Enforcer("examples/abac_rule_model.conf", "");
+            TestSubject sub = newTestSubject("alice", 18);
 
-        for (int i = 0; i < 1000; i++) {
-            e.addPolicy("r.sub.Age > 20", String.format("data%d", i), "read");
-        }
+            for (int i = 0; i < 1000; i++) {
+                e.addPolicy("r.sub.Age > 20", String.format("data%d", i), "read");
+            }
 
-        e.enforce(sub, "data100", "read");
+            e.enforce(sub, "data100", "read");
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkKeyMatchModel() {
-        Enforcer e = new Enforcer("examples/keymatch_model.conf", "examples/keymatch_policy.csv");
-        e.enforce("alice", "/alice_data/resource1", "GET");
+        BenchmarkUtil.runBenchmark("KeyMatch Model", () -> {
+            Enforcer e = new Enforcer("examples/keymatch_model.conf", "examples/keymatch_policy.csv");
+            e.enforce("alice", "/alice_data/resource1", "GET");
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkRBACModelWithDeny() {
-        Enforcer e = new Enforcer("examples/rbac_with_deny_model.conf", "examples/rbac_with_deny_policy.csv");
-        e.enforce("alice", "data1", "read");
+        BenchmarkUtil.runBenchmark("RBAC Model With Deny", () -> {
+            Enforcer e = new Enforcer("examples/rbac_with_deny_model.conf", "examples/rbac_with_deny_policy.csv");
+            e.enforce("alice", "data1", "read");
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkPriorityModel() {
-        Enforcer e = new Enforcer("examples/priority_model.conf", "examples/priority_policy.csv");
-        e.enforce("alice", "data1", "read");
+        BenchmarkUtil.runBenchmark("Priority Model", () -> {
+            Enforcer e = new Enforcer("examples/priority_model.conf", "examples/priority_policy.csv");
+            e.enforce("alice", "data1", "read");
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkRBACModelWithDomainPatternLarge() {
-        Enforcer e = new Enforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv");
-        e.addNamedDomainMatchingFunc("g", "", BuiltInFunctions::keyMatch4);
-        e.buildRoleLinks();
-        e.enforce("staffUser1001", "/orgs/1/sites/site001", "App001.Module001.Action1001");
-    }
-
-    public static void main(String[] args) throws RunnerException {
-        Options opt = new OptionsBuilder()
-                .include(EnforcerBenchmarkTest.class.getName())
-                .build();
-        new Runner(opt).run();
+        BenchmarkUtil.runBenchmark("RBAC Model With Domain Pattern Large", () -> {
+            Enforcer e = new Enforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv");
+            e.addNamedDomainMatchingFunc("g", "", BuiltInFunctions::keyMatch4);
+            e.buildRoleLinks();
+            e.enforce("staffUser1001", "/orgs/1/sites/site001", "App001.Module001.Action1001");
+        });
     }
 }

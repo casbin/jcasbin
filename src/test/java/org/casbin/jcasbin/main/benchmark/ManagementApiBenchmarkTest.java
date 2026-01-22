@@ -15,176 +15,175 @@
 package org.casbin.jcasbin.main.benchmark;
 
 import org.casbin.jcasbin.main.Enforcer;
-import org.openjdk.jmh.annotations.*;
-import org.openjdk.jmh.runner.Runner;
-import org.openjdk.jmh.runner.RunnerException;
-import org.openjdk.jmh.runner.options.Options;
-import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
-@BenchmarkMode(Mode.Throughput)
-@Warmup(iterations = 3, time = 1)
-@Measurement(iterations = 5, time = 1)
-@Threads(1)
-@Fork(1)
-@State(value = Scope.Benchmark)
-@OutputTimeUnit(TimeUnit.SECONDS)
 public class ManagementApiBenchmarkTest {
 
     private Random random = new Random();
 
-    @Benchmark
+    @Test
     public void benchmarkHasPolicySmall() {
-        Enforcer e = new Enforcer("examples/basic_model.conf", "");
+        BenchmarkUtil.runBenchmark("HasPolicy Small", () -> {
+            Enforcer e = new Enforcer("examples/basic_model.conf", "");
 
-        // 100 roles, 10 resources.
-        for (int i = 0; i < 100; i++) {
-            e.addPolicy(String.format("user%d", i), String.format("data%d", i / 10), "read");
-        }
+            // 100 roles, 10 resources.
+            for (int i = 0; i < 100; i++) {
+                e.addPolicy(String.format("user%d", i), String.format("data%d", i / 10), "read");
+            }
 
-        e.hasPolicy(String.format("user%d", random.nextInt(100)), String.format("data%d", random.nextInt(100) / 10), "read");
+            e.hasPolicy(String.format("user%d", random.nextInt(100)), String.format("data%d", random.nextInt(100) / 10), "read");
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkHasPolicyMedium() {
-        Enforcer e = new Enforcer("examples/basic_model.conf", "");
+        BenchmarkUtil.runBenchmark("HasPolicy Medium", () -> {
+            Enforcer e = new Enforcer("examples/basic_model.conf", "");
 
-        // 1000 roles, 100 resources.
-        List<List<String>> pPolicies = new ArrayList<>();
-        for (int i = 0; i < 1000; i++) {
-            List<String> policy = new ArrayList<>();
-            policy.add(String.format("user%d", i));
-            policy.add(String.format("data%d", i / 10));
-            policy.add("read");
-            pPolicies.add(policy);
-        }
-        e.addPolicies(pPolicies);
+            // 1000 roles, 100 resources.
+            List<List<String>> pPolicies = new ArrayList<>();
+            for (int i = 0; i < 1000; i++) {
+                List<String> policy = new ArrayList<>();
+                policy.add(String.format("user%d", i));
+                policy.add(String.format("data%d", i / 10));
+                policy.add("read");
+                pPolicies.add(policy);
+            }
+            e.addPolicies(pPolicies);
 
-        e.hasPolicy(String.format("user%d", random.nextInt(1000)), String.format("data%d", random.nextInt(1000) / 10), "read");
+            e.hasPolicy(String.format("user%d", random.nextInt(1000)), String.format("data%d", random.nextInt(1000) / 10), "read");
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkHasPolicyLarge() {
-        Enforcer e = new Enforcer("examples/basic_model.conf", "");
+        BenchmarkUtil.runBenchmark("HasPolicy Large", () -> {
+            Enforcer e = new Enforcer("examples/basic_model.conf", "");
 
-        // 10000 roles, 1000 resources.
-        List<List<String>> pPolicies = new ArrayList<>();
-        for (int i = 0; i < 10000; i++) {
-            List<String> policy = new ArrayList<>();
-            policy.add(String.format("user%d", i));
-            policy.add(String.format("data%d", i / 10));
-            policy.add("read");
-            pPolicies.add(policy);
-        }
-        e.addPolicies(pPolicies);
+            // 10000 roles, 1000 resources.
+            List<List<String>> pPolicies = new ArrayList<>();
+            for (int i = 0; i < 10000; i++) {
+                List<String> policy = new ArrayList<>();
+                policy.add(String.format("user%d", i));
+                policy.add(String.format("data%d", i / 10));
+                policy.add("read");
+                pPolicies.add(policy);
+            }
+            e.addPolicies(pPolicies);
 
-        e.hasPolicy(String.format("user%d", random.nextInt(10000)), String.format("data%d", random.nextInt(10000) / 10), "read");
+            e.hasPolicy(String.format("user%d", random.nextInt(10000)), String.format("data%d", random.nextInt(10000) / 10), "read");
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkAddPolicySmall() {
-        Enforcer e = new Enforcer("examples/basic_model.conf", "");
+        BenchmarkUtil.runBenchmark("AddPolicy Small", () -> {
+            Enforcer e = new Enforcer("examples/basic_model.conf", "");
 
-        // 100 roles, 10 resources.
-        for (int i = 0; i < 100; i++) {
-            e.addPolicy(String.format("user%d", i), String.format("data%d", i / 10), "read");
-        }
+            // 100 roles, 10 resources.
+            for (int i = 0; i < 100; i++) {
+                e.addPolicy(String.format("user%d", i), String.format("data%d", i / 10), "read");
+            }
 
-        e.addPolicy(String.format("user%d", random.nextInt(100) + 100), String.format("data%d", (random.nextInt(100) + 100) / 10), "read");
+            e.addPolicy(String.format("user%d", random.nextInt(100) + 100), String.format("data%d", (random.nextInt(100) + 100) / 10), "read");
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkAddPolicyMedium() {
-        Enforcer e = new Enforcer("examples/basic_model.conf", "");
+        BenchmarkUtil.runBenchmark("AddPolicy Medium", () -> {
+            Enforcer e = new Enforcer("examples/basic_model.conf", "");
 
-        // 1000 roles, 100 resources.
-        List<List<String>> pPolicies = new ArrayList<>();
-        for (int i = 0; i < 1000; i++) {
-            List<String> policy = new ArrayList<>();
-            policy.add(String.format("user%d", i));
-            policy.add(String.format("data%d", i / 10));
-            policy.add("read");
-            pPolicies.add(policy);
-        }
-        e.addPolicies(pPolicies);
+            // 1000 roles, 100 resources.
+            List<List<String>> pPolicies = new ArrayList<>();
+            for (int i = 0; i < 1000; i++) {
+                List<String> policy = new ArrayList<>();
+                policy.add(String.format("user%d", i));
+                policy.add(String.format("data%d", i / 10));
+                policy.add("read");
+                pPolicies.add(policy);
+            }
+            e.addPolicies(pPolicies);
 
-        e.addPolicy(String.format("user%d", random.nextInt(1000) + 1000), String.format("data%d", (random.nextInt(1000) + 1000) / 10), "read");
+            e.addPolicy(String.format("user%d", random.nextInt(1000) + 1000), String.format("data%d", (random.nextInt(1000) + 1000) / 10), "read");
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkAddPolicyLarge() {
-        Enforcer e = new Enforcer("examples/basic_model.conf", "");
+        BenchmarkUtil.runBenchmark("AddPolicy Large", () -> {
+            Enforcer e = new Enforcer("examples/basic_model.conf", "");
 
-        // 10000 roles, 1000 resources.
-        List<List<String>> pPolicies = new ArrayList<>();
-        for (int i = 0; i < 10000; i++) {
-            List<String> policy = new ArrayList<>();
-            policy.add(String.format("user%d", i));
-            policy.add(String.format("data%d", i / 10));
-            policy.add("read");
-            pPolicies.add(policy);
-        }
-        e.addPolicies(pPolicies);
+            // 10000 roles, 1000 resources.
+            List<List<String>> pPolicies = new ArrayList<>();
+            for (int i = 0; i < 10000; i++) {
+                List<String> policy = new ArrayList<>();
+                policy.add(String.format("user%d", i));
+                policy.add(String.format("data%d", i / 10));
+                policy.add("read");
+                pPolicies.add(policy);
+            }
+            e.addPolicies(pPolicies);
 
-        e.addPolicy(String.format("user%d", random.nextInt(10000) + 10000), String.format("data%d", (random.nextInt(10000) + 10000) / 10), "read");
+            e.addPolicy(String.format("user%d", random.nextInt(10000) + 10000), String.format("data%d", (random.nextInt(10000) + 10000) / 10), "read");
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkRemovePolicySmall() {
-        Enforcer e = new Enforcer("examples/basic_model.conf", "");
+        BenchmarkUtil.runBenchmark("RemovePolicy Small", () -> {
+            Enforcer e = new Enforcer("examples/basic_model.conf", "");
 
-        // 100 roles, 10 resources.
-        for (int i = 0; i < 100; i++) {
-            e.addPolicy(String.format("user%d", i), String.format("data%d", i / 10), "read");
-        }
+            // 100 roles, 10 resources.
+            for (int i = 0; i < 100; i++) {
+                e.addPolicy(String.format("user%d", i), String.format("data%d", i / 10), "read");
+            }
 
-        e.removePolicy(String.format("user%d", random.nextInt(100)), String.format("data%d", random.nextInt(100) / 10), "read");
+            e.removePolicy(String.format("user%d", random.nextInt(100)), String.format("data%d", random.nextInt(100) / 10), "read");
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkRemovePolicyMedium() {
-        Enforcer e = new Enforcer("examples/basic_model.conf", "");
+        BenchmarkUtil.runBenchmark("RemovePolicy Medium", () -> {
+            Enforcer e = new Enforcer("examples/basic_model.conf", "");
 
-        // 1000 roles, 100 resources.
-        List<List<String>> pPolicies = new ArrayList<>();
-        for (int i = 0; i < 1000; i++) {
-            List<String> policy = new ArrayList<>();
-            policy.add(String.format("user%d", i));
-            policy.add(String.format("data%d", i / 10));
-            policy.add("read");
-            pPolicies.add(policy);
-        }
-        e.addPolicies(pPolicies);
+            // 1000 roles, 100 resources.
+            List<List<String>> pPolicies = new ArrayList<>();
+            for (int i = 0; i < 1000; i++) {
+                List<String> policy = new ArrayList<>();
+                policy.add(String.format("user%d", i));
+                policy.add(String.format("data%d", i / 10));
+                policy.add("read");
+                pPolicies.add(policy);
+            }
+            e.addPolicies(pPolicies);
 
-        e.removePolicy(String.format("user%d", random.nextInt(1000)), String.format("data%d", random.nextInt(1000) / 10), "read");
+            e.removePolicy(String.format("user%d", random.nextInt(1000)), String.format("data%d", random.nextInt(1000) / 10), "read");
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkRemovePolicyLarge() {
-        Enforcer e = new Enforcer("examples/basic_model.conf", "");
+        BenchmarkUtil.runBenchmark("RemovePolicy Large", () -> {
+            Enforcer e = new Enforcer("examples/basic_model.conf", "");
 
-        // 10000 roles, 1000 resources.
-        List<List<String>> pPolicies = new ArrayList<>();
-        for (int i = 0; i < 10000; i++) {
-            List<String> policy = new ArrayList<>();
-            policy.add(String.format("user%d", i));
-            policy.add(String.format("data%d", i / 10));
-            policy.add("read");
-            pPolicies.add(policy);
-        }
-        e.addPolicies(pPolicies);
+            // 10000 roles, 1000 resources.
+            List<List<String>> pPolicies = new ArrayList<>();
+            for (int i = 0; i < 10000; i++) {
+                List<String> policy = new ArrayList<>();
+                policy.add(String.format("user%d", i));
+                policy.add(String.format("data%d", i / 10));
+                policy.add("read");
+                pPolicies.add(policy);
+            }
+            e.addPolicies(pPolicies);
 
-        e.removePolicy(String.format("user%d", random.nextInt(10000)), String.format("data%d", random.nextInt(10000) / 10), "read");
-    }
-
-    public static void main(String[] args) throws RunnerException {
-        Options opt = new OptionsBuilder()
-                .include(ManagementApiBenchmarkTest.class.getName())
-                .build();
-        new Runner(opt).run();
+            e.removePolicy(String.format("user%d", random.nextInt(10000)), String.format("data%d", random.nextInt(10000) / 10), "read");
+        });
     }
 }

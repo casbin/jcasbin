@@ -17,195 +17,187 @@ package org.casbin.jcasbin.main.benchmark;
 import org.casbin.jcasbin.main.Enforcer;
 import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.BuiltInFunctions;
-import org.openjdk.jmh.annotations.*;
-import org.openjdk.jmh.runner.Runner;
-import org.openjdk.jmh.runner.RunnerException;
-import org.openjdk.jmh.runner.options.Options;
-import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-@BenchmarkMode(Mode.Throughput)
-@Warmup(iterations = 3, time = 1)
-@Measurement(iterations = 5, time = 1)
-@Threads(1)
-@Fork(1)
-@State(value = Scope.Benchmark)
-@OutputTimeUnit(TimeUnit.SECONDS)
 public class RoleManagerBenchmarkTest {
 
-    @Benchmark
+    @Test
     public void benchmarkRoleManagerSmall() {
-        Enforcer e = new Enforcer("examples/rbac_model.conf", "");
-        // Do not rebuild the role inheritance relations for every AddGroupingPolicy() call.
-        e.enableAutoBuildRoleLinks(false);
+        BenchmarkUtil.runBenchmark("RoleManager Small", () -> {
+            Enforcer e = new Enforcer("examples/rbac_model.conf", "");
+            // Do not rebuild the role inheritance relations for every AddGroupingPolicy() call.
+            e.enableAutoBuildRoleLinks(false);
 
-        // 100 roles, 10 resources.
-        List<List<String>> pPolicies = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
-            List<String> policy = new ArrayList<>();
-            policy.add(String.format("group%d", i));
-            policy.add(String.format("data%d", i / 10));
-            policy.add("read");
-            pPolicies.add(policy);
-        }
-        e.addPolicies(pPolicies);
+            // 100 roles, 10 resources.
+            List<List<String>> pPolicies = new ArrayList<>();
+            for (int i = 0; i < 100; i++) {
+                List<String> policy = new ArrayList<>();
+                policy.add(String.format("group%d", i));
+                policy.add(String.format("data%d", i / 10));
+                policy.add("read");
+                pPolicies.add(policy);
+            }
+            e.addPolicies(pPolicies);
 
-        // 1000 users.
-        List<List<String>> gPolicies = new ArrayList<>();
-        for (int i = 0; i < 1000; i++) {
-            List<String> policy = new ArrayList<>();
-            policy.add(String.format("user%d", i));
-            policy.add(String.format("group%d", i / 10));
-            gPolicies.add(policy);
-        }
-        e.addGroupingPolicies(gPolicies);
+            // 1000 users.
+            List<List<String>> gPolicies = new ArrayList<>();
+            for (int i = 0; i < 1000; i++) {
+                List<String> policy = new ArrayList<>();
+                policy.add(String.format("user%d", i));
+                policy.add(String.format("group%d", i / 10));
+                gPolicies.add(policy);
+            }
+            e.addGroupingPolicies(gPolicies);
 
-        RoleManager rm = e.getRoleManager();
+            RoleManager rm = e.getRoleManager();
 
-        for (int j = 0; j < 100; j++) {
-            rm.hasLink("user501", String.format("group%d", j));
-        }
+            for (int j = 0; j < 100; j++) {
+                rm.hasLink("user501", String.format("group%d", j));
+            }
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkRoleManagerMedium() {
-        Enforcer e = new Enforcer("examples/rbac_model.conf", "");
-        // Do not rebuild the role inheritance relations for every AddGroupingPolicy() call.
-        e.enableAutoBuildRoleLinks(false);
+        BenchmarkUtil.runBenchmark("RoleManager Medium", () -> {
+            Enforcer e = new Enforcer("examples/rbac_model.conf", "");
+            // Do not rebuild the role inheritance relations for every AddGroupingPolicy() call.
+            e.enableAutoBuildRoleLinks(false);
 
-        // 1000 roles, 100 resources.
-        List<List<String>> pPolicies = new ArrayList<>();
-        for (int i = 0; i < 1000; i++) {
-            List<String> policy = new ArrayList<>();
-            policy.add(String.format("group%d", i));
-            policy.add(String.format("data%d", i / 10));
-            policy.add("read");
-            pPolicies.add(policy);
-        }
-        e.addPolicies(pPolicies);
+            // 1000 roles, 100 resources.
+            List<List<String>> pPolicies = new ArrayList<>();
+            for (int i = 0; i < 1000; i++) {
+                List<String> policy = new ArrayList<>();
+                policy.add(String.format("group%d", i));
+                policy.add(String.format("data%d", i / 10));
+                policy.add("read");
+                pPolicies.add(policy);
+            }
+            e.addPolicies(pPolicies);
 
-        // 10000 users.
-        List<List<String>> gPolicies = new ArrayList<>();
-        for (int i = 0; i < 10000; i++) {
-            List<String> policy = new ArrayList<>();
-            policy.add(String.format("user%d", i));
-            policy.add(String.format("group%d", i / 10));
-            gPolicies.add(policy);
-        }
-        e.addGroupingPolicies(gPolicies);
+            // 10000 users.
+            List<List<String>> gPolicies = new ArrayList<>();
+            for (int i = 0; i < 10000; i++) {
+                List<String> policy = new ArrayList<>();
+                policy.add(String.format("user%d", i));
+                policy.add(String.format("group%d", i / 10));
+                gPolicies.add(policy);
+            }
+            e.addGroupingPolicies(gPolicies);
 
-        e.buildRoleLinks();
+            e.buildRoleLinks();
 
-        RoleManager rm = e.getRoleManager();
+            RoleManager rm = e.getRoleManager();
 
-        for (int j = 0; j < 1000; j++) {
-            rm.hasLink("user501", String.format("group%d", j));
-        }
+            for (int j = 0; j < 1000; j++) {
+                rm.hasLink("user501", String.format("group%d", j));
+            }
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkRoleManagerLarge() {
-        Enforcer e = new Enforcer("examples/rbac_model.conf", "");
+        BenchmarkUtil.runBenchmark("RoleManager Large", () -> {
+            Enforcer e = new Enforcer("examples/rbac_model.conf", "");
 
-        // 10000 roles, 1000 resources.
-        List<List<String>> pPolicies = new ArrayList<>();
-        for (int i = 0; i < 10000; i++) {
-            List<String> policy = new ArrayList<>();
-            policy.add(String.format("group%d", i));
-            policy.add(String.format("data%d", i / 10));
-            policy.add("read");
-            pPolicies.add(policy);
-        }
-        e.addPolicies(pPolicies);
+            // 10000 roles, 1000 resources.
+            List<List<String>> pPolicies = new ArrayList<>();
+            for (int i = 0; i < 10000; i++) {
+                List<String> policy = new ArrayList<>();
+                policy.add(String.format("group%d", i));
+                policy.add(String.format("data%d", i / 10));
+                policy.add("read");
+                pPolicies.add(policy);
+            }
+            e.addPolicies(pPolicies);
 
-        // 100000 users.
-        List<List<String>> gPolicies = new ArrayList<>();
-        for (int i = 0; i < 100000; i++) {
-            List<String> policy = new ArrayList<>();
-            policy.add(String.format("user%d", i));
-            policy.add(String.format("group%d", i / 10));
-            gPolicies.add(policy);
-        }
-        e.addGroupingPolicies(gPolicies);
+            // 100000 users.
+            List<List<String>> gPolicies = new ArrayList<>();
+            for (int i = 0; i < 100000; i++) {
+                List<String> policy = new ArrayList<>();
+                policy.add(String.format("user%d", i));
+                policy.add(String.format("group%d", i / 10));
+                gPolicies.add(policy);
+            }
+            e.addGroupingPolicies(gPolicies);
 
-        RoleManager rm = e.getRoleManager();
+            RoleManager rm = e.getRoleManager();
 
-        for (int j = 0; j < 10000; j++) {
-            rm.hasLink("user501", String.format("group%d", j));
-        }
+            for (int j = 0; j < 10000; j++) {
+                rm.hasLink("user501", String.format("group%d", j));
+            }
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkBuildRoleLinksWithPatternLarge() {
-        Enforcer e = new Enforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv");
-        e.addNamedMatchingFunc("g", "", BuiltInFunctions::keyMatch4);
-        e.buildRoleLinks();
+        BenchmarkUtil.runBenchmark("BuildRoleLinks With Pattern Large", () -> {
+            Enforcer e = new Enforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv");
+            e.addNamedMatchingFunc("g", "", BuiltInFunctions::keyMatch4);
+            e.buildRoleLinks();
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkBuildRoleLinksWithDomainPatternLarge() {
-        Enforcer e = new Enforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv");
-        e.addNamedDomainMatchingFunc("g", "", BuiltInFunctions::keyMatch4);
-        e.buildRoleLinks();
+        BenchmarkUtil.runBenchmark("BuildRoleLinks With Domain Pattern Large", () -> {
+            Enforcer e = new Enforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv");
+            e.addNamedDomainMatchingFunc("g", "", BuiltInFunctions::keyMatch4);
+            e.buildRoleLinks();
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkBuildRoleLinksWithPatternAndDomainPatternLarge() {
-        Enforcer e = new Enforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv");
-        e.addNamedMatchingFunc("g", "", BuiltInFunctions::keyMatch4);
-        e.addNamedDomainMatchingFunc("g", "", BuiltInFunctions::keyMatch4);
-        e.buildRoleLinks();
+        BenchmarkUtil.runBenchmark("BuildRoleLinks With Pattern And Domain Pattern Large", () -> {
+            Enforcer e = new Enforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv");
+            e.addNamedMatchingFunc("g", "", BuiltInFunctions::keyMatch4);
+            e.addNamedDomainMatchingFunc("g", "", BuiltInFunctions::keyMatch4);
+            e.buildRoleLinks();
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkHasLinkWithPatternLarge() {
-        Enforcer e = new Enforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv");
-        e.addNamedMatchingFunc("g", "", BuiltInFunctions::keyMatch4);
-        RoleManager rm = e.getRoleManager();
-        rm.hasLink("staffUser1001", "staff001", "/orgs/1/sites/site001");
+        BenchmarkUtil.runBenchmark("HasLink With Pattern Large", () -> {
+            Enforcer e = new Enforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv");
+            e.addNamedMatchingFunc("g", "", BuiltInFunctions::keyMatch4);
+            RoleManager rm = e.getRoleManager();
+            rm.hasLink("staffUser1001", "staff001", "/orgs/1/sites/site001");
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkHasLinkWithDomainPatternLarge() {
-        Enforcer e = new Enforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv");
-        e.addNamedDomainMatchingFunc("g", "", BuiltInFunctions::keyMatch4);
-        RoleManager rm = e.getRoleManager();
-        rm.hasLink("staffUser1001", "staff001", "/orgs/1/sites/site001");
+        BenchmarkUtil.runBenchmark("HasLink With Domain Pattern Large", () -> {
+            Enforcer e = new Enforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv");
+            e.addNamedDomainMatchingFunc("g", "", BuiltInFunctions::keyMatch4);
+            RoleManager rm = e.getRoleManager();
+            rm.hasLink("staffUser1001", "staff001", "/orgs/1/sites/site001");
+        });
     }
 
-    @Benchmark
+    @Test
     public void benchmarkHasLinkWithPatternAndDomainPatternLarge() {
-        Enforcer e = new Enforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv");
-        e.addNamedMatchingFunc("g", "", BuiltInFunctions::keyMatch4);
-        e.addNamedDomainMatchingFunc("g", "", BuiltInFunctions::keyMatch4);
-        RoleManager rm = e.getRoleManager();
-        rm.hasLink("staffUser1001", "staff001", "/orgs/1/sites/site001");
+        BenchmarkUtil.runBenchmark("HasLink With Pattern And Domain Pattern Large", () -> {
+            Enforcer e = new Enforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv");
+            e.addNamedMatchingFunc("g", "", BuiltInFunctions::keyMatch4);
+            e.addNamedDomainMatchingFunc("g", "", BuiltInFunctions::keyMatch4);
+            RoleManager rm = e.getRoleManager();
+            rm.hasLink("staffUser1001", "staff001", "/orgs/1/sites/site001");
+        });
     }
 
-    @Benchmark
-    public void benchmarkConcurrentHasLinkWithMatching(ThreadState state) {
-        state.rm.hasLink("alice", "/book/123");
-    }
-
-    @State(Scope.Thread)
-    public static class ThreadState {
-        RoleManager rm;
-
-        @Setup(Level.Trial)
-        public void setup() {
+    @Test
+    public void benchmarkConcurrentHasLinkWithMatching() {
+        BenchmarkUtil.runBenchmark("Concurrent HasLink With Matching", () -> {
             Enforcer e = new Enforcer("examples/rbac_with_pattern_model.conf", "examples/rbac_with_pattern_policy.csv");
             e.addNamedMatchingFunc("g2", "keyMatch2", BuiltInFunctions::keyMatch2);
-            rm = e.getRoleManager();
-        }
-    }
-
-    public static void main(String[] args) throws RunnerException {
-        Options opt = new OptionsBuilder()
-                .include(RoleManagerBenchmarkTest.class.getName())
-                .build();
-        new Runner(opt).run();
+            RoleManager rm = e.getRoleManager();
+            rm.hasLink("alice", "/book/123");
+        });
     }
 }

@@ -14,7 +14,7 @@
 
 package org.casbin.jcasbin.main;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import static java.util.Arrays.asList;
 import static org.casbin.jcasbin.main.TestUtil.testEnforce;

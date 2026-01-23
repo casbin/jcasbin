@@ -18,9 +18,9 @@ import org.casbin.jcasbin.detector.DefaultDetector;
 import org.casbin.jcasbin.detector.Detector;
 import org.casbin.jcasbin.rbac.DefaultRoleManager;
 import org.casbin.jcasbin.rbac.RoleManager;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
-import static org.junit.Assert.*;
+import static org.testng.Assert.*;
 
 /**
  * Unit tests for DefaultDetector
@@ -40,7 +40,7 @@ public class DefaultDetectorTest {
         Detector detector = new DefaultDetector();
         String result = detector.check(rm);
         
-        assertNull("Expected no cycle to be detected", result);
+        assertNull(result, "Expected no cycle to be detected");
     }
 
     @Test
@@ -54,11 +54,11 @@ public class DefaultDetectorTest {
         Detector detector = new DefaultDetector();
         String result = detector.check(rm);
         
-        assertNotNull("Expected a cycle to be detected", result);
-        assertTrue("Result should contain 'Cycle detected'", result.contains("Cycle detected:"));
-        assertTrue("Result should contain role A", result.contains("A"));
-        assertTrue("Result should contain role B", result.contains("B"));
-        assertTrue("Result should contain role C", result.contains("C"));
+        assertNotNull(result, "Expected a cycle to be detected");
+        assertTrue(result.contains("Cycle detected:"), "Result should contain 'Cycle detected'");
+        assertTrue(result.contains("A"), "Result should contain role A");
+        assertTrue(result.contains("B"), "Result should contain role B");
+        assertTrue(result.contains("C"), "Result should contain role C");
     }
 
     @Test
@@ -70,9 +70,9 @@ public class DefaultDetectorTest {
         Detector detector = new DefaultDetector();
         String result = detector.check(rm);
         
-        assertNotNull("Expected a cycle to be detected", result);
-        assertTrue("Result should contain 'Cycle detected'", result.contains("Cycle detected:"));
-        assertTrue("Result should contain role A", result.contains("A"));
+        assertNotNull(result, "Expected a cycle to be detected");
+        assertTrue(result.contains("Cycle detected:"), "Result should contain 'Cycle detected'");
+        assertTrue(result.contains("A"), "Result should contain role A");
     }
 
     @Test
@@ -85,8 +85,8 @@ public class DefaultDetectorTest {
         Detector detector = new DefaultDetector();
         String result = detector.check(rm);
         
-        assertNotNull("Expected a cycle to be detected", result);
-        assertTrue("Result should contain 'Cycle detected'", result.contains("Cycle detected:"));
+        assertNotNull(result, "Expected a cycle to be detected");
+        assertTrue(result.contains("Cycle detected:"), "Result should contain 'Cycle detected'");
     }
 
     @Test
@@ -103,7 +103,7 @@ public class DefaultDetectorTest {
         Detector detector = new DefaultDetector();
         String result = detector.check(rm);
         
-        assertNull("Expected no cycle to be detected", result);
+        assertNull(result, "Expected no cycle to be detected");
     }
 
     @Test
@@ -121,8 +121,8 @@ public class DefaultDetectorTest {
         Detector detector = new DefaultDetector();
         String result = detector.check(rm);
         
-        assertNotNull("Expected a cycle to be detected", result);
-        assertTrue("Result should contain 'Cycle detected'", result.contains("Cycle detected:"));
+        assertNotNull(result, "Expected a cycle to be detected");
+        assertTrue(result.contains("Cycle detected:"), "Result should contain 'Cycle detected'");
     }
 
     @Test
@@ -146,8 +146,8 @@ public class DefaultDetectorTest {
         Detector detector = new DefaultDetector();
         String result = detector.check(rm);
         
-        assertNotNull("Expected a cycle to be detected", result);
-        assertTrue("Result should contain 'Cycle detected'", result.contains("Cycle detected:"));
+        assertNotNull(result, "Expected a cycle to be detected");
+        assertTrue(result.contains("Cycle detected:"), "Result should contain 'Cycle detected'");
     }
 
     @Test
@@ -158,7 +158,7 @@ public class DefaultDetectorTest {
         Detector detector = new DefaultDetector();
         String result = detector.check(rm);
         
-        assertNull("Expected no cycle in empty graph", result);
+        assertNull(result, "Expected no cycle in empty graph");
     }
 
     @Test
@@ -171,7 +171,7 @@ public class DefaultDetectorTest {
         Detector detector = new DefaultDetector();
         String result = detector.check(rm);
         
-        assertNull("Expected no cycle with single isolated node", result);
+        assertNull(result, "Expected no cycle with single isolated node");
     }
 
     @Test
@@ -192,8 +192,8 @@ public class DefaultDetectorTest {
         long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;
         
-        assertNull("Expected no cycle in large chain", result);
-        assertTrue("Detection should complete in reasonable time (< 5 seconds)", duration < 5000);
+        assertNull(result, "Expected no cycle in large chain");
+        assertTrue(duration < 5000, "Detection should complete in reasonable time (< 5 seconds)");
     }
 
     @Test
@@ -210,8 +210,8 @@ public class DefaultDetectorTest {
         Detector detector = new DefaultDetector();
         String result = detector.check(rm);
         
-        assertNotNull("Expected a cycle to be detected in large graph", result);
-        assertTrue("Result should contain 'Cycle detected'", result.contains("Cycle detected:"));
+        assertNotNull(result, "Expected a cycle to be detected in large graph");
+        assertTrue(result.contains("Cycle detected:"), "Result should contain 'Cycle detected'");
     }
 
     @Test
@@ -249,7 +249,7 @@ public class DefaultDetectorTest {
         
         Detector detector = new DefaultDetector();
         String result = detector.check(rm);
-        assertNull("Expected no cycle with default getRoleGraph() implementation", result);
+        assertNull(result, "Expected no cycle with default getRoleGraph() implementation");
     }
 
     @Test
@@ -262,11 +262,11 @@ public class DefaultDetectorTest {
         
         Detector detector = new DefaultDetector();
         String result = detector.check(rm);
-        assertNotNull("Expected a cycle before clear", result);
+        assertNotNull(result, "Expected a cycle before clear");
         
         rm.clear();
         result = detector.check(rm);
-        assertNull("Expected no cycle after clear", result);
+        assertNull(result, "Expected no cycle after clear");
     }
 
     @Test
@@ -279,10 +279,10 @@ public class DefaultDetectorTest {
         
         Detector detector = new DefaultDetector();
         String result = detector.check(rm);
-        assertNotNull("Expected a cycle before delete", result);
+        assertNotNull(result, "Expected a cycle before delete");
         
         rm.deleteLink("C", "A");
         result = detector.check(rm);
-        assertNull("Expected no cycle after breaking the cycle", result);
+        assertNull(result, "Expected no cycle after breaking the cycle");
     }
 }

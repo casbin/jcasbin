@@ -18,7 +18,7 @@ import org.casbin.jcasbin.exception.CasbinAdapterException;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.file_adapter.FilteredAdapter;
 import org.casbin.jcasbin.util.Util;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import static java.util.Arrays.asList;
 import static org.casbin.jcasbin.main.TestUtil.testHasPolicy;

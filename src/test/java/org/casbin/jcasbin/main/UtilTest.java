@@ -18,7 +18,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.casbin.jcasbin.util.SyncedLRUCache;
 import org.casbin.jcasbin.util.Util;
-import org.junit.Test;
+import org.testng.annotations.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.MockedConstruction;
@@ -27,7 +27,7 @@ import org.mockito.MockedStatic;
 import java.io.IOException;
 import java.io.StringReader;
 
-import static org.junit.Assert.*;
+import static org.testng.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
 
 public class UtilTest {
@@ -91,15 +91,15 @@ public class UtilTest {
   @Test
   public void testSplitCommaDelimited(){
     assertNull(Util.splitCommaDelimited(null));
-    assertArrayEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("a,b,c"));
-    assertArrayEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("a, b, c"));
-    assertArrayEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("a ,b ,c"));
-    assertArrayEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("  a,     b   ,c     "));
-    assertArrayEquals(new String[]{"a,b,c", "d,e", "f"}, Util.splitCommaDelimited("\"a,b,c\", \"d,e\", f"));
-    assertArrayEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("\"a\", \"b\", \"c\""));
-    assertArrayEquals(new String[]{"\"a", "\"b\"", "c\""}, Util.splitCommaDelimited("\"\"\"a\",\"\"\"b\"\"\",\"c\"\"\""));
-    assertArrayEquals(new String[]{"\"a", "\"b\"", "c\""}, Util.splitCommaDelimited("\"\"\"a\",\"\"\"b\"\"\",\"c\"\"\""));
-    assertArrayEquals(new String[]{"a b", "c", "d"}, Util.splitCommaDelimited("\"a b\", c, d"));
+    assertEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("a,b,c"));
+    assertEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("a, b, c"));
+    assertEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("a ,b ,c"));
+    assertEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("  a,     b   ,c     "));
+    assertEquals(new String[]{"a,b,c", "d,e", "f"}, Util.splitCommaDelimited("\"a,b,c\", \"d,e\", f"));
+    assertEquals(new String[]{"a", "b", "c"}, Util.splitCommaDelimited("\"a\", \"b\", \"c\""));
+    assertEquals(new String[]{"\"a", "\"b\"", "c\""}, Util.splitCommaDelimited("\"\"\"a\",\"\"\"b\"\"\",\"c\"\"\""));
+    assertEquals(new String[]{"\"a", "\"b\"", "c\""}, Util.splitCommaDelimited("\"\"\"a\",\"\"\"b\"\"\",\"c\"\"\""));
+    assertEquals(new String[]{"a b", "c", "d"}, Util.splitCommaDelimited("\"a b\", c, d"));
   }
 
   @Test

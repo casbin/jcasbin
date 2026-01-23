@@ -16,7 +16,7 @@ package org.casbin.jcasbin.main;
 
 import org.casbin.jcasbin.config.Config;
 import org.casbin.jcasbin.model.Model;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,7 +26,7 @@ import java.util.Map;
 
 import static org.casbin.jcasbin.model.Model.requiredSections;
 import static org.casbin.jcasbin.model.Model.sectionNameMap;
-import static org.junit.Assert.*;
+import static org.testng.Assert.*;
 
 public class ModelTest {
 
@@ -95,8 +95,8 @@ public class ModelTest {
         } catch (RuntimeException e) {
             // check for missing sections in message
             for (String rs : requiredSections) {
-                assertTrue("section name: " + sectionNameMap.get(rs) + " should be in message",
-                    e.getMessage().contains(sectionNameMap.get(rs)));
+                assertTrue(e.getMessage().contains(sectionNameMap.get(rs)),
+                    "section name: " + sectionNameMap.get(rs) + " should be in message");
             }
         }
     }
@@ -106,7 +106,7 @@ public class ModelTest {
         Model m = new Model();
         m.loadModelFromConfig(basicConfig);
         for (String sec : requiredSections) {
-            assertTrue(sec + " section was expected in model", m.hasSection(sec));
+            assertTrue(m.hasSection(sec), sec + " section was expected in model");
         }
 
         m = new Model();
@@ -115,7 +115,7 @@ public class ModelTest {
         }catch (RuntimeException e){
         }finally {
             for (String sec : requiredSections) {
-                assertFalse(sec + " section was not expected in model", m.hasSection(sec));
+                assertFalse(m.hasSection(sec), sec + " section was not expected in model");
             }
         }
     }

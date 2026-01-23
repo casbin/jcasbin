@@ -16,7 +16,7 @@ package org.casbin.jcasbin.main.benchmark;
 
 import org.casbin.jcasbin.main.Enforcer;
 import org.casbin.jcasbin.util.BuiltInFunctions;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.List;

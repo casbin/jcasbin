@@ -24,7 +24,7 @@ import org.casbin.jcasbin.util.Util;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.testng.Assert.*;
 
 public class TestUtil {
     static void testEnforce(Enforcer e, Object sub, Object obj, String act, boolean res) {

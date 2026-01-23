@@ -16,8 +16,8 @@ package org.casbin.jcasbin.main;
 
 import org.casbin.jcasbin.config.Config;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.testng.annotations.Test;
+import static org.testng.Assert.*;
 
 public class ConfigTest {
 
@@ -31,7 +31,7 @@ public class ConfigTest {
 
         // redis::key test
         String[] redisKeys = config.getStrings("redis::redis.key");
-        assertArrayEquals(new String[]{"push1", "push2"}, redisKeys);
+        assertEquals(new String[]{"push1", "push2"}, redisKeys);
         assertEquals("127.0.0.1", config.getString("mysql::mysql.dev.host"));
         assertEquals("10.0.0.1", config.getString("mysql::mysql.master.host"));
         assertEquals("root", config.getString("mysql::mysql.master.user"));

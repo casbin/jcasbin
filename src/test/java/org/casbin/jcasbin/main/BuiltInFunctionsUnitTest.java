@@ -18,7 +18,7 @@ import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import org.casbin.jcasbin.util.BuiltInFunctions;
 import org.casbin.jcasbin.util.Util;
-import org.junit.Test;
+import org.testng.annotations.Test;
 import org.mockito.BDDMockito;
 import org.mockito.MockedStatic;
 

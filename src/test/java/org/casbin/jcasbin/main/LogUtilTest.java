@@ -16,7 +16,7 @@ package org.casbin.jcasbin.main;
 
 import org.casbin.jcasbin.log.LogUtil;
 import org.casbin.jcasbin.log.mocks.MockLogger;
-import org.junit.Test;
+import org.testng.annotations.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 

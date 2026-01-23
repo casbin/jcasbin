@@ -22,7 +22,7 @@ import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.BuiltInFunctions;
 import org.casbin.jcasbin.util.Util;
 import org.casbin.jcasbin.util.function.CustomFunction;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.util.*;
 
@@ -32,7 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import static org.casbin.jcasbin.main.TestUtil.testDomainEnforce;
 import static org.casbin.jcasbin.main.TestUtil.testEnforce;
 import static org.casbin.jcasbin.main.TestUtil.testEnforceWithoutUsers;
-import static org.junit.Assert.assertEquals;
+import static org.testng.Assert.assertEquals;
 
 public class ModelUnitTest {
     @Test
@@ -490,7 +490,7 @@ public class ModelUnitTest {
     public static void testEnforce(Enforcer e, Object sub, Object obj, String act, boolean res) {
         try {
             boolean myRes = e.enforce(sub, obj, act);
-            assertEquals(String.format("%s, %s, %s: %b, supposed to be %b", sub, obj, act, myRes, res), res, myRes);
+            assertEquals(Boolean.valueOf(myRes), Boolean.valueOf(res), String.format("%s, %s, %s: %b, supposed to be %b", sub, obj, act, myRes, res));
         } catch (Exception ex) {
             throw new RuntimeException(String.format("Enforce Error: %s", ex.getMessage()), ex);
         }

@@ -18,7 +18,7 @@ import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import org.casbin.jcasbin.util.function.CustomFunction;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.util.Map;
 import java.util.regex.Pattern;

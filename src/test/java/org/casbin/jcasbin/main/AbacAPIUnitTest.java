@@ -15,7 +15,7 @@
 package org.casbin.jcasbin.main;
 
 import org.casbin.jcasbin.util.Util;
-import org.junit.Test;
+import org.testng.annotations.Test;
 import java.util.Map;
 import java.util.HashMap;
 

@@ -14,13 +14,13 @@
 
 package org.casbin.jcasbin.main;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.util.Collections;
 
 import static java.util.Arrays.asList;
 import static org.casbin.jcasbin.main.TestUtil.*;
-import static org.junit.Assert.assertEquals;
+import static org.testng.Assert.assertEquals;
 
 public class SyncedRbacAPIUnitTest {
     @Test

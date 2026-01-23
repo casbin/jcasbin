@@ -15,14 +15,14 @@
 package org.casbin.jcasbin.main;
 
 import org.casbin.jcasbin.persist.Watcher;
-import org.junit.Assert;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-import static org.junit.Assert.fail;
+import static org.testng.Assert.fail;
 
 public class WatcherTest {
     public static class SampleWatcher implements Watcher {

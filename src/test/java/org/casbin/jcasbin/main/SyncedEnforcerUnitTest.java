@@ -17,7 +17,7 @@ package org.casbin.jcasbin.main;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
 import org.casbin.jcasbin.persist.file_adapter.FileAdapter;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -27,7 +27,7 @@ import static java.util.Arrays.asList;
 import static org.casbin.jcasbin.main.CoreEnforcer.newModel;
 import static org.casbin.jcasbin.main.TestUtil.*;
 import static org.casbin.jcasbin.main.TestUtil.testEnforceEx;
-import static org.junit.Assert.assertEquals;
+import static org.testng.Assert.assertEquals;
 
 public class SyncedEnforcerUnitTest {
 

@@ -16,13 +16,14 @@ package org.casbin.jcasbin.main;
 
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
-import org.junit.Assert;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.casbin.jcasbin.main.TestUtil.*;
+import static org.testng.Assert.assertEquals;
 
 public class ManagementAPIUnitTest {
     @Test
@@ -231,7 +232,7 @@ public class ManagementAPIUnitTest {
 
         // Test addGroupingPoliciesEx - should add only new rules (bob and eve), not fail on existing (alice)
         boolean result = e.addGroupingPoliciesEx(groupingRules);
-        Assert.assertTrue("addGroupingPoliciesEx should return true", result);
+        Assert.assertTrue(result, "addGroupingPoliciesEx should return true");
         testGetRoles(e, "alice", asList("data2_admin"));
         testGetRoles(e, "bob", asList("data1_admin"));
         testGetRoles(e, "eve", asList("data3_admin"));
@@ -248,7 +249,7 @@ public class ManagementAPIUnitTest {
         );
 
         result = e.addGroupingPoliciesEx(groupingRulesList);
-        Assert.assertTrue("addGroupingPoliciesEx with List should return true", result);
+        Assert.assertTrue(result, "addGroupingPoliciesEx with List should return true");
         testGetRoles(e, "alice", asList("data2_admin"));
         testGetRoles(e, "bob", asList("data1_admin"));
         testGetRoles(e, "ham", asList("data4_admin"));
@@ -259,7 +260,7 @@ public class ManagementAPIUnitTest {
 
         // Test addNamedGroupingPoliciesEx with List<List<String>>
         result = e.addNamedGroupingPoliciesEx("g", groupingRulesList);
-        Assert.assertTrue("addNamedGroupingPoliciesEx with List should return true", result);
+        Assert.assertTrue(result, "addNamedGroupingPoliciesEx with List should return true");
         testGetRoles(e, "alice", asList("data2_admin"));
         testGetRoles(e, "bob", asList("data1_admin"));
         testGetRoles(e, "ham", asList("data4_admin"));
@@ -270,7 +271,7 @@ public class ManagementAPIUnitTest {
 
         // Test addNamedGroupingPoliciesEx with String[][]
         result = e.addNamedGroupingPoliciesEx("g", groupingRules);
-        Assert.assertTrue("addNamedGroupingPoliciesEx with String[][] should return true", result);
+        Assert.assertTrue(result, "addNamedGroupingPoliciesEx with String[][] should return true");
         testGetRoles(e, "alice", asList("data2_admin"));
         testGetRoles(e, "bob", asList("data1_admin"));
         testGetRoles(e, "eve", asList("data3_admin"));
@@ -294,7 +295,7 @@ public class ManagementAPIUnitTest {
         // when
         enforcer.setAviatorEvaluator(instance);
         // then
-        Assert.assertEquals(instance, enforcer.getAviatorEval());
+        assertEquals(enforcer.getAviatorEval(), instance);
     }
 
 }

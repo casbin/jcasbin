@@ -19,7 +19,7 @@ import org.casbin.jcasbin.rbac.DefaultRoleManager;
 import org.casbin.jcasbin.rbac.DomainManager;
 import org.casbin.jcasbin.util.BuiltInFunctions;
 import org.casbin.jcasbin.util.Util;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -27,8 +27,8 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.casbin.jcasbin.main.TestUtil.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 public class RbacAPIUnitTest {
     @Test
@@ -295,7 +295,7 @@ public class RbacAPIUnitTest {
             e.getAllowedObjectConditions(user, action, prefix);
             fail("Expected exception " + expectedExceptionClass.getName() + " was not thrown");
         } catch (RuntimeException ex) {
-            assertEquals(expectedExceptionClass, ex.getClass());
+            assertEquals(ex.getClass(), expectedExceptionClass);
         }
     }
 }

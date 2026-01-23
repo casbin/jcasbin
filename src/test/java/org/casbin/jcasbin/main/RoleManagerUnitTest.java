@@ -18,7 +18,7 @@ import org.casbin.jcasbin.rbac.DefaultRoleManager;
 import org.casbin.jcasbin.rbac.DomainManager;
 import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.BuiltInFunctions;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.Collections;

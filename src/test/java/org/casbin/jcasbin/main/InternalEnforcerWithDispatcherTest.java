@@ -1,16 +1,15 @@
 package org.casbin.jcasbin.main;
 
 import org.casbin.jcasbin.persist.Dispatcher;
-import org.junit.Before;
-import org.junit.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 public class InternalEnforcerWithDispatcherTest {
 
@@ -28,7 +27,7 @@ public class InternalEnforcerWithDispatcherTest {
 
     private InternalEnforcer enforcer;
 
-    @Before
+    @BeforeMethod
     public void setUp() {
         this.enforcer = new InternalEnforcer();
         this.enforcer.setDispatcher(new CustomDispatcher());
@@ -105,7 +104,7 @@ public class InternalEnforcerWithDispatcherTest {
             assertEquals(SEC, sec);
             assertEquals(PTYPE, ptype);
             assertEquals(FIELD_INDEX, fieldIndex);
-            assertArrayEquals(FIELD_VALUES, fieldValues);
+            assertEquals(FIELD_VALUES, fieldValues);
         }
 
         @Override

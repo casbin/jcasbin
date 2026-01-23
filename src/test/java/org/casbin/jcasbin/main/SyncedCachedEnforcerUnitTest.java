@@ -14,19 +14,19 @@
 
 package org.casbin.jcasbin.main;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
+import static org.testng.Assert.assertEquals;
 
 public class SyncedCachedEnforcerUnitTest {
 
     private void testSyncEnforceCache(SyncedCachedEnforcer e, String sub, Object obj, String act, boolean res) {
         boolean myRes = e.enforce(sub, obj, act);
-        assertEquals(String.format("%s, %s, %s: %b, supposed to be %b", sub, obj, act, myRes, res), res, myRes);
+        assertEquals(Boolean.valueOf(myRes), Boolean.valueOf(res), String.format("%s, %s, %s: %b, supposed to be %b", sub, obj, act, myRes, res));
     }
 
     @Test

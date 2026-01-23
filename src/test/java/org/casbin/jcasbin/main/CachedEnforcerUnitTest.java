@@ -30,7 +30,7 @@ public class CachedEnforcerUnitTest {
 
     private void testEnforceCache(String sub, String obj, String act, boolean expectedRes) throws Exception {
         Boolean actualRes = cachedEnforcer.enforce(sub, obj, act);
-        assertEquals(actualRes, expectedRes, String.format("%s, %s, %s: %s, supposed to be %s", sub, obj, act, actualRes, expectedRes));
+        assertEquals(actualRes.booleanValue(), expectedRes, String.format("%s, %s, %s: %s, supposed to be %s", sub, obj, act, actualRes, expectedRes));
     }
 
     @Test

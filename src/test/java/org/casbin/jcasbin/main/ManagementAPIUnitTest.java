@@ -283,7 +283,7 @@ public class ManagementAPIUnitTest {
         AviatorEvaluatorInstance instance = null;
         Enforcer enforcer = new Enforcer();
         // when
-        Assert.assertThrows("The aviator evaluator cannot be null.", NullPointerException.class,
+        Assert.assertThrows(NullPointerException.class,
             () -> enforcer.setAviatorEvaluator(instance));
     }
 

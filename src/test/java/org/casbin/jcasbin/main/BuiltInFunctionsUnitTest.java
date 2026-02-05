@@ -16,6 +16,7 @@ package org.casbin.jcasbin.main;
 
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.EvalMode;
 import org.casbin.jcasbin.util.BuiltInFunctions;
 import org.casbin.jcasbin.util.Util;
 import org.testng.annotations.Test;
@@ -248,7 +249,7 @@ public class BuiltInFunctionsUnitTest {
         testEval("r_sub.name == 'alice'", env, null, true);
         testEval("r_sub.name == 'bob'", env, null, false);
 
-        AviatorEvaluatorInstance aviatorEval = AviatorEvaluator.newInstance();
+        AviatorEvaluatorInstance aviatorEval = AviatorEvaluator.newInstance(EvalMode.INTERPRETER);
         aviatorEval.addFunction(new FunctionTest.CustomFunc());
         env.put("r_obj", "/test/url1/url2");
 

@@ -120,6 +120,12 @@ For Maven:
 </dependency>
 ```
 
+### Android Compatibility
+
+jCasbin is fully compatible with Android API 23+ (Android 6.0 Marshmallow and later). The library uses AviatorScript in **interpreter mode** to ensure compatibility with older Android versions that don't support MethodHandle APIs (which require API 26+).
+
+No special configuration is needed - jCasbin automatically uses interpreter mode for all platforms, making it safe to use on Android devices running API 23 and above.
+
 ## Documentation
 
 https://casbin.org/docs/overview

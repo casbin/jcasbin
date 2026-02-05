@@ -16,6 +16,7 @@ package org.casbin.jcasbin.main;
 
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.EvalMode;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -290,7 +291,7 @@ public class ManagementAPIUnitTest {
     @Test
     public void should_true_when_setAviatorEvaluator_given_customInstance() {
         // given
-        AviatorEvaluatorInstance instance = AviatorEvaluator.newInstance();
+        AviatorEvaluatorInstance instance = AviatorEvaluator.newInstance(EvalMode.INTERPRETER);
         Enforcer enforcer = new Enforcer();
         // when
         enforcer.setAviatorEvaluator(instance);

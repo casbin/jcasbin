@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.EvalMode;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import org.casbin.jcasbin.effect.DefaultEffector;
@@ -76,7 +77,7 @@ public class CoreEnforcer {
         autoSave = adapter instanceof FileAdapter ? false : true;
         autoBuildRoleLinks = true;
         dispatcher = null;
-        aviatorEval = AviatorEvaluator.newInstance();
+        aviatorEval = AviatorEvaluator.newInstance(EvalMode.INTERPRETER);
         initRmMap();
         initBuiltInFunction();
     }

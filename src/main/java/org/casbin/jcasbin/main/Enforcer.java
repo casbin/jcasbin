@@ -54,7 +54,17 @@ public class Enforcer extends ManagementEnforcer {
      * @param adapter the adapter.
      */
     public Enforcer(String modelPath, Adapter adapter) {
-        this(newModel(modelPath, ""), adapter);
+        this(newModel(modelPath, ""), adapter, true);
+    }
+
+    /**
+     * Enforcer initializes an enforcer with a database adapter and an enable log flag.
+     *
+     * @param modelPath the path of the model file.
+     * @param adapter the adapter.
+     */
+    public Enforcer(String modelPath, Adapter adapter, boolean enableLog) {
+        this(newModel(modelPath, ""), adapter, enableLog);
         this.modelPath = modelPath;
     }
 

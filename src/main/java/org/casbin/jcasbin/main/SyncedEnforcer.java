@@ -83,6 +83,7 @@ public class SyncedEnforcer extends Enforcer {
      *
      * @param modelPath the path of the model file.
      * @param adapter   the adapter.
+     * @param enableLog whether to enable Casbin's log.
      */
     public SyncedEnforcer(String modelPath, Adapter adapter, boolean enableLog) {
         super(modelPath, adapter, enableLog);
@@ -103,6 +104,7 @@ public class SyncedEnforcer extends Enforcer {
      *
      * @param m       the model.
      * @param adapter the adapter.
+     * @param enableLog whether to enable Casbin's log.
      */
     public SyncedEnforcer(Model m, Adapter adapter, boolean enableLog) {
         super(m, adapter, enableLog);

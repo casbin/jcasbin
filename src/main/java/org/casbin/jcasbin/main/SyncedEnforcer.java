@@ -102,8 +102,8 @@ public class SyncedEnforcer extends Enforcer {
     /**
      * SyncedEnforcer initializes an enforcer with a model, a database adapter and an enable log flag.
      *
-     * @param m       the model.
-     * @param adapter the adapter.
+     * @param m         the model.
+     * @param adapter   the adapter.
      * @param enableLog whether to enable Casbin's log.
      */
     public SyncedEnforcer(Model m, Adapter adapter, boolean enableLog) {

@@ -54,7 +54,7 @@ public class Enforcer extends ManagementEnforcer {
      * @param adapter the adapter.
      */
     public Enforcer(String modelPath, Adapter adapter) {
-        this(newModel(modelPath, ""), adapter, true);
+        this(modelPath, adapter, true);
     }
 
     /**

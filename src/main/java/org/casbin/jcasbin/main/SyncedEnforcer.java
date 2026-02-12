@@ -79,6 +79,17 @@ public class SyncedEnforcer extends Enforcer {
     }
 
     /**
+     * SyncedEnforcer initializes an enforcer with a database adapter and an enable log flag.
+     *
+     * @param modelPath the path of the model file.
+     * @param adapter   the adapter.
+     * @param enableLog whether to enable Casbin's log.
+     */
+    public SyncedEnforcer(String modelPath, Adapter adapter, boolean enableLog) {
+        super(modelPath, adapter, enableLog);
+    }
+
+    /**
      * SyncedEnforcer initializes an enforcer with a model and a database adapter.
      *
      * @param m       the model.
@@ -86,6 +97,17 @@ public class SyncedEnforcer extends Enforcer {
      */
     public SyncedEnforcer(Model m, Adapter adapter) {
         super(m, adapter);
+    }
+
+    /**
+     * SyncedEnforcer initializes an enforcer with a model, a database adapter and an enable log flag.
+     *
+     * @param m         the model.
+     * @param adapter   the adapter.
+     * @param enableLog whether to enable Casbin's log.
+     */
+    public SyncedEnforcer(Model m, Adapter adapter, boolean enableLog) {
+        super(m, adapter, enableLog);
     }
 
     /**

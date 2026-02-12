@@ -623,7 +623,7 @@ public class CoreEnforcer {
             policyEffects = new Effect[policyLen];
             matcherResults = new float[policyLen];
 
-            for (int i = 0; i < policy.size(); i++) {
+            for (int i = 0; i < policyLen; i++) {
                 List<String> pvals = policy.get(i);
                 Map<String, Object> parameters = new HashMap<>(rvals.length + pTokens.length);
                 getPTokens(parameters, pType, pvals, pTokens);

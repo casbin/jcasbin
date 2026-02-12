@@ -187,6 +187,43 @@ https://casbin.org/docs/adapters
 
 https://casbin.org/docs/role-managers
 
+## Expression Validation and Cross-Platform Compatibility
+
+Starting from version 1.98.1, jCasbin validates expressions to ensure cross-platform compatibility with other Casbin implementations (Go, Node.js, Python, .NET, etc.).
+
+### Restricted Syntax
+
+The following AviatorScript-specific features are **not allowed** in `eval()` expressions and policy rules:
+
+- **Namespace methods**: `seq.list()`, `string.startsWith()`, `string.endsWith()`, `math.sqrt()`, etc.
+- **Advanced control structures**: `lambda`, `let`, `fn`, `for`, `while`, `return`, `if-then-else`, `->`
+
+These features are restricted because they are specific to AviatorScript and would make policies incompatible with other Casbin implementations.
+
+### Allowed Syntax
+
+The following standard Casbin syntax is fully supported:
+
+- **Operators**: `&&`, `||`, `==`, `!=`, `<`, `>`, `<=`, `>=`, `+`, `-`, `*`, `/`, `!`, `in`
+- **Built-in functions**: `g()`, `keyMatch()`, `keyMatch2-5()`, `regexMatch()`, `ipMatch()`, `globMatch()`, `timeMatch()`, `eval()`
+- **Custom functions**: Users can still register custom functions using `enforcer.addFunction()`
+- **Variable access**: `r.attr`, `p.attr` (automatically escaped to `r_attr`, `p_attr`)
+
+### Example
+
+```java
+// ❌ NOT allowed - AviatorScript-specific syntax
+"eval(seq.list('admin', 'editor'))"
+"eval(string.startsWith(r.path, '/admin'))"
+
+// ✅ Allowed - Standard Casbin syntax
+"eval(r.age > 18 && r.age < 65)"
+"r.role in ('admin', 'editor')"  // Converted to include(tuple(...), ...)
+"g(r.sub, p.sub) && keyMatch(r.path, p.path)"
+```
+
+If an expression contains restricted syntax, it will be logged as a warning and return `false`.
+
 ## Examples
 
 | Model                     | Model file                                                                                                                        | Policy file                                                                                                                       |

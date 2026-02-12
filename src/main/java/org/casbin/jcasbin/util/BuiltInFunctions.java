@@ -488,7 +488,7 @@ public class BuiltInFunctions {
      * @return the result of the eval.
      */
     public static boolean eval(String eval, Map<String, Object> env, AviatorEvaluatorInstance aviatorEval) {
-        // Validate expression to block aviatorscript-specific features
+        // Validate expression to block AviatorScript-specific features
         // that break cross-platform compatibility
         try {
             ExpressionValidator.validateExpression(eval);

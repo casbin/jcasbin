@@ -19,11 +19,11 @@ import java.util.regex.Pattern;
 
 /**
  * ExpressionValidator validates expressions to ensure they only use standard Casbin syntax
- * and don't expose aviatorscript-specific features that would break cross-platform compatibility.
+ * and don't expose AviatorScript-specific features that would break cross-platform compatibility.
  */
 public class ExpressionValidator {
     
-    // Patterns for aviatorscript-specific syntax that should be blocked
+    // Patterns for AviatorScript-specific syntax that should be blocked
     private static final Pattern[] DISALLOWED_PATTERNS = {
         Pattern.compile("\\bseq\\."),           // seq.list(), seq.map(), etc.
         Pattern.compile("\\bstring\\."),        // string.startsWith(), string.endsWith(), etc.
@@ -37,7 +37,6 @@ public class ExpressionValidator {
         Pattern.compile("\\bwhile\\b"),         // while loops
         Pattern.compile("\\breturn\\b"),        // return statements
         Pattern.compile("\\bif\\b.*\\bthen\\b.*\\belse\\b"), // if-then-else (aviator style)
-        Pattern.compile("\\?:"),                // ternary operator (aviator uses different syntax)
     };
     
     /**
@@ -47,17 +46,17 @@ public class ExpressionValidator {
      * @throws IllegalArgumentException if the expression contains non-standard syntax
      */
     public static void validateExpression(String expression) {
-        if (expression == null || expression.isEmpty()) {
+        if (expression == null || expression.trim().isEmpty()) {
             return;
         }
         
-        // Check for disallowed aviatorscript-specific patterns
+        // Check for disallowed AviatorScript-specific patterns
         for (Pattern pattern : DISALLOWED_PATTERNS) {
             Matcher matcher = pattern.matcher(expression);
             if (matcher.find()) {
                 throw new IllegalArgumentException(
                     "Expression contains non-standard syntax: '" + matcher.group() + 
-                    "'. This aviatorscript-specific feature is not part of Casbin's standard specification."
+                    "'. This AviatorScript-specific feature is not part of Casbin's standard specification."
                 );
             }
         }

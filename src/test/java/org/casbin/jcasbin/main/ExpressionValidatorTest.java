@@ -88,7 +88,7 @@ public class ExpressionValidatorTest {
             fail("Should have thrown IllegalArgumentException for seq.list()");
         } catch (IllegalArgumentException e) {
             assertTrue(e.getMessage().contains("seq."));
-            assertTrue(e.getMessage().contains("aviatorscript-specific"));
+            assertTrue(e.getMessage().contains("AviatorScript-specific"));
         }
         
         // seq.map() should be disallowed
@@ -108,7 +108,7 @@ public class ExpressionValidatorTest {
             fail("Should have thrown IllegalArgumentException for string.startsWith()");
         } catch (IllegalArgumentException e) {
             assertTrue(e.getMessage().contains("string."));
-            assertTrue(e.getMessage().contains("aviatorscript-specific"));
+            assertTrue(e.getMessage().contains("AviatorScript-specific"));
         }
         
         // string.endsWith() should be disallowed
@@ -136,7 +136,7 @@ public class ExpressionValidatorTest {
             fail("Should have thrown IllegalArgumentException for math.sqrt()");
         } catch (IllegalArgumentException e) {
             assertTrue(e.getMessage().contains("math."));
-            assertTrue(e.getMessage().contains("aviatorscript-specific"));
+            assertTrue(e.getMessage().contains("AviatorScript-specific"));
         }
         
         // math.pow() should be disallowed

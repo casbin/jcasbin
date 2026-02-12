@@ -60,7 +60,6 @@ public class ConcurrentEnforcerTest {
                                 enforcer.enforce("alice", "data1", "read");
                             } catch (ArrayIndexOutOfBoundsException e) {
                                 errorOccurred.set(true);
-                                System.err.println("ArrayIndexOutOfBoundsException caught: " + e.getMessage());
                             }
                         }
                     }

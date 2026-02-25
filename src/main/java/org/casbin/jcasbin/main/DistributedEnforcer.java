@@ -98,6 +98,28 @@ public class DistributedEnforcer extends SyncedEnforcer {
     }
 
     /**
+     * DistributedEnforcer initializes an enforcer with a database adapter and an enable log flag.
+     *
+     * @param modelPath the path of the model file.
+     * @param adapter   the adapter.
+     * @param enableLog whether to enable Casbin's log.
+     */
+    public DistributedEnforcer(String modelPath, Adapter adapter, boolean enableLog) {
+        super(modelPath, adapter, enableLog);
+    }
+
+    /**
+     * DistributedEnforcer initializes an enforcer with a model, a database adapter and an enable log flag.
+     *
+     * @param m         the model.
+     * @param adapter   the adapter.
+     * @param enableLog whether to enable Casbin's log.
+     */
+    public DistributedEnforcer(Model m, Adapter adapter, boolean enableLog) {
+        super(m, adapter, enableLog);
+    }
+
+    /**
      * AddPolicySelf provides a method for dispatcher to add authorization rules to the current policy.
      * The function returns the rules affected and error.
      *

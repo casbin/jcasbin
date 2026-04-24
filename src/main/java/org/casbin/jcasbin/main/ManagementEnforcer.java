@@ -126,28 +126,14 @@ public class ManagementEnforcer extends InternalEnforcer {
     }
 
     /**
-     * getUsers gets the list of users that show up in the current policy.
+     * getAllUsers gets the list of users that show up in the current policy.
      * Users are subjects that are not roles (i.e., subjects that do not appear
      * as the second element in any grouping policy).
      *
      * @return all users in policy, excluding roles.
      */
-    public List<String> getUsers() {
+    public List<String> getAllUsers() {
         List<String> subjects = getAllSubjects();
-        List<String> roles = getAllRoles();
-        return Util.setSubtract(subjects, roles);
-    }
-
-    /**
-     * getNamedUsers gets the list of users that show up in the current named policy.
-     * Users are subjects that are not roles.
-     *
-     * @param ptype the policy type, can be "p", "p2", "p3", ..
-     * @return all users in the specified policy type, excluding roles.
-     */
-    public List<String> getNamedUsers(String ptype) {
-        int subjectIndex = model.getFieldIndex(ptype, "sub");
-        List<String> subjects = model.getValuesForFieldInPolicy("p", ptype, subjectIndex);
         List<String> roles = getAllRoles();
         return Util.setSubtract(subjects, roles);
     }

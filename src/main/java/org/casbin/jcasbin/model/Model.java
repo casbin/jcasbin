@@ -505,19 +505,23 @@ public class Model extends Policy {
      *
      * @param ptype the policy type, e.g., "p", "p2"
      * @param field the field name, e.g., "sub", "obj", "act"
-     * @return the index of the field in the policy rule, or 0 if not found
+     * @return the index of the field in the policy rule, or -1 if not found
      */
     public int getFieldIndex(String ptype, String field) {
         String pattern = ptype + "_" + field;
-        Assertion ast = model.get("p").get(ptype);
+        Map<String, Assertion> pSection = model.get("p");
+        if (pSection == null) {
+            return -1;
+        }
+        Assertion ast = pSection.get(ptype);
         if (ast == null || ast.tokens == null) {
-            return 0;
+            return -1;
         }
         for (int i = 0; i < ast.tokens.length; i++) {
             if (pattern.equals(ast.tokens[i])) {
                 return i;
             }
         }
-        return 0;
+        return -1;
     }
 }

@@ -127,20 +127,15 @@ public class ManagementEnforcer extends InternalEnforcer {
 
     /**
      * getUsers gets the list of users that show up in the current policy.
-     * Users are subjects that are not roles.
+     * Users are subjects that are not roles (i.e., subjects that do not appear
+     * as the second element in any grouping policy).
      *
-     * @return all users in policy and grouping rules, excluding roles.
+     * @return all users in policy, excluding roles.
      */
     public List<String> getUsers() {
-        List<String> pSubjects = getAllSubjects();
-        List<String> gSubjects = model.getValuesForFieldInPolicyAllTypes("g", 0);
+        List<String> subjects = getAllSubjects();
         List<String> roles = getAllRoles();
-
-        List<String> allSubjects = new ArrayList<>(pSubjects);
-        allSubjects.addAll(gSubjects);
-        allSubjects = Util.arrayRemoveDuplicates(allSubjects);
-
-        return Util.setSubtract(allSubjects, roles);
+        return Util.setSubtract(subjects, roles);
     }
 
     /**
@@ -152,15 +147,9 @@ public class ManagementEnforcer extends InternalEnforcer {
      */
     public List<String> getNamedUsers(String ptype) {
         int subjectIndex = model.getFieldIndex(ptype, "sub");
-        List<String> pSubjects = model.getValuesForFieldInPolicy("p", ptype, subjectIndex);
-        List<String> gSubjects = model.getValuesForFieldInPolicyAllTypes("g", 0);
+        List<String> subjects = model.getValuesForFieldInPolicy("p", ptype, subjectIndex);
         List<String> roles = getAllRoles();
-
-        List<String> allSubjects = new ArrayList<>(pSubjects);
-        allSubjects.addAll(gSubjects);
-        allSubjects = Util.arrayRemoveDuplicates(allSubjects);
-
-        return Util.setSubtract(allSubjects, roles);
+        return Util.setSubtract(subjects, roles);
     }
 
     /**

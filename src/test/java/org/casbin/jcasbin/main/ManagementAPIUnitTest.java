@@ -16,6 +16,7 @@ package org.casbin.jcasbin.main;
 
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import org.casbin.jcasbin.util.Util;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -296,6 +297,52 @@ public class ManagementAPIUnitTest {
         enforcer.setAviatorEvaluator(instance);
         // then
         assertEquals(enforcer.getAviatorEval(), instance);
+    }
+
+    @Test
+    public void testGetUsersAPI() {
+        Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
+
+        testGetAllSubjectsUtil(e, asList("alice", "bob", "data2_admin"));
+        testGetAllRolesUtil(e, asList("data2_admin"));
+        testGetUsersUtil(e, asList("alice", "bob"));
+        testGetNamedUsersUtil(e, "p", asList("alice", "bob"));
+    }
+
+    private void testGetAllSubjectsUtil(Enforcer enforcer, List<String> res) {
+        List<String> myRes = enforcer.getAllSubjects();
+        Util.logPrint("All subjects: " + myRes);
+
+        if (!Util.setEquals(res, myRes)) {
+            Assert.fail("All subjects: " + myRes + ", supposed to be " + res);
+        }
+    }
+
+    private void testGetAllRolesUtil(Enforcer enforcer, List<String> res) {
+        List<String> myRes = enforcer.getAllRoles();
+        Util.logPrint("All roles: " + myRes);
+
+        if (!Util.setEquals(res, myRes)) {
+            Assert.fail("All roles: " + myRes + ", supposed to be " + res);
+        }
+    }
+
+    private void testGetUsersUtil(Enforcer enforcer, List<String> res) {
+        List<String> myRes = enforcer.getUsers();
+        Util.logPrint("Users: " + myRes);
+
+        if (!Util.setEquals(res, myRes)) {
+            Assert.fail("Users: " + myRes + ", supposed to be " + res);
+        }
+    }
+
+    private void testGetNamedUsersUtil(Enforcer enforcer, String ptype, List<String> res) {
+        List<String> myRes = enforcer.getNamedUsers(ptype);
+        Util.logPrint("Named users (" + ptype + "): " + myRes);
+
+        if (!Util.setEquals(res, myRes)) {
+            Assert.fail("Named users (" + ptype + "): " + myRes + ", supposed to be " + res);
+        }
     }
 
 }

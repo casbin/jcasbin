@@ -470,4 +470,54 @@ public class Model extends Policy {
             s.append(String.format("%s = %s\n", sec, value));
         }
     }
+
+    /**
+     * getValuesForFieldInPolicyAllTypes gets all values for a field for all rules
+     * across all policy types in a section. Duplicated values are removed.
+     *
+     * @param sec the section, "p" or "g".
+     * @param fieldIndex the policy rule's index.
+     * @return all field values across all ptypes.
+     */
+    public List<String> getValuesForFieldInPolicyAllTypes(String sec, int fieldIndex) {
+        List<String> values = new ArrayList<>();
+
+        Map<String, Assertion> section = model.get(sec);
+        if (section == null) {
+            return values;
+        }
+
+        for (Assertion assertion : section.values()) {
+            for (List<String> rule : assertion.policy) {
+                if (fieldIndex < rule.size()) {
+                    values.add(rule.get(fieldIndex));
+                }
+            }
+        }
+
+        return Util.arrayRemoveDuplicates(values);
+    }
+
+    /**
+     * getFieldIndex returns the index of a field in a policy type.
+     * For example, given ptype="p" and field="sub", returns the index
+     * where "p_sub" appears in the tokens array.
+     *
+     * @param ptype the policy type, e.g., "p", "p2"
+     * @param field the field name, e.g., "sub", "obj", "act"
+     * @return the index of the field in the policy rule, or 0 if not found
+     */
+    public int getFieldIndex(String ptype, String field) {
+        String pattern = ptype + "_" + field;
+        Assertion ast = model.get("p").get(ptype);
+        if (ast == null || ast.tokens == null) {
+            return 0;
+        }
+        for (int i = 0; i < ast.tokens.length; i++) {
+            if (pattern.equals(ast.tokens[i])) {
+                return i;
+            }
+        }
+        return 0;
+    }
 }

@@ -133,7 +133,7 @@ jobs:
           name: ${{ steps.snapshot.outputs.version }}
           body_path: SNAPSHOT_RELEASE_NOTES.md
           draft: false
-          prerelease: true
+          prerelease: false
           files: |
             dist/${{ steps.snapshot.outputs.basename }}.tar.gz
             dist/${{ steps.snapshot.outputs.basename }}.zip

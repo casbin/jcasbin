@@ -30,3 +30,17 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+
+  publish-maven-snapshot:
+    needs: build
+    if: ${{ github.repository == 'apache/casbin-jcasbin' && github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+    uses: ./.github/workflows/maven-snapshot.yml
+    secrets: inherit
+
+  semantic-release:
+    name: Semantic Release
+    needs: publish-maven-snapshot
+    if: ${{ github.repository == 'apache/casbin-jcasbin' && github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+    permissions:
+      contents: write
+    uses: ./.github/workflows/source-snapshot.yml

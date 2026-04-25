@@ -1,13 +1,7 @@
 name: Publish Maven Snapshot
 
 on:
-  workflow_run:
-    workflows:
-      - build
-    types:
-      - completed
-    branches:
-      - master
+  workflow_call:
   workflow_dispatch:
 
 permissions:
@@ -15,14 +9,13 @@ permissions:
 
 jobs:
   publish-maven-snapshot:
-    if: ${{ github.repository == 'apache/casbin-jcasbin' && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success') }}
+    if: ${{ github.repository == 'apache/casbin-jcasbin' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - name: Set up JDK 1.8
         uses: actions/setup-java@v4

@@ -22,11 +22,6 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-          server-id: ossrh
-          server-username: OSSRH_JIRA_USERNAME
-          server-password: OSSRH_JIRA_PASSWORD
-          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-          gpg-passphrase: GPG_PASSPHRASE
 
       - name: Build with Maven
         run: mvn clean test cobertura:cobertura
@@ -36,18 +31,87 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
+  prepare_snapshot_version:
+    name: Prepare Snapshot Version
+    needs: build
+    if: ${{ github.repository == 'apache/casbin-jcasbin' && github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.snapshot.outputs.version }}
+      maven_version: ${{ steps.snapshot.outputs.maven_version }}
+      basename: ${{ steps.snapshot.outputs.basename }}
+      previous_tag: ${{ steps.snapshot.outputs.previous_tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          node-version: 20
+          fetch-depth: 0
 
-      - name: Semantic Release
+      - name: Compute snapshot version
+        id: snapshot
         run: |
-          npm install -g @conveyal/maven-semantic-release semantic-release
-          semantic-release --prepare @conveyal/maven-semantic-release --publish @semantic-release/github,@conveyal/maven-semantic-release --verify-conditions @semantic-release/github,@conveyal/maven-semantic-release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GPG_KEY_NAME: ${{ secrets.GPG_KEY_NAME }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-          OSSRH_JIRA_USERNAME: ${{ secrets.OSSRH_JIRA_USERNAME }}
-          OSSRH_JIRA_PASSWORD: ${{ secrets.OSSRH_JIRA_PASSWORD }}
+          LATEST_RELEASE_TAG="$(
+            git tag --list 'v*' |
+              grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' |
+              sort -V |
+              tail -n 1
+          )"
+
+          if [ -z "${LATEST_RELEASE_TAG}" ]; then
+            BASE_VERSION="0.1.0"
+          else
+            RELEASE_VERSION="${LATEST_RELEASE_TAG#v}"
+            MAJOR="${RELEASE_VERSION%%.*}"
+            REST="${RELEASE_VERSION#*.}"
+            MINOR="${REST%%.*}"
+            NEXT_MINOR="$((MINOR + 1))"
+            BASE_VERSION="${MAJOR}.${NEXT_MINOR}.0"
+          fi
+
+          ESCAPED_BASE_VERSION="${BASE_VERSION//./\\.}"
+          LAST_SNAPSHOT_NUMBER="$(
+            git tag --list "v${BASE_VERSION}-snapshot.*" |
+              sed -nE "s/^v${ESCAPED_BASE_VERSION}-snapshot\\.([0-9]+)$/\\1/p" |
+              sort -n |
+              tail -n 1
+          )"
+          LAST_SNAPSHOT_NUMBER="${LAST_SNAPSHOT_NUMBER:-0}"
+          NEXT_SNAPSHOT_NUMBER="$((LAST_SNAPSHOT_NUMBER + 1))"
+          SNAPSHOT_VERSION="v${BASE_VERSION}-snapshot.${NEXT_SNAPSHOT_NUMBER}"
+          MAVEN_VERSION="${SNAPSHOT_VERSION#v}"
+          BASENAME="jcasbin-${MAVEN_VERSION}-src"
+
+          echo "version=${SNAPSHOT_VERSION}" >> "${GITHUB_OUTPUT}"
+          echo "maven_version=${MAVEN_VERSION}" >> "${GITHUB_OUTPUT}"
+          echo "basename=${BASENAME}" >> "${GITHUB_OUTPUT}"
+          if [ "${LAST_SNAPSHOT_NUMBER}" -gt 0 ]; then
+            echo "previous_tag=v${BASE_VERSION}-snapshot.${LAST_SNAPSHOT_NUMBER}" >> "${GITHUB_OUTPUT}"
+          else
+            echo "previous_tag=${LATEST_RELEASE_TAG}" >> "${GITHUB_OUTPUT}"
+          fi
+
+          echo "Computed snapshot version: ${SNAPSHOT_VERSION}"
+          echo "Computed Maven version: ${MAVEN_VERSION}"
+
+  publish-maven:
+    name: Publish Maven
+    needs: prepare_snapshot_version
+    if: ${{ github.repository == 'apache/casbin-jcasbin' && github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+    uses: ./.github/workflows/maven-snapshot.yml
+    with:
+      maven_version: ${{ needs.prepare_snapshot_version.outputs.maven_version }}
+    secrets: inherit
+
+  semantic-release:
+    name: Semantic Release
+    needs:
+      - prepare_snapshot_version
+      - publish-maven
+    if: ${{ github.repository == 'apache/casbin-jcasbin' && github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+    permissions:
+      contents: write
+    uses: ./.github/workflows/source-snapshot.yml
+    with:
+      version: ${{ needs.prepare_snapshot_version.outputs.version }}
+      basename: ${{ needs.prepare_snapshot_version.outputs.basename }}
+      previous_tag: ${{ needs.prepare_snapshot_version.outputs.previous_tag }}

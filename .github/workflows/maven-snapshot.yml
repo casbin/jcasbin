@@ -1,0 +1,49 @@
+name: Publish Maven
+
+on:
+  workflow_call:
+    inputs:
+      maven_version:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      maven_version:
+        description: Maven release version to publish, for example 1.2.3-snapshot.1
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  publish-maven:
+    name: Publish Maven
+    if: ${{ github.repository == 'apache/casbin-jcasbin' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 8
+          server-id: ossrh
+          server-username: OSSRH_JIRA_USERNAME
+          server-password: OSSRH_JIRA_PASSWORD
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: GPG_PASSPHRASE
+
+      - name: Publish Maven
+        run: |
+          mvn -B org.codehaus.mojo:versions-maven-plugin:2.16.2:set -DnewVersion="${{ inputs.maven_version }}" -DgenerateBackupPoms=false
+          mvn -B deploy -DskipTests
+        env:
+          GPG_KEY_NAME: ${{ secrets.GPG_KEY_NAME }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          OSSRH_JIRA_USERNAME: ${{ secrets.OSSRH_JIRA_USERNAME }}
+          OSSRH_JIRA_PASSWORD: ${{ secrets.OSSRH_JIRA_PASSWORD }}

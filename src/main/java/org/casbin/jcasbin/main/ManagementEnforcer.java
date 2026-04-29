@@ -126,6 +126,19 @@ public class ManagementEnforcer extends InternalEnforcer {
     }
 
     /**
+     * getAllUsers gets the list of users that show up in the current policy.
+     * Users are subjects that are not roles (i.e., subjects that do not appear
+     * as the second element in any grouping policy).
+     *
+     * @return all users in policy, excluding roles.
+     */
+    public List<String> getAllUsers() {
+        List<String> subjects = getAllSubjects();
+        List<String> roles = getAllRoles();
+        return Util.setSubtract(subjects, roles);
+    }
+
+    /**
      * getPolicy gets all the authorization rules in the policy.
      *
      * @return all the "p" policy rules.

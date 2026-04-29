@@ -406,6 +406,17 @@ public class SyncedEnforcer extends Enforcer {
     }
 
     /**
+     * getAllUsers gets the list of users that show up in the current policy.
+     * Users are subjects that are not roles.
+     *
+     * @return all users in policy rules, excluding roles.
+     */
+    @Override
+    public List<String> getAllUsers() {
+        return runSynchronized(super::getAllUsers, getReadWriteLock().readLock());
+    }
+
+    /**
      * getPolicy gets all the authorization rules in the policy.
      *
      * @return all the "p" policy rules.

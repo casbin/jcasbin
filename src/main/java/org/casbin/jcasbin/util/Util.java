@@ -388,4 +388,29 @@ public class Util {
             return false;
         }
     }
+
+    /**
+     * setSubtract returns elements in list A that are not in list B.
+     * Preserves order from list A.
+     *
+     * @param a the first list (base)
+     * @param b the second list (subtrahend)
+     * @return a - b (elements in A but not in B)
+     */
+    public static List<String> setSubtract(List<String> a, List<String> b) {
+        if (a == null) {
+            a = new ArrayList<>();
+        }
+        if (b == null) {
+            b = new ArrayList<>();
+        }
+        Set<String> bSet = new HashSet<>(b);
+        List<String> result = new ArrayList<>();
+        for (String item : a) {
+            if (!bSet.contains(item)) {
+                result.add(item);
+            }
+        }
+        return result;
+    }
 }

@@ -16,6 +16,7 @@ package org.casbin.jcasbin.main;
 
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import org.casbin.jcasbin.util.Util;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -296,6 +297,76 @@ public class ManagementAPIUnitTest {
         enforcer.setAviatorEvaluator(instance);
         // then
         assertEquals(enforcer.getAviatorEval(), instance);
+    }
+
+    @Test
+    public void testGetUsersAPI() {
+        // 1. Basic RBAC: alice and bob are users, data2_admin is a role
+        Enforcer e = new Enforcer("examples/rbac_model.conf", "examples/rbac_policy.csv");
+        testGetAllSubjectsUtil(e, asList("alice", "bob", "data2_admin"));
+        testGetAllRolesUtil(e, asList("data2_admin"));
+        testGetAllUsersUtil(e, asList("alice", "bob"));
+
+        // 2. Add user "admin" that appears in both policy (as subject) and grouping (as role target)
+        // getAllUsers computes: subjects (from p) - roles (from g, column 1)
+        // admin is added as a policy subject and also assigned to role "root"
+        e.addPolicy("admin", "data1", "read");
+        e.addGroupingPolicy("admin", "root");
+        testGetAllSubjectsUtil(e, asList("alice", "bob", "data2_admin", "admin"));
+        testGetAllRolesUtil(e, asList("data2_admin", "root"));
+        testGetAllUsersUtil(e, asList("alice", "bob", "admin")); // admin is user since it's in p, not in g column 1
+        e.removePolicy("admin", "data1", "read");
+        e.removeGroupingPolicy("admin", "root");
+
+        // 3. Add regular user "eve" who is only in policy (not a role in any grouping)
+        e.addPolicy("eve", "data3", "read");
+        testGetAllSubjectsUtil(e, asList("alice", "bob", "data2_admin", "eve"));
+        testGetAllRolesUtil(e, asList("data2_admin"));
+        testGetAllUsersUtil(e, asList("alice", "bob", "eve")); // eve is user since she's not in g column 1
+        e.removePolicy("eve", "data3", "read");
+
+        // 4. Clear all policies - verify empty results
+        e.clearPolicy();
+        testGetAllSubjectsUtil(e, asList());
+        testGetAllRolesUtil(e, asList());
+        testGetAllUsersUtil(e, asList());
+
+        // 5. Add new user and role relationship: user1 is a member of role "member"
+        // getAllSubjects: ["user1"] - from p column 0
+        // getAllRoles: ["member"] - from g column 1 (the second element in grouping)
+        // getAllUsers: ["user1"] = subjects - roles
+        e.addPolicy("user1", "data1", "read");
+        e.addGroupingPolicy("user1", "member");
+        testGetAllSubjectsUtil(e, asList("user1"));
+        testGetAllRolesUtil(e, asList("member"));
+        testGetAllUsersUtil(e, asList("user1"));
+    }
+
+    private void testGetAllSubjectsUtil(Enforcer enforcer, List<String> res) {
+        List<String> myRes = enforcer.getAllSubjects();
+        Util.logPrint("All subjects: " + myRes);
+
+        if (!Util.setEquals(res, myRes)) {
+            Assert.fail("All subjects: " + myRes + ", supposed to be " + res);
+        }
+    }
+
+    private void testGetAllRolesUtil(Enforcer enforcer, List<String> res) {
+        List<String> myRes = enforcer.getAllRoles();
+        Util.logPrint("All roles: " + myRes);
+
+        if (!Util.setEquals(res, myRes)) {
+            Assert.fail("All roles: " + myRes + ", supposed to be " + res);
+        }
+    }
+
+    private void testGetAllUsersUtil(Enforcer enforcer, List<String> res) {
+        List<String> myRes = enforcer.getAllUsers();
+        Util.logPrint("All users: " + myRes);
+
+        if (!Util.setEquals(res, myRes)) {
+            Assert.fail("All users: " + myRes + ", supposed to be " + res);
+        }
     }
 
 }

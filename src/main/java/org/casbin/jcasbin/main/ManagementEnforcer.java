@@ -16,6 +16,8 @@ package org.casbin.jcasbin.main;
 
 import org.casbin.jcasbin.effect.Effect;
 import org.casbin.jcasbin.model.Assertion;
+import org.casbin.jcasbin.rbac.DefaultRoleManager;
+import org.casbin.jcasbin.rbac.RoleManager;
 import org.casbin.jcasbin.util.Util;
 import org.casbin.jcasbin.util.function.CustomFunction;
 
@@ -26,6 +28,24 @@ import java.util.stream.Collectors;
  * ManagementEnforcer = InternalEnforcer + Management API.
  */
 public class ManagementEnforcer extends InternalEnforcer {
+    
+    /**
+     * loadPolicy reloads the policy from file/database.
+     * Overridden to add cycle detection check after policy loading.
+     */
+    @Override
+    public void loadPolicy() {
+        super.loadPolicy();
+        
+        // Check for cycles in all role managers after policy is loaded
+        for (Map.Entry<String, RoleManager> entry : rmMap.entrySet()) {
+            RoleManager rm = entry.getValue();
+            if (rm instanceof DefaultRoleManager) {
+                ((DefaultRoleManager) rm).checkCycles();
+            }
+        }
+    }
+    
     /**
      * getAllSubjects gets the list of subjects that show up in the current policy.
      *

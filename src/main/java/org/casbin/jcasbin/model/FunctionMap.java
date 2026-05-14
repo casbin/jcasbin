@@ -84,6 +84,7 @@ public class FunctionMap {
         fm.addFunction("keyMatch5", new KeyMatch5Func());
         fm.addFunction("keyGet", new KeyGetFunc());
         fm.addFunction("keyGet2", new KeyGet2Func());
+        fm.addFunction("keyGet3", new KeyGet3Func());
         fm.addFunction("regexMatch", new RegexMatchFunc());
         fm.addFunction("ipMatch", new IPMatchFunc());
         fm.addFunction("eval", new EvalFunc());

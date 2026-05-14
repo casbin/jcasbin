@@ -276,6 +276,47 @@ public class BuiltInFunctions {
     }
 
     /**
+     * KeyGet3 returns value matched pattern. For example, "/resource1" matches "/{resource}", if the pathVar == "resource", then "resource1" will be returned.
+     * This is similar with KeyGet2(), except using "/proxy/{id}" instead of "/proxy/:id".
+     *
+     * @param key1    the first argument.
+     * @param key2    the second argument.
+     * @param pathVar the name of the variable to retrieve from the matched pattern.
+     * @return the matched part.
+     */
+    public static String keyGet3Func(String key1, String key2, String pathVar) {
+        key2 = key2.replace("/*", "/.*");
+        String regexp = "\\{[^/]+?\\}";
+        Pattern re = Pattern.compile(regexp);
+        Matcher keys = re.matcher(key2);
+        List<String> keysList = new ArrayList<>();
+        while (keys.find()) {
+            keysList.add(keys.group());
+        }
+        key2 = re.matcher(key2).replaceAll("([^/]+?)");
+        // Escape { and } for Java regex compatibility since { is treated as repetition quantifier
+        key2 = key2.replace("{", "\\{").replace("}", "\\}");
+        key2 = "^" + key2 + "$";
+        Pattern re2 = Pattern.compile(key2);
+        Matcher values = re2.matcher(key1);
+        List<String> valuesList = new ArrayList<>();
+        while (values.find()) {
+            for (int i = 0; i <= values.groupCount(); i++) {
+                valuesList.add(values.group(i));
+            }
+        }
+        if (valuesList.isEmpty()) {
+            return "";
+        }
+        for (int i = 0; i < keysList.size(); i++) {
+            if (pathVar.equals(keysList.get(i).substring(1, keysList.get(i).length() - 1))) {
+                return valuesList.get(i + 1);
+            }
+        }
+        return "";
+    }
+
+    /**
      * regexMatch determines whether key1 matches the pattern of key2 in regular expression.
      *
      * @param key1 the first argument.

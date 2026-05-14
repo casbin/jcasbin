@@ -215,6 +215,46 @@ public class BuiltInFunctionsUnitTest {
     }
 
     @Test
+    public void testKeyGet3Func() {
+        // KeyGet3() is similar with KeyGet2(), except using "/proxy/{id}" instead of "/proxy/:id".
+        testKeyGet3("/foo", "/foo", "id", "");
+        testKeyGet3("/foo", "/foo*", "id", "");
+        testKeyGet3("/foo", "/foo/*", "id", "");
+        testKeyGet3("/foo/bar", "/foo", "id", "");
+        testKeyGet3("/foo/bar", "/foo*", "id", "");
+        testKeyGet3("/foo/bar", "/foo/*", "id", "");
+        testKeyGet3("/foobar", "/foo", "id", "");
+        testKeyGet3("/foobar", "/foo*", "id", "");
+        testKeyGet3("/foobar", "/foo/*", "id", "");
+
+        testKeyGet3("/", "/{resource}", "resource", "");
+        testKeyGet3("/resource1", "/{resource}", "resource", "resource1");
+        testKeyGet3("/myid", "/{id}/using/{resId}", "id", "");
+        testKeyGet3("/myid/using/myresid", "/{id}/using/{resId}", "id", "myid");
+        testKeyGet3("/myid/using/myresid", "/{id}/using/{resId}", "resId", "myresid");
+
+        testKeyGet3("/proxy/myid", "/proxy/{id}/*", "id", "");
+        testKeyGet3("/proxy/myid/", "/proxy/{id}/*", "id", "myid");
+        testKeyGet3("/proxy/myid/res", "/proxy/{id}/*", "id", "myid");
+        testKeyGet3("/proxy/myid/res/res2", "/proxy/{id}/*", "id", "myid");
+        testKeyGet3("/proxy/myid/res/res2/res3", "/proxy/{id}/*", "id", "myid");
+        testKeyGet3("/proxy/", "/proxy/{id}/*", "id", "");
+
+        testKeyGet3("/api/group1_group_name/project1_admin/info", "/api/{proj}_admin/info", "proj", "");
+        testKeyGet3("/{id/using/myresid", "/{id/using/{resId}", "resId", "myresid");
+        testKeyGet3("/{id/using/myresid/status}", "/{id/using/{resId}/status}", "resId", "myresid");
+
+        testKeyGet3("/proxy/myid/res/res2/res3", "/proxy/{id}/*/{res}", "res", "res3");
+        testKeyGet3("/api/project1_admin/info", "/api/{proj}_admin/info", "proj", "project1");
+        testKeyGet3("/api/group1_group_name/project1_admin/info", "/api/{g}_{gn}/{proj}_admin/info",
+            "g", "group1");
+        testKeyGet3("/api/group1_group_name/project1_admin/info", "/api/{g}_{gn}/{proj}_admin/info",
+            "gn", "group_name");
+        testKeyGet3("/api/group1_group_name/project1_admin/info", "/api/{g}_{gn}/{proj}_admin/info",
+            "proj", "project1");
+    }
+
+    @Test
     public void testRegexMatchFunc() {
         testRegexMatch("/topic/create", "/topic/create", true);
         testRegexMatch("/topic/create/123", "/topic/create", true);
